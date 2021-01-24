@@ -1,0 +1,23 @@
+[package]
+authors = ["Daniel Wiesenberg <weasy@hotmail.de>"]
+description = "Load and draw simple SVG files in Bevy."
+edition = "2018"
+license = "APACHE"
+name = "bevy_svg"
+readme = "README.md"
+repository = "https://github.com/Weasy666/bevy_svg/"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { git = "https://github.com/bevyengine/bevy", default-features = false, features = ["default", "trace"] }
+
+lyon_geom = "0.17"
+lyon_svg = "0.17"
+lyon_tessellation = "0.17"
+quick-xml = { version = "0.20", default-features = false, features = ["serialize"]}
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+
+[dev-dependencies]
+bevy = {git = "https://github.com/bevyengine/bevy", default-features = true}
