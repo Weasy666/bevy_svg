@@ -147,8 +147,12 @@ impl<'de> Deserialize<'de> for Style {
 
                     match split_style[0].to_lowercase().as_str() {
                         "fill" => {
-                            let color = split_style[1].parse().map_err(|e| E::custom(format!("{}", e)))?;
-                            style.fill = Some(style.fill.unwrap_or_default().with_color(color));
+                            let mut fill = style.fill.unwrap_or_default();
+                            if split_style[1] != "none" {
+                                let color = split_style[1].parse().map_err(|e| E::custom(format!("{} while parsing fill: {}", e, split_style[1])))?;
+                                fill = fill.with_color(color);
+                            }
+                            style.fill = Some(fill);
                         },
                         "fill-rule" => {
                             let fill_rule =  match split_style[1].to_lowercase().as_str() {
@@ -159,15 +163,15 @@ impl<'de> Deserialize<'de> for Style {
                             style.fill = Some(style.fill.unwrap_or_default().with_rule(fill_rule));
                         },
                         "fill-opacity" => {
-                            let opacity = split_style[1].parse().map_err(|e| E::custom(format!("{}", e)))?;
+                            let opacity = split_style[1].parse().map_err(|e| E::custom(format!("{} while parsing fill-opacity: {}", e, split_style[1])))?;
                             style.fill = Some(style.fill.unwrap_or_default().with_opacity(opacity));
                         },
                         "stroke" => {
-                            let color = split_style[1].parse().map_err(|e| E::custom(format!("{}", e)))?;
+                            let color = split_style[1].parse().map_err(|e| E::custom(format!("{} while parsing stroke: {}", e, split_style[1])))?;
                             style.stroke = Some(style.stroke.unwrap_or_default().with_color(color));
                         },
                         "stroke-opacity" => {
-                            let opacity = split_style[1].parse().map_err(|e| E::custom(format!("{}", e)))?;
+                            let opacity = split_style[1].parse().map_err(|e| E::custom(format!("{} while parsing stroke-opacity: {}", e, split_style[1])))?;
                             style.stroke = Some(style.stroke.unwrap_or_default().with_opacity(opacity));
                         },
                         "stroke-linecap" => {
@@ -190,11 +194,11 @@ impl<'de> Deserialize<'de> for Style {
                             style.stroke = Some(style.stroke.unwrap_or_default().with_line_join(line_join));
                         },
                         "stroke-miterlimit" => {
-                            let miter_limit = split_style[1].parse().map_err(|e| E::custom(format!("{}", e)))?;
+                            let miter_limit = split_style[1].parse().map_err(|e| E::custom(format!("{} while parsing stroke-miterlimit: {}", e, split_style[1])))?;
                             style.stroke = Some(style.stroke.unwrap_or_default().with_miter_limit(miter_limit));
                         },
                         "stroke-width" => {
-                            let width = split_style[1].parse().map_err(|e| E::custom(format!("{}", e)))?;
+                            let width = split_style[1].parse().map_err(|e| E::custom(format!("{} while parsing stroke-width: {}", e, split_style[1])))?;
                             style.stroke = Some(style.stroke.unwrap_or_default().with_width(width));
                         },
                         "clip-rule" => (), // This is currently not supported, but it is part of some SVGs i use and so i don't want to error out of the deserialization
