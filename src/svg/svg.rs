@@ -36,7 +36,7 @@ pub struct Svg {
     pub paths: Vec<Path>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 /// Origin of the coordinate system.
 pub enum Origin {
     /// Top left of the image or viewbox, this is the default for a SVG.
@@ -90,7 +90,12 @@ impl SvgBuilder {
         svg.file = self.file.file_name().unwrap().to_string_lossy().to_string();
         svg.origin = self.origin;
 
-        Ok(SvgBundle::new(svg).at_position(self.translation))
+        let translation = match self.origin {
+            Origin::Center => self.translation + Vec3::new(-svg.view_box.w as f32 / 2.0, svg.view_box.h as f32 / 2.0, 0.0),
+            _ => self.translation,
+        };
+
+        Ok(SvgBundle::new(svg).at_position(translation))
     }
 }
 
