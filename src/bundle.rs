@@ -66,4 +66,10 @@ impl SvgBundle {
         self.transform = transform;
         self
     }
+
+    /// Scale the SVG.
+    pub fn with_scale(mut self, scale: Vec2) -> SvgBundle {
+        self.transform.scale = Vec3::new(scale.x, -scale.y, 1.0);
+        self
+    }
 }

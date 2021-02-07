@@ -13,15 +13,16 @@
 
 use crate::svg::{DrawType, Svg};
 use bevy::{
-    app::{AppBuilder, Plugin}, asset::{Assets, Handle}, ecs::{Added, IntoSystem, Query, ResMut, SystemStage}, log::error,
+    app::{AppBuilder, Plugin}, asset::{Assets, Handle}, ecs::{Added, IntoSystem, Query, ResMut, StageLabel, SystemStage}, log::error,
     prelude::{Color, ColorMaterial}, render::{draw::Visible, mesh::{Indices, Mesh}, pipeline::PrimitiveTopology,},
 };
 use lyon_tessellation::{self, BuffersBuilder, FillOptions, FillTessellator, FillVertex, FillVertexConstructor, StrokeTessellator, StrokeVertex, StrokeVertexConstructor};
 
 /// Stages for this plugin.
-pub mod stage {
+#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
+pub enum Stage {
     /// Stage in which [`SvgBundle`](crate::bundle::SvgBundle)s get converted into drawable meshes.
-    pub const SVG: &str = "svg";
+    SVG,
 }
 
 /// The index type of a Bevy [`Mesh`](bevy::render::mesh::Mesh).
@@ -78,11 +79,11 @@ impl Plugin for SvgPlugin {
         app.insert_resource(fill_tess)
             .insert_resource(stroke_tess)
             .add_stage_after(
-                bevy::app::stage::UPDATE,
-                stage::SVG,
+                bevy::app::CoreStage::Update,
+                Stage::SVG,
                 SystemStage::parallel(),
             )
-            .add_system_to_stage(stage::SVG, svg_mesh_maker.system());
+            .add_system_to_stage(Stage::SVG, svg_mesh_maker.system());
     }
 }
 
