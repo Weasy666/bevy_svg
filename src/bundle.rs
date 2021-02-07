@@ -16,7 +16,7 @@ use bevy::{
 #[allow(missing_docs)]
 #[derive(Bundle)]
 pub struct SvgBundle {
-    pub svg: Svg,
+    pub svg: Svg ,
     pub sprite: Sprite,
     pub mesh: Handle<Mesh>,
     pub material: Handle<ColorMaterial>,
@@ -56,6 +56,14 @@ impl SvgBundle {
     /// Specifies the 3D position at which the [`SvgBundle`] will be spawned.
     pub fn at_position(mut self, translation: Vec3) -> SvgBundle {
         self.transform = Transform::from_translation(translation);
+        // Because of the different y-axis origin, we need to flip the SVG
+        self.transform.scale = Vec3::new(1.0, -1.0, 1.0);
+        self
+    }
+
+    /// Specifies a Transform.
+    pub fn with_transform(mut self, transform: Transform) -> SvgBundle {
+        self.transform = transform;
         self
     }
 }

@@ -11,15 +11,12 @@
 //! that creates a mesh for each entity that has been spawned as a
 //! `SvgBundle`.
 
-use crate::svg::Svg;
+use crate::svg::{DrawType, Svg};
 use bevy::{
     app::{AppBuilder, Plugin}, asset::{Assets, Handle}, ecs::{Added, IntoSystem, Query, ResMut, SystemStage}, log::error,
     prelude::{Color, ColorMaterial}, render::{draw::Visible, mesh::{Indices, Mesh}, pipeline::PrimitiveTopology,},
 };
-use lyon_tessellation::{
-    self, BuffersBuilder, FillTessellator, FillVertex, FillVertexConstructor,
-    StrokeTessellator, StrokeVertex, StrokeVertexConstructor,
-};
+use lyon_tessellation::{self, BuffersBuilder, FillOptions, FillTessellator, FillVertex, FillVertexConstructor, StrokeTessellator, StrokeVertex, StrokeVertexConstructor};
 
 /// Stages for this plugin.
 pub mod stage {
@@ -39,10 +36,13 @@ struct Vertex {
     position: [f32; 3],
     normal: [f32; 3],
     uv: [f32; 2],
+    color: [f32; 4],
 }
 
 /// Zero-sized type used to implement various vertex construction traits from Lyon.
-struct VertexConstructor;
+struct VertexConstructor {
+    color: Color,
+}
 
 /// Enables the construction of a [`Vertex`] when using a `FillTessellator`.
 impl FillVertexConstructor<Vertex> for VertexConstructor {
@@ -51,6 +51,7 @@ impl FillVertexConstructor<Vertex> for VertexConstructor {
             position: [vertex.position().x, vertex.position().y, 0.0],
             normal: [0.0, 0.0, 1.0],
             uv: [0.0, 0.0],
+            color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
         }
     }
 }
@@ -62,6 +63,7 @@ impl StrokeVertexConstructor<Vertex> for VertexConstructor {
             position: [vertex.position().x, vertex.position().y, 0.0],
             normal: [0.0, 0.0, 1.0],
             uv: [0.0, 0.0],
+            color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
         }
     }
 }
@@ -98,46 +100,30 @@ fn svg_mesh_maker(
     for (svg, mut mesh, mut material, mut visible) in query.iter_mut() {
         let mut buffers = VertexBuffers::new();
 
-        //TODO: Try to create a Texture with the colors specified in the SVG file and map the colors to
-        // the meshs UV coords...if that is possible
-        // let width;
-        // let height;
-        // let raw_data = i.into_raw();
-        // let texture = Texture::new(
-        //     Extent3d::new(width, height, 1),
-        //     TextureDimension::D2,
-        //     raw_data.as_slice().as_bytes().to_owned(),
-        //     TextureFormat::Rgba16Uint,
-        // );
+        //TODO: still need to do something about the color
         let mut color = None;
         for path in svg.paths.iter() {
-            if let Some(stroke) = path.style.stroke.or(svg.style.stroke) {
-                color = stroke.color.map(|c|
-                        Color::rgb_u8(c.red, c.green, c.blue)
-                            .set_a(stroke.opacity.unwrap_or(1.0)).to_owned()
-                    )
-                    .or(color);
-                if let Err(e) = stroke_tess.tessellate_path(
-                    path.d.as_slice(),
-                    &stroke.to_options(),
-                    &mut BuffersBuilder::new(&mut buffers, VertexConstructor)
-                ) {
-                    error!("StrokeTessellator error: {:?}", e)
-                }
+            if color.is_none() {
+                color = Some(path.color);
             }
-
-            if let Some(fill) = path.style.fill.or(svg.style.fill) {
-                color = fill.color.map(|c|
-                        Color::rgb_u8(c.red, c.green, c.blue)
-                            .set_a(fill.opacity.unwrap_or(1.0)).to_owned()
-                    )
-                    .or(color);
-                if let Err(e) = fill_tess.tessellate_path(
-                    path.d.as_slice(),
-                    &fill.to_options(),
-                    &mut BuffersBuilder::new(&mut buffers, VertexConstructor)
-                ) {
-                    error!("FillTessellator error: {:?}", e)
+            match path.draw_type {
+                DrawType::Fill => {
+                    if let Err(e) = fill_tess.tessellate(
+                        path.segments.clone(),
+                        &FillOptions::tolerance(0.001),
+                        &mut BuffersBuilder::new(&mut buffers, VertexConstructor { color: path.color })
+                    ) {
+                        error!("FillTessellator error: {:?}", e)
+                    }
+                },
+                DrawType::Stroke(opts) => {
+                    if let Err(e) = stroke_tess.tessellate(
+                        path.segments.clone(),
+                        &opts,
+                        &mut BuffersBuilder::new(&mut buffers, VertexConstructor { color: path.color })
+                    ) {
+                        error!("StrokeTessellator error: {:?}", e)
+                    }
                 }
             }
         }
@@ -174,6 +160,14 @@ fn build_mesh(buffers: &VertexBuffers) -> Mesh {
             .iter()
             .map(|v| v.uv)
             .collect::<Vec<[f32; 2]>>(),
+    );
+    mesh.set_attribute(
+        Mesh::ATTRIBUTE_COLOR,
+        buffers
+            .vertices
+            .iter()
+            .map(|v| v.color)
+            .collect::<Vec<[f32; 4]>>(),
     );
 
     mesh

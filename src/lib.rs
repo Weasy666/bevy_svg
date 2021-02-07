@@ -27,10 +27,10 @@
     clippy::cargo
 )]
 
-pub mod bundle;
-pub mod plugin;
-pub mod svg;
-pub mod utils;
+mod bundle;
+mod plugin;
+mod svg;
+mod utils;
 
 /// Import this module as `use bevy_svg::prelude::*` to get
 /// convenient imports.
