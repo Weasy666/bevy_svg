@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use bevy::{math::Vec3, prelude::{Color, Transform}};
+use bevy::{math::{Vec2, Vec3}, prelude::{Color, Transform}};
 use lyon_svg::parser::ViewBox;
 use lyon_tessellation::math::Point;
 use usvg::NodeExt;
@@ -42,6 +42,7 @@ pub struct SvgBuilder {
     file: PathBuf,
     origin: Origin,
     translation: Vec3,
+    scale: Vec2,
 }
 
 impl SvgBuilder {
@@ -51,6 +52,7 @@ impl SvgBuilder {
             file: PathBuf::from(path.as_ref()),
             origin: Origin::default(),
             translation: Vec3::default(),
+            scale: Vec2::new(1.0, 1.0),
         }
     }
 
@@ -68,6 +70,12 @@ impl SvgBuilder {
         self
     }
 
+    /// Value by which the SVG will be scaled, default is (1.0, 1.0).
+    pub fn scale(mut self, scale: Vec2) ->  SvgBuilder {
+        self.scale = scale;
+        self
+    }
+
     /// Load and finish the SVG content into a [`SvgBundle`], which then will be
     /// spawned by the [`SvgPlugin`].
     pub fn build<'s>(self) -> Result<SvgBundle, Box<dyn std::error::Error>> {
@@ -76,7 +84,11 @@ impl SvgBuilder {
         let size = svg_tree.svg_node().size;
 
         let translation = match self.origin {
-            Origin::Center => self.translation + Vec3::new(-view_box.rect.width() as f32 / 2.0, view_box.rect.height() as f32 / 2.0, 0.0),
+            Origin::Center => self.translation + Vec3::new(
+                -view_box.rect.width() as f32 * self.scale.x / 2.0,
+                view_box.rect.height() as f32 * self.scale.y / 2.0,
+                0.0
+            ),
             _ => self.translation,
         };
 
@@ -134,7 +146,7 @@ impl SvgBuilder {
             paths: descriptors,
         };
 
-        Ok(SvgBundle::new(svg).at_position(translation))
+        Ok(SvgBundle::new(svg).at_position(translation).with_scale(self.scale))
     }
 }
 
