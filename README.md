@@ -13,6 +13,17 @@ or PRs in general.
 Something else that i want to change, is how i load the SVG file. This would ideally use the Bevy asset manager,
 but i didn't have the time to take a deeper look at how it works or how i can integrate with it.
 
+## Examples
+### Complex shapes
+![](assets/complex_one_color.png)
+
+As you can see, even shapes with complex forms are working.
+
+### Multiple colors
+![](assets/two_colors.png)
+
+As stated above, multiple colors are currently not working and the color of the last path in the file is used for every path.
+
 ## Usage
 
 This crate is not yet on crates.io because it uses Bevy master. But i am planning to publish it as soon as Bevy 0.5 is released.
