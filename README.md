@@ -26,7 +26,7 @@ This crate is not yet on crates.io because it uses Bevy master. But i am plannin
 Until then, you need to copy this to your `Cargo.toml`
 
 ```toml
-bevy_svg = { git = "https://github.com/Weasy666/bevy_svg" }
+bevy_svg = { git = "https://github.com/Weasy666/bevy_svg", branch = "main" }
 ```
 
 Then use it like this.
