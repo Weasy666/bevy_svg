@@ -4,12 +4,8 @@ For one of my personal projects i needed a way to load and display some simple S
 so i took inspiration from [`bevy_prototype_lyon`] and modified and extended it to...well...load and display
 simple SVG files. It currently is rather limited. Ideally, this will change in the future. Currently i use
 [`usvg`] to load, parse and simplify an SVG or SVGZ file and afterwards use [`Lyon`] to tessellate and draw
-it as a [`Bevy`] mesh. For the color, the first occurance of a color in the file is used as the material
-for the resulting mesh, which is why every path on the mesh then has that same color.
+it as a [`Bevy`] mesh. SVG files with multiple colors are also working.
 
-In the future i want to change this, maybe use shader to draw the correct color of a [vertex](https://github.com/Weasy666/bevy_svg/blob/master/src/plugin.rs#L39) or doing
-some kind of UV magic...dunno, but if someone wants to tackle this, go for it! I will happily accept such a PR,
-or PRs in general.
 Something else that i want to change, is how i load the SVG file. This would ideally use the Bevy asset manager,
 but i didn't have the time to take a deeper look at how it works or how i can integrate with it.
 
@@ -22,7 +18,7 @@ As you can see, even shapes with complex forms are working.
 ### Multiple colors
 ![](assets/two_colors.png)
 
-As stated above, multiple colors are currently not working and the color of the last path in the file is used for every path.
+Multiple colors are also working.
 
 ## Usage
 

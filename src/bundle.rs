@@ -1,13 +1,13 @@
 //! Bevy [`Bundle`] representing an SVG entity.
 
-use crate::svg::Svg;
+use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::Svg};
 use bevy::{
     asset::Handle, ecs::Bundle, math::{Vec2, Vec3},
     render::{
         draw::{Draw, Visible}, mesh::Mesh, pipeline::{RenderPipeline, RenderPipelines},
         render_graph::base::MainPass,
     },
-    sprite::{ColorMaterial, Sprite, QUAD_HANDLE, SPRITE_PIPELINE_HANDLE},
+    sprite::{Sprite, QUAD_HANDLE},
     transform::components::{GlobalTransform, Transform}
 };
 
@@ -19,7 +19,7 @@ pub struct SvgBundle {
     pub svg: Svg ,
     pub sprite: Sprite,
     pub mesh: Handle<Mesh>,
-    pub material: Handle<ColorMaterial>,
+    pub material: Handle<SvgMaterial>,
     pub main_pass: MainPass,
     pub draw: Draw,
     pub visible: Visible,
@@ -35,7 +35,7 @@ impl SvgBundle {
             svg,
             mesh: QUAD_HANDLE.typed(),
             render_pipelines: RenderPipelines::from_pipelines(vec![RenderPipeline::new(
-                SPRITE_PIPELINE_HANDLE.typed(),
+                SVG_PIPELINE_HANDLE.typed(),
             )]),
             visible: Visible {
                 is_visible: false,

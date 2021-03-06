@@ -13,10 +13,22 @@
 
 use crate::svg::{DrawType, Svg};
 use bevy::{
-    app::{AppBuilder, Plugin}, asset::{Assets, Handle}, ecs::{Added, IntoSystem, Query, ResMut, StageLabel, SystemStage}, log::error,
-    prelude::{Color, ColorMaterial}, render::{draw::Visible, mesh::{Indices, Mesh}, pipeline::PrimitiveTopology,},
+    app::{AppBuilder, Plugin}, asset::{Assets, Handle},
+    asset::{AddAsset, HandleUntyped},
+    ecs::{Added, IntoSystem, Query, ResMut, StageLabel, SystemStage},
+    log::error,
+    reflect::TypeUuid,
+    render::{
+        color::Color, draw::Visible, mesh::{Indices, Mesh},
+        pipeline::{PipelineDescriptor, PrimitiveTopology},
+        render_graph::{AssetRenderResourcesNode, base, RenderGraph},
+        renderer::RenderResources,
+        shader::{Shader, ShaderStage, ShaderStages}
+    },
 };
 use lyon_tessellation::{self, BuffersBuilder, FillOptions, FillTessellator, FillVertex, FillVertexConstructor, StrokeTessellator, StrokeVertex, StrokeVertexConstructor};
+
+pub const SVG_PIPELINE_HANDLE: HandleUntyped = HandleUntyped::weak_from_u64(PipelineDescriptor::TYPE_UUID, 8514826620251853414);
 
 /// Stages for this plugin.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
@@ -76,8 +88,10 @@ impl Plugin for SvgPlugin {
     fn build(&self, app: &mut AppBuilder) {
         let fill_tess = FillTessellator::new();
         let stroke_tess = StrokeTessellator::new();
-        app.insert_resource(fill_tess)
+        app.add_asset::<SvgMaterial>()
+            .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
+            .add_startup_system(setup.system())
             .add_stage_after(
                 bevy::app::CoreStage::Update,
                 Stage::SVG,
@@ -87,18 +101,46 @@ impl Plugin for SvgPlugin {
     }
 }
 
+fn setup(
+    mut pipelines: ResMut<Assets<PipelineDescriptor>>,
+    mut shaders: ResMut<Assets<Shader>>,
+    mut render_graph: ResMut<RenderGraph>,
+) {
+    // Create a new shader pipeline
+    pipelines.set_untracked(
+        SVG_PIPELINE_HANDLE,
+        PipelineDescriptor::default_config(ShaderStages {
+            vertex: shaders.add(Shader::from_glsl(ShaderStage::Vertex, VERTEX_SHADER)),
+            fragment: Some(shaders.add(Shader::from_glsl(ShaderStage::Fragment, FRAGMENT_SHADER))),
+        })
+    );
+
+    // Add an AssetRenderResourcesNode to our Render Graph. This will bind MyMaterialWithVertexColorSupport resources to our shader
+    render_graph.add_system_node(
+        "svg_material",
+        AssetRenderResourcesNode::<SvgMaterial>::new(true),
+    );
+
+    // Add a Render Graph edge connecting our new "my_material" node to the main pass node. This ensures "my_material" runs before the main pass
+    render_graph
+        .add_node_edge(
+            "svg_material",
+            base::node::MAIN_PASS,
+        )
+        .unwrap();
+}
+
 /// Bevy system which queries all [`SvgBundle`]s to complete them with a mesh and material.
 fn svg_mesh_maker(
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (&Svg, &mut Handle<Mesh>, &mut Handle<ColorMaterial>, &mut Visible),
+        (&Svg, &mut Handle<Mesh>, &mut Visible),
         Added<Svg>
     >,
 ) {
-    for (svg, mut mesh, mut material, mut visible) in query.iter_mut() {
+    for (svg, mut mesh, mut visible) in query.iter_mut() {
         let mut buffers = VertexBuffers::new();
 
         //TODO: still need to do something about the color
@@ -129,7 +171,7 @@ fn svg_mesh_maker(
             }
         }
 
-        *material = materials.add(color.unwrap_or(Color::BLACK).into());
+        //*material = materials.add(color.unwrap_or(Color::BLACK).into());
         *mesh = meshes.add(build_mesh(&buffers));
         visible.is_visible = true;
     }
@@ -173,3 +215,37 @@ fn build_mesh(buffers: &VertexBuffers) -> Mesh {
 
     mesh
 }
+
+#[derive(RenderResources, Default, TypeUuid)]
+#[uuid = "d2c5985d-e221-4257-9e3b-ff0fb87e28ba"]
+pub struct SvgMaterial;
+
+const VERTEX_SHADER: &str = r#"
+#version 450
+layout(location = 0) in vec3 Vertex_Position;
+layout(location = 1) in vec4 Vertex_Color;
+
+layout(location = 0) out vec4 v_color;
+
+layout(set = 0, binding = 0) uniform Camera {
+    mat4 ViewProj;
+};
+layout(set = 1, binding = 0) uniform Transform {
+    mat4 Model;
+};
+
+void main() {
+    gl_Position = ViewProj * Model * vec4(Vertex_Position, 1.0);
+    v_color = Vertex_Color;
+}
+"#;
+
+const FRAGMENT_SHADER: &str = r#"
+#version 450
+layout(location = 0) in vec4 v_color;
+layout(location = 0) out vec4 o_Target;
+
+void main() {
+    o_Target = v_color;
+}
+"#;
