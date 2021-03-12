@@ -16,7 +16,7 @@ fn main() {
         .run();
 }
 
-fn setup(commands: &mut Commands) {
+fn setup(mut commands: Commands) {
     commands.spawn(OrthographicCameraBundle::new_2d())
         .spawn(SvgBuilder::from_file("examples/assets/asteroid_field.svg")
             .origin(Origin::Center)

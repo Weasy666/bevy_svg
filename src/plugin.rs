@@ -15,7 +15,11 @@ use crate::svg::{DrawType, Svg};
 use bevy::{
     app::{AppBuilder, Plugin}, asset::{Assets, Handle},
     asset::{AddAsset, HandleUntyped},
-    ecs::{Added, IntoSystem, Query, ResMut, StageLabel, SystemStage},
+    ecs::{
+        query::Added,
+        schedule::{StageLabel, SystemStage},
+        system::{IntoSystem, Query, ResMut}
+    },
     log::error,
     reflect::TypeUuid,
     render::{

@@ -2,7 +2,7 @@
 
 use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::Svg};
 use bevy::{
-    asset::Handle, ecs::Bundle, math::{Vec2, Vec3},
+    asset::Handle, ecs::bundle::Bundle, math::{Vec2, Vec3},
     render::{
         draw::{Draw, Visible}, mesh::Mesh, pipeline::{RenderPipeline, RenderPipelines},
         render_graph::base::MainPass,
