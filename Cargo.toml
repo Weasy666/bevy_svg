@@ -18,7 +18,7 @@ bevy = { git = "https://github.com/bevyengine/bevy", rev = "3319195f9036e9ee3015
 lyon_geom = "0.17"
 lyon_svg = "0.17"
 lyon_tessellation = "0.17"
-usvg = "0.13"
+usvg = "0.14"
 
 [dev-dependencies]
 bevy = { git = "https://github.com/bevyengine/bevy", rev = "3319195f9036e9ee301545632b98f1090a3ba3b0", default-features = true }
