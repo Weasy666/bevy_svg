@@ -30,7 +30,7 @@
 mod bundle;
 mod plugin;
 mod svg;
-mod utils;
+mod vertex_buffer;
 
 /// Import this module as `use bevy_svg::prelude::*` to get
 /// convenient imports.
@@ -39,4 +39,10 @@ pub mod prelude {
     pub use lyon_tessellation::{
         FillOptions, FillRule, LineCap, LineJoin, Orientation, StrokeOptions,
     };
+}
+
+/// A locally defined [`std::convert::Into`] surrogate to overcome orphan rules.
+pub trait Convert<T>: Sized {
+    /// Converts the value to `T`.
+    fn convert(self) -> T;
 }
