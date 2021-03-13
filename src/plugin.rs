@@ -96,16 +96,19 @@ fn svg_mesh_maker(
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (&Svg, &mut Handle<Mesh>, &mut Visible),
+        (&mut Svg, &mut Handle<Mesh>, &mut Visible),
         Added<Svg>
     >,
 ) {
-    for (svg, mut mesh, mut visible) in query.iter_mut() {
+    for (mut svg, mut mesh, mut visible) in query.iter_mut() {
         let mut buffers = VertexBuffers::new();
 
-        //TODO: still need to do something about the color
+        //TODO: still need to do something about the color, it is pretty washed out
         let mut color = None;
-        for path in svg.paths.iter() {
+        // Convert path descriptors into vertices and afterwards drop the descriptor
+        // to save memory. If one really needs to access the paths again, then they
+        // can be loaded with the `Svg` struct.
+        while let Some(path) = svg.paths.pop() {
             if color.is_none() {
                 color = Some(path.color);
             }
