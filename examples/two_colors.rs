@@ -17,8 +17,8 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(OrthographicCameraBundle::new_2d())
-        .spawn(SvgBuilder::from_file("examples/assets/neutron_star.svg")
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(SvgBuilder::from_file("examples/assets/neutron_star.svg")
             .origin(Origin::Center)
             .position(Vec3::new(0.0, 0.0, 0.0))
             .build()
