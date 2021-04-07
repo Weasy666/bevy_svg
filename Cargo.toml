@@ -2,18 +2,18 @@
 authors = ["Daniel Wiesenberg <weasy@hotmail.de>"]
 description = "Load and draw simple SVG files in Bevy."
 edition = "2018"
-license = "APACHE"
+license = "Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
 repository = "https://github.com/Weasy666/bevy_svg/"
-version = "0.2.4"
+version = "0.3.0"
 keywords = ["gamedev", "graphics", "bevy", "svg"]
 categories = ["Graphics", "Game engines", "Rendering"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy", branch = "main", default-features = false, features = ["render", "trace"] }
+bevy = { version = "0.5", default-features = false, features = ["render", "trace"] }
 
 lyon_geom = "0.17"
 lyon_svg = "0.17"
@@ -21,4 +21,4 @@ lyon_tessellation = "0.17"
 usvg = "0.14"
 
 [dev-dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy", branch = "main", default-features = true }
+bevy = { version = "0.5", default-features = true }

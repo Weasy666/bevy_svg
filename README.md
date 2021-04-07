@@ -1,4 +1,6 @@
 # bevy_svg
+[![Crates.io](https://img.shields.io/crates/v/bevy_svg.svg)](https://crates.io/crates/bevy_svg)
+[![license](https://img.shields.io/badge/license-Apache-blue.svg)](./LICENSE)
 
 For one of my personal projects i needed a way to load and display some simple SVG files/shapes in [`Bevy`],
 so i took inspiration from [`bevy_prototype_lyon`] and modified and extended it to...well...load and display
@@ -8,6 +10,9 @@ it as a [`Bevy`] mesh. SVG files with multiple colors are also working.
 
 Something else that i want to change, is how i load the SVG file. This would ideally use the Bevy asset manager,
 but i didn't have the time to take a deeper look at how it works or how i can integrate with it.
+
+The `main`-branch will track Bevy's `main`-branch as closely as i can with the free time i have. From Bevy `0.5` on,
+i will create a branch for each `0.*` release to be able to implement fixes and maybe backport some features.
 
 ## Examples
 ### Complex shapes
