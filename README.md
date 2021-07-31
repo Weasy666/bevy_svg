@@ -45,24 +45,24 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
-        .spawn(OrthographicCameraBundle::new_2d())
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(svg_drawer.system());
+        .add_startup_system(setup.system());
         .run();
 }
 
 /// Just a marker.
 struct SVG;
 
-fn svg_drawer(commands: &mut Commands) {
-    commands.spawn(
+fn setup(mut commands: Commands) {
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(
         SvgBuilder::from_file("path/to/file.svg")
             .origin(Origin::Center)
             .position(Vec3::new(0.0, 0.0, 0.0))
             .build()
             .expect("File not found")
     )
-    .with(SVG);
+    .insert(SVG);
 }
 ```
 

@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{io::Read, path::PathBuf};
 use bevy::{math::{Vec2, Vec3}, prelude::{Color, Transform}};
 use lyon_svg::parser::ViewBox;
 use lyon_tessellation::math::Point;
@@ -10,7 +10,7 @@ use crate::bundle::SvgBundle;
 #[derive(Debug)]
 pub struct Svg {
     /// The name of the file.
-    pub file: String,
+    pub name: String,
     /// Width of the SVG.
     pub width: f64,
     /// Height of the SVG.
@@ -37,19 +37,52 @@ impl Default for Origin {
     }
 }
 
+enum Data<'a> {
+    Bytes(&'a [u8]),
+    File(PathBuf),
+    Reader(Box<dyn std::io::Read>),
+}
+
 /// Builder for loading a SVG file and building a [`SvgBundle`].
-pub struct SvgBuilder {
-    file: PathBuf,
+pub struct SvgBuilder<'a> {
+    name: String,
+    //reader: Option<Box<dyn std::io::Read>>,
+    //file: Option<PathBuf>,
+    data: Data<'a>,
     origin: Origin,
     translation: Vec3,
     scale: Vec2,
 }
 
-impl SvgBuilder {
+impl<'a> SvgBuilder<'a> {
     /// Create a [`SvgBuilder`] to load a SVG from a file.
-    pub fn from_file<P: AsRef<std::path::Path>>(path: P) -> SvgBuilder {
+    pub fn from_file<P: AsRef<std::path::Path>>(path: P) -> SvgBuilder<'a> {
+        let path = PathBuf::from(path.as_ref());
         SvgBuilder {
-            file: PathBuf::from(path.as_ref()),
+            name: path.file_name().unwrap().to_string_lossy().to_string(),
+            data: Data::File(path),
+            origin: Origin::default(),
+            translation: Vec3::default(),
+            scale: Vec2::new(1.0, 1.0),
+        }
+    }
+
+    /// Create a [`SvgBuilder`] from a reader.
+    pub fn from_reader<R: 'static + std::io::Read>(reader: R, name: &str) -> SvgBuilder<'a> {
+        SvgBuilder {
+            name: name.to_string(),
+            data: Data::Reader(Box::new(reader)),
+            origin: Origin::default(),
+            translation: Vec3::default(),
+            scale: Vec2::new(1.0, 1.0),
+        }
+    }
+
+    /// Create a [`SvgBuilder`] from bytes.
+    pub fn from_bytes(bytes: &'a [u8], name: &str) -> SvgBuilder<'a> {
+        SvgBuilder {
+            name: name.to_string(),
+            data: Data::Bytes(bytes),
             origin: Origin::default(),
             translation: Vec3::default(),
             scale: Vec2::new(1.0, 1.0),
@@ -58,20 +91,20 @@ impl SvgBuilder {
 
     /// Change the origin of the SVG's coordinate system. The origin is also the
     /// Bevy origin.
-    pub fn origin(mut self, origin: Origin) -> SvgBuilder {
+    pub fn origin(mut self, origin: Origin) -> SvgBuilder<'a> {
         self.origin = origin;
         self
     }
 
     /// Position at which the [`SvgBundle`] will be spawned in Bevy. The origin
     /// of the SVG coordinate system will be at this position.
-    pub fn position(mut self, translation: Vec3) ->  SvgBuilder {
+    pub fn position(mut self, translation: Vec3) ->  SvgBuilder<'a> {
         self.translation = translation;
         self
     }
 
     /// Value by which the SVG will be scaled, default is (1.0, 1.0).
-    pub fn scale(mut self, scale: Vec2) ->  SvgBuilder {
+    pub fn scale(mut self, scale: Vec2) ->  SvgBuilder<'a> {
         self.scale = scale;
         self
     }
@@ -82,7 +115,16 @@ impl SvgBuilder {
         let mut opt = usvg::Options::default();
         opt.fontdb.load_system_fonts();
 
-        let svg_data = std::fs::read(&self.file)?;
+        let mut svg_data = Vec::new();
+        match self.data {
+            Data::Bytes(bytes) => svg_data = bytes.to_vec(),
+            Data::File(path) => {
+                let mut file = std::fs::File::open(path)?;
+                file.read_to_end(&mut svg_data)?;
+            },
+            Data::Reader(mut reader) => { reader.read_to_end(&mut svg_data)?; },
+        }
+
         let svg_tree = usvg::Tree::from_data(&svg_data, &opt)?;
 
         let view_box = svg_tree.svg_node().view_box;
@@ -138,7 +180,7 @@ impl SvgBuilder {
         }
 
         let svg = Svg {
-            file: self.file.file_name().unwrap().to_string_lossy().to_string(),
+            name: self.name.to_string(),
             width: size.width(),
             height: size.height(),
             view_box: ViewBox {
