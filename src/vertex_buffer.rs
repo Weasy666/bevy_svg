@@ -10,8 +10,6 @@ use crate::Convert;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) struct Vertex {
     position: [f32; 3],
-    normal: [f32; 3],
-    uv: [f32; 2],
     color: [f32; 4],
 }
 
@@ -24,14 +22,10 @@ pub(crate) type VertexBuffers = lyon_tessellation::VertexBuffers<Vertex, IndexTy
 impl Convert<Mesh> for VertexBuffers {
     fn convert(self) -> Mesh {
         let mut positions = Vec::with_capacity(self.vertices.len());
-        let mut normals = Vec::with_capacity(self.vertices.len());
-        let mut uvs = Vec::with_capacity(self.vertices.len());
         let mut colors = Vec::with_capacity(self.vertices.len());
 
         self.vertices.iter().for_each(|v| {
             positions.push(v.position);
-            normals.push(v.normal);
-            uvs.push(v.uv);
             colors.push(v.color);
         });
 
@@ -40,14 +34,6 @@ impl Convert<Mesh> for VertexBuffers {
         mesh.set_attribute(
             Mesh::ATTRIBUTE_POSITION,
             positions
-        );
-        mesh.set_attribute(
-            Mesh::ATTRIBUTE_NORMAL,
-            normals
-        );
-        mesh.set_attribute(
-            Mesh::ATTRIBUTE_UV_0,
-            uvs
         );
         mesh.set_attribute(
             Mesh::ATTRIBUTE_COLOR,
@@ -68,8 +54,6 @@ impl FillVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: FillVertex) -> Vertex {
         Vertex {
             position: [vertex.position().x, vertex.position().y, 0.0],
-            normal: [0.0, 0.0, 1.0],
-            uv: [0.0, 0.0],
             color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
         }
     }
@@ -80,8 +64,6 @@ impl StrokeVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: StrokeVertex) -> Vertex {
         Vertex {
             position: [vertex.position().x, vertex.position().y, 0.0],
-            normal: [0.0, 0.0, 1.0],
-            uv: [0.0, 0.0],
             color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
         }
     }

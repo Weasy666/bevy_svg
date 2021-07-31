@@ -7,7 +7,7 @@ use bevy::{
         draw::{Draw, Visible}, mesh::Mesh, pipeline::{RenderPipeline, RenderPipelines},
         render_graph::base::MainPass,
     },
-    sprite::{Sprite, QUAD_HANDLE},
+    sprite::QUAD_HANDLE,
     transform::components::{GlobalTransform, Transform}
 };
 
@@ -17,7 +17,6 @@ use bevy::{
 #[derive(Bundle)]
 pub struct SvgBundle {
     pub svg: Svg ,
-    pub sprite: Sprite,
     pub mesh: Handle<Mesh>,
     pub material: Handle<SvgMaterial>,
     pub main_pass: MainPass,
@@ -43,10 +42,6 @@ impl SvgBundle {
             },
             main_pass: MainPass,
             draw: Default::default(),
-            sprite: Sprite {
-                size: Vec2::new(1.0, 1.0),
-                ..Default::default()
-            },
             material: Default::default(),
             transform: Default::default(),
             global_transform: Default::default(),
