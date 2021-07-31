@@ -79,17 +79,22 @@ impl SvgBuilder {
     /// Load and finish the SVG content into a [`SvgBundle`], which then will be
     /// spawned by the [`SvgPlugin`].
     pub fn build<'s>(self) -> Result<SvgBundle, Box<dyn std::error::Error>> {
-        let svg_tree = usvg::Tree::from_file(&self.file, &usvg::Options::default())?;
+        let mut opt = usvg::Options::default();
+        opt.fontdb.load_system_fonts();
+
+        let svg_data = std::fs::read(&self.file)?;
+        let svg_tree = usvg::Tree::from_data(&svg_data, &opt)?;
+
         let view_box = svg_tree.svg_node().view_box;
         let size = svg_tree.svg_node().size;
 
         let translation = match self.origin {
             Origin::Center => self.translation + Vec3::new(
-                -view_box.rect.width() as f32 * self.scale.x / 2.0,
-                view_box.rect.height() as f32 * self.scale.y / 2.0,
+                -size.width() as f32 * self.scale.x / 2.0,
+                size.height() as f32 * self.scale.y / 2.0,
                 0.0
             ),
-            _ => self.translation,
+            Origin::TopLeft => self.translation,
         };
 
         let mut descriptors = Vec::new();
