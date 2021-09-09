@@ -1,8 +1,7 @@
 use std::path::PathBuf;
-use bevy::{math::{Vec2, Vec3}, prelude::{Color, Transform}};
+use bevy::{math::{Mat4, Vec2, Vec3}, prelude::{Color, Transform}};
 use lyon_svg::parser::ViewBox;
 use lyon_tessellation::math::Point;
-use usvg::NodeExt;
 
 use crate::bundle::SvgBundle;
 
@@ -96,13 +95,23 @@ impl SvgBuilder {
 
         for node in svg_tree.root().descendants() {
             if let usvg::NodeKind::Path(ref p) = *node.borrow() {
-                let t = node.abs_transform();
-                let mat = bevy::math::Mat4::from_cols(
+                let t = &p.transform;
+
+                // For some reason transform has sometimes negative scale values.
+                // Here we correct to positive values.
+                let (scale_x, scale_y) = (
+                    if t.a < 0.0 { -1.0 } else { 1.0 },
+                    if t.d < 0.0 { -1.0 } else { 1.0 }
+                );
+                let scale = lyon_geom::Transform::scale(scale_x, scale_y);
+
+                let mut mat = Mat4::from_cols(
                     [t.a as f32, t.b as f32, 0.0, 0.0].into(),
                     [t.c as f32, t.d as f32, 0.0, 0.0].into(),
-                    [t.e as f32, t.f as f32, 1.0, 0.0].into(),
-                    [0.0, 0.0, 0.0, 1.0].into()
+                    [0.0, 0.0, 1.0, 0.0].into(),
+                    [t.e as f32, t.f as f32, 0.0, 1.0].into()
                 );
+                mat = mat * Mat4::from_scale(Vec3::new(scale_x, scale_y, 1.0));
 
                 if let Some(ref fill) = p.fill {
                     let color = match fill.paint {
@@ -112,7 +121,9 @@ impl SvgBuilder {
                     };
 
                     descriptors.push(PathDescriptor {
-                        segments: convert_path(p).collect(),
+                        segments: convert_path(p)
+                            .map(|p| p.transformed(&scale))
+                            .collect(),
                         abs_transform: Transform::from_matrix(mat),
                         color,
                         draw_type: DrawType::Fill,
@@ -123,7 +134,9 @@ impl SvgBuilder {
                     let (color, stroke_opts) = convert_stroke(stroke);
 
                     descriptors.push(PathDescriptor {
-                        segments: convert_path(p).collect(),
+                        segments: convert_path(p)
+                            .map(|p| p.transformed(&scale))
+                            .collect(),
                         abs_transform: Transform::from_matrix(mat),
                         color,
                         draw_type: DrawType::Stroke(stroke_opts),
