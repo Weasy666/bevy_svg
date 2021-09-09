@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+use bevy::math::Vec3;
 use bevy::render::{
     color::Color, mesh::{Indices, Mesh},
     pipeline::PrimitiveTopology,
@@ -67,4 +69,31 @@ impl StrokeVertexConstructor<Vertex> for VertexConstructor {
             color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
         }
     }
+}
+
+pub(crate) fn apply_transform(buffer: &mut VertexBuffers, transform: Transform) {
+    for mut vertex in buffer.vertices.iter_mut() {
+        let pos = transform * Vec3::new(
+            vertex.position[0],
+            vertex.position[1],
+            0.0
+        );
+
+        vertex.position[0] = pos.x;
+        vertex.position[1] = pos.y;
+    }
+}
+
+pub(crate) fn merge_buffers(buffers: Vec<VertexBuffers>) -> VertexBuffers {
+    let mut buffer = VertexBuffers::new();
+    let mut offset = 0;
+
+    for buf in buffers.iter() {
+        buffer.vertices.extend(&buf.vertices);
+        buffer.indices.extend(buf.indices.iter().map(|i| i + offset));
+
+        offset += buf.vertices.len() as u32;
+    }
+
+    buffer
 }

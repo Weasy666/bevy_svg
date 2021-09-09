@@ -11,7 +11,11 @@
 //! that creates a mesh for each entity that has been spawned as a
 //! `SvgBundle`.
 
-use crate::{Convert, svg::{DrawType, Svg}, vertex_buffer::{VertexBuffers, VertexConstructor}};
+use crate::{
+    Convert,
+    svg::{DrawType, Svg},
+    vertex_buffer::{VertexBuffers, VertexConstructor, apply_transform, merge_buffers}
+};
 use bevy::{
     app::{AppBuilder, Plugin}, asset::{Assets, Handle},
     asset::{AddAsset, HandleUntyped},
@@ -101,7 +105,7 @@ fn svg_mesh_maker(
     >,
 ) {
     for (mut svg, mut mesh, mut visible) in query.iter_mut() {
-        let mut buffers = VertexBuffers::new();
+        let mut buffers = Vec::new();
 
         //TODO: still need to do something about the color, it is pretty washed out
         let mut color = None;
@@ -109,15 +113,18 @@ fn svg_mesh_maker(
         // to save memory. If one really needs to access the paths again, then they
         // can be loaded with the `Svg` struct.
         while let Some(path) = svg.paths.pop() {
+            let mut buffer = VertexBuffers::new();
+
             if color.is_none() {
                 color = Some(path.color);
             }
+
             match path.draw_type {
                 DrawType::Fill => {
                     if let Err(e) = fill_tess.tessellate(
                         path.segments.clone(),
                         &FillOptions::tolerance(0.001),
-                        &mut BuffersBuilder::new(&mut buffers, VertexConstructor { color: path.color })
+                        &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color })
                     ) {
                         error!("FillTessellator error: {:?}", e)
                     }
@@ -126,15 +133,18 @@ fn svg_mesh_maker(
                     if let Err(e) = stroke_tess.tessellate(
                         path.segments.clone(),
                         &opts,
-                        &mut BuffersBuilder::new(&mut buffers, VertexConstructor { color: path.color })
+                        &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color })
                     ) {
                         error!("StrokeTessellator error: {:?}", e)
                     }
                 }
             }
+
+            apply_transform(&mut buffer, path.abs_transform);
+            buffers.push(buffer);
         }
 
-        *mesh = meshes.add(buffers.convert());
+        *mesh = meshes.add(merge_buffers(buffers).convert());
         visible.is_visible = true;
     }
 }
