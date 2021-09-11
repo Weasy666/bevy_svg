@@ -18,7 +18,7 @@ bevy = { version = "0.5", default-features = false, features = ["render", "trace
 lyon_geom = "0.17"
 lyon_svg = "0.17"
 lyon_tessellation = "0.17"
-usvg = "0.15"
+usvg = "0.17"
 
 [dev-dependencies]
 bevy = { version = "0.5", default-features = true }

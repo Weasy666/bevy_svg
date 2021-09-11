@@ -124,7 +124,7 @@ impl<'a> SvgBuilder<'a> {
             Data::Reader(mut reader) => { reader.read_to_end(&mut svg_data)?; },
         }
 
-        let svg_tree = usvg::Tree::from_data(&svg_data, &opt)?;
+        let svg_tree = usvg::Tree::from_data(&svg_data, &opt.to_ref())?;
 
         let view_box = svg_tree.svg_node().view_box;
         let size = svg_tree.svg_node().size;
