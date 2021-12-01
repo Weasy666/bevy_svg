@@ -25,6 +25,8 @@ pub struct SvgFile {
     pub origin: Origin,
     /// All paths that make up the SVG
     pub paths: Vec<PathDescriptor>,
+    /// If the SVG is visible after it is instantiated.
+    pub is_visible: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -55,6 +57,7 @@ pub struct SvgBuilder<'a> {
     origin: Origin,
     translation: Vec3,
     scale: Vec2,
+    is_visible: bool,
 }
 
 impl<'a> SvgBuilder<'a> {
@@ -67,6 +70,7 @@ impl<'a> SvgBuilder<'a> {
             origin: Origin::default(),
             translation: Vec3::default(),
             scale: Vec2::new(1.0, 1.0),
+            is_visible: true,
         }
     }
 
@@ -78,6 +82,7 @@ impl<'a> SvgBuilder<'a> {
             origin: Origin::default(),
             translation: Vec3::default(),
             scale: Vec2::new(1.0, 1.0),
+            is_visible: true,
         }
     }
 
@@ -89,6 +94,7 @@ impl<'a> SvgBuilder<'a> {
             origin: Origin::default(),
             translation: Vec3::default(),
             scale: Vec2::new(1.0, 1.0),
+            is_visible: true,
         }
     }
 
@@ -109,6 +115,12 @@ impl<'a> SvgBuilder<'a> {
     /// Value by which the SVG will be scaled, default is (1.0, 1.0).
     pub fn scale(mut self, scale: Vec2) ->  SvgBuilder<'a> {
         self.scale = scale;
+        self
+    }
+
+    /// Value by which the SVG will be scaled, default is (1.0, 1.0).
+    pub fn is_visible(mut self, visible: bool) ->  SvgBuilder<'a> {
+        self.is_visible = visible;
         self
     }
 
@@ -208,6 +220,7 @@ impl<'a> SvgBuilder<'a> {
             },
             origin: self.origin,
             paths: descriptors,
+            is_visible: self.is_visible,
         };
 
         Ok(SvgBundle::new(svg).at_position(translation).with_scale(self.scale))

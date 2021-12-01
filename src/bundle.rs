@@ -31,6 +31,7 @@ pub struct SvgBundle {
 impl SvgBundle {
     /// Create a new [`SvgBundle`] from a [`SvgFile`].
     pub fn new(svg: SvgFile) -> SvgBundle {
+        let is_visible = svg.is_visible;
         Self {
             marker: Svg {},
             svg,
@@ -39,7 +40,7 @@ impl SvgBundle {
                 SVG_PIPELINE_HANDLE.typed(),
             )]),
             visible: Visible {
-                is_visible: false,
+                is_visible,
                 is_transparent: true,
             },
             main_pass: MainPass,

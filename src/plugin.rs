@@ -27,7 +27,7 @@ use bevy::{
     log::error,
     reflect::TypeUuid,
     render::{
-        draw::Visible, mesh::Mesh,
+        mesh::Mesh,
         pipeline::PipelineDescriptor,
         render_graph::{AssetRenderResourcesNode, base, RenderGraph},
         renderer::RenderResources,
@@ -100,11 +100,11 @@ fn svg_mesh_maker(
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (&mut SvgFile, &mut Handle<Mesh>, &mut Visible),
+        (&mut SvgFile, &mut Handle<Mesh>),
         Added<SvgFile>
     >,
 ) {
-    for (mut svg, mut mesh, mut visible) in query.iter_mut() {
+    for (mut svg, mut mesh) in query.iter_mut() {
         let mut buffers = Vec::new();
 
         //TODO: still need to do something about the color, it is pretty washed out
@@ -145,7 +145,6 @@ fn svg_mesh_maker(
         }
 
         *mesh = meshes.add(merge_buffers(buffers).convert());
-        visible.is_visible = true;
     }
 }
 
