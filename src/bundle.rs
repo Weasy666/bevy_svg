@@ -1,6 +1,6 @@
 //! Bevy [`Bundle`] representing an SVG entity.
 
-use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::Svg};
+use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::{Svg, SvgFile}};
 use bevy::{
     asset::Handle, ecs::bundle::Bundle, math::{Vec2, Vec3},
     render::{
@@ -16,7 +16,8 @@ use bevy::{
 #[allow(missing_docs)]
 #[derive(Bundle)]
 pub struct SvgBundle {
-    pub svg: Svg ,
+    marker: Svg,
+    pub svg: SvgFile,
     pub mesh: Handle<Mesh>,
     pub material: Handle<SvgMaterial>,
     pub main_pass: MainPass,
@@ -28,9 +29,10 @@ pub struct SvgBundle {
 }
 
 impl SvgBundle {
-    /// Create a new [`SvgBundle`] from a [`Svg`].
-    pub fn new(svg: Svg) -> SvgBundle {
+    /// Create a new [`SvgBundle`] from a [`SvgFile`].
+    pub fn new(svg: SvgFile) -> SvgBundle {
         Self {
+            marker: Svg {},
             svg,
             mesh: QUAD_HANDLE.typed(),
             render_pipelines: RenderPipelines::from_pipelines(vec![RenderPipeline::new(

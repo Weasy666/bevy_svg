@@ -5,9 +5,14 @@ use lyon_tessellation::math::Point;
 
 use crate::bundle::SvgBundle;
 
+
+/// A marker struct, to enable Bevy queries.
+#[derive(Debug)]
+pub struct Svg {}
+
 /// A loaded and deserialized SVG file.
 #[derive(Debug)]
-pub struct Svg {
+pub struct SvgFile {
     /// The name of the file.
     pub name: String,
     /// Width of the SVG.
@@ -18,6 +23,7 @@ pub struct Svg {
     pub view_box: ViewBox,
     /// Origin of the coordinate system and as such the origin for the Bevy position.
     pub origin: Origin,
+    /// All paths that make up the SVG
     pub paths: Vec<PathDescriptor>,
 }
 
@@ -45,8 +51,6 @@ enum Data<'a> {
 /// Builder for loading a SVG file and building a [`SvgBundle`].
 pub struct SvgBuilder<'a> {
     name: String,
-    //reader: Option<Box<dyn std::io::Read>>,
-    //file: Option<PathBuf>,
     data: Data<'a>,
     origin: Origin,
     translation: Vec3,
@@ -192,7 +196,7 @@ impl<'a> SvgBuilder<'a> {
             }
         }
 
-        let svg = Svg {
+        let svg = SvgFile {
             name: self.name.to_string(),
             width: size.width(),
             height: size.height(),

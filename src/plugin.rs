@@ -13,7 +13,7 @@
 
 use crate::{
     Convert,
-    svg::{DrawType, Svg},
+    svg::{DrawType, SvgFile},
     vertex_buffer::{VertexBuffers, VertexConstructor, apply_transform, merge_buffers}
 };
 use bevy::{
@@ -100,8 +100,8 @@ fn svg_mesh_maker(
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (&mut Svg, &mut Handle<Mesh>, &mut Visible),
-        Added<Svg>
+        (&mut SvgFile, &mut Handle<Mesh>, &mut Visible),
+        Added<SvgFile>
     >,
 ) {
     for (mut svg, mut mesh, mut visible) in query.iter_mut() {
