@@ -14,16 +14,22 @@ but i didn't have the time to take a deeper look at how it works or how i can in
 The `main`-branch will track Bevy's `main`-branch as closely as i can with the free time i have. From Bevy `0.5` on,
 i will create a branch for each `0.*` release to be able to implement fixes and maybe backport some features.
 
+## Compatibility
+| `Bevy` version | `bevy_svg` version | Branch      |
+|--------------|---------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.5.0-orange)](https://crates.io/crates/bevy/0.5.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.3.2-orange)](https://crates.io/crates/bevy-svg/0.3.2) | [`bevy-0.5`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.5) |
+| [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
+
+
 ## Examples
-### Complex shapes
-![](assets/complex_one_color.png)
 
-As you can see, even shapes with complex forms are working.
+| Complex shapes       | Multiple colors | Fonts      |
+|----------------------|-----------------|------------|
+| ![complex_one_color] | ![two_colors]   | ![twinkle] |
 
-### Multiple colors
-![](assets/two_colors.png)
-
-Multiple colors are also working.
+[complex_one_color]: assets/complex_one_color.png
+[two_colors]: assets/two_colors.png
+[twinkle]: assets/twinkle.png
 
 ## Usage
 
