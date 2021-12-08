@@ -16,13 +16,18 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("asteroid_field.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBuilder::from_file("examples/assets/asteroid_field.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, 0.0))
-            .scale(Vec3::new(2.0, 2.0, 1.0))
-            .build()
-            .unwrap()
-        );
+    let mut transform = Transform::from_xyz(0.0, 0.0, 0.0);
+    transform.scale = Vec3::new(2.0, 2.0, 1.0);
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        transform,
+        ..Default::default()
+    });
 }

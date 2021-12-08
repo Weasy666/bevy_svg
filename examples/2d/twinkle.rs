@@ -16,14 +16,18 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("twinkle.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    let svg_bundle = SvgBuilder::from_file("examples/assets/twinkle.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, 0.0))
-            .scale(Vec3::new(0.75, 0.75, 1.0))
-            .build()
-            .unwrap();
-    println!("Transform.scale: {} - Global_Transform.scale: {}", svg_bundle.transform.scale, svg_bundle.global_transform.scale);
-    commands.spawn_bundle(svg_bundle);
+    let mut transform = Transform::from_xyz(0.0, 0.0, 0.0);
+    transform.scale = Vec3::new(0.75, 0.75, 1.0);
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        transform,
+        ..Default::default()
+    });
 }

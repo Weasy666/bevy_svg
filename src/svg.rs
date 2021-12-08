@@ -1,13 +1,13 @@
-use std::{io::Read, path::PathBuf};
-use bevy::{math::{Mat4, Vec3}, prelude::{Color, Transform, Visible}};
+use bevy::{math::Mat4, prelude::{Color, Transform}, reflect::TypeUuid};
 use lyon_geom::euclid::default::Transform2D;
 use lyon_svg::{parser::ViewBox, path::PathEvent};
 use lyon_tessellation::math::Point;
 
-use crate::{bundle::SvgBundle, Convert};
+use crate::Convert;
 
 /// A loaded and deserialized SVG file.
-#[derive(Debug)]
+#[derive(Debug, TypeUuid)]
+#[uuid = "d2c5985d-e221-4257-9e3b-ff0fb87e28ba"]
 pub struct Svg {
     /// The name of the file.
     pub name: String,
@@ -17,8 +17,6 @@ pub struct Svg {
     pub height: f64,
     /// ViewBox of the SVG.
     pub view_box: ViewBox,
-    /// Origin of the coordinate system and as such the origin for the Bevy position.
-    pub origin: Origin,
     /// All paths that make up the SVG
     pub paths: Vec<PathDescriptor>,
 }
@@ -79,7 +77,6 @@ impl Svg {
                 w: view_box.rect.width(),
                 h: view_box.rect.height(),
             },
-            origin: Default::default(),
             paths: descriptors,
         }
     }
@@ -97,129 +94,6 @@ pub enum Origin {
 impl Default for Origin {
     fn default() -> Self {
         Origin::TopLeft
-    }
-}
-
-enum Data<'a> {
-    Bytes(&'a [u8]),
-    File(PathBuf),
-    Reader(Box<dyn std::io::Read>),
-}
-
-/// Builder for loading a SVG file and building a [`SvgBundle`].
-pub struct SvgBuilder<'a> {
-    name: String,
-    data: Data<'a>,
-    origin: Origin,
-    translation: Vec3,
-    scale: Vec3,
-    is_visible: bool,
-}
-
-impl<'a> SvgBuilder<'a> {
-    /// Create a [`SvgBuilder`] to load a SVG from a file.
-    pub fn from_file<P: AsRef<std::path::Path>>(path: P) -> SvgBuilder<'a> {
-        let path = PathBuf::from(path.as_ref());
-        SvgBuilder {
-            name: path.file_name().unwrap().to_string_lossy().to_string(),
-            data: Data::File(path),
-            origin: Origin::default(),
-            translation: Vec3::default(),
-            scale: Vec3::new(1.0, 1.0, 1.0),
-            is_visible: true,
-        }
-    }
-
-    /// Create a [`SvgBuilder`] from a reader.
-    pub fn from_reader<R: 'static + std::io::Read>(reader: R, name: &str) -> SvgBuilder<'a> {
-        SvgBuilder {
-            name: name.to_string(),
-            data: Data::Reader(Box::new(reader)),
-            origin: Origin::default(),
-            translation: Vec3::default(),
-            scale: Vec3::new(1.0, 1.0, 1.0),
-            is_visible: true,
-        }
-    }
-
-    /// Create a [`SvgBuilder`] from bytes.
-    pub fn from_bytes(bytes: &'a [u8], name: &str) -> SvgBuilder<'a> {
-        SvgBuilder {
-            name: name.to_string(),
-            data: Data::Bytes(bytes),
-            origin: Origin::default(),
-            translation: Vec3::default(),
-            scale: Vec3::new(1.0, 1.0, 1.0),
-            is_visible: true,
-        }
-    }
-
-    /// Change the origin of the SVG's coordinate system. The origin is also the
-    /// Bevy origin.
-    pub fn origin(mut self, origin: Origin) -> SvgBuilder<'a> {
-        self.origin = origin;
-        self
-    }
-
-    /// Position at which the [`SvgBundle`] will be spawned in Bevy. The origin
-    /// of the SVG coordinate system will be at this position.
-    pub fn position(mut self, translation: Vec3) ->  SvgBuilder<'a> {
-        self.translation = translation;
-        self
-    }
-
-    /// Value by which the SVG will be scaled, default is (1.0, 1.0).
-    pub fn scale(mut self, scale: Vec3) ->  SvgBuilder<'a> {
-        self.scale = scale;
-        self
-    }
-
-    /// Value by which the SVG will be scaled, default is (1.0, 1.0).
-    pub fn is_visible(mut self, visible: bool) ->  SvgBuilder<'a> {
-        self.is_visible = visible;
-        self
-    }
-
-    /// Load and finish the SVG content into a [`SvgBundle`], which then will be
-    /// spawned by the [`SvgPlugin`].
-    pub fn build<'s>(self) -> Result<SvgBundle, Box<dyn std::error::Error>> {
-        let mut opt = usvg::Options::default();
-        opt.fontdb.load_system_fonts();
-
-        let mut svg_data = Vec::new();
-        match self.data {
-            Data::Bytes(bytes) => svg_data = bytes.to_vec(),
-            Data::File(path) => {
-                let mut file = std::fs::File::open(path)?;
-                file.read_to_end(&mut svg_data)?;
-            },
-            Data::Reader(mut reader) => { reader.read_to_end(&mut svg_data)?; },
-        }
-
-        let svg_tree = usvg::Tree::from_data(&svg_data, &opt.to_ref())?;
-
-        let translation = match self.origin {
-            Origin::Center => self.translation + Vec3::new(
-                -svg_tree.svg_node().size.width() as f32 * self.scale.x / 2.0,
-                svg_tree.svg_node().size.height() as f32 * self.scale.y / 2.0,
-                0.0
-            ),
-            Origin::TopLeft => self.translation,
-        };
-
-        let svg = Svg {
-            name: self.name,
-            origin: self.origin,
-            ..Svg::from_tree(svg_tree)
-        };
-
-        Ok(SvgBundle {
-            visible: Visible {
-                is_visible: self.is_visible,
-                is_transparent: true,
-            },
-            ..SvgBundle::new(svg).at_position(translation).with_scale(self.scale)
-        })
     }
 }
 

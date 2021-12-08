@@ -16,12 +16,15 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBuilder::from_file("examples/assets/neutron_star.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, 0.0))
-            .build()
-            .unwrap()
-        );
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        ..Default::default()
+    });
 }

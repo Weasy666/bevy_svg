@@ -1,13 +1,12 @@
 //! Bevy [`Bundle`] representing an SVG entity.
 
-use crate::{plugin::{SVG_PIPELINE_HANDLE}, svg::Svg};
+use crate::{plugin::SVG_PIPELINE_HANDLE, svg::Svg, prelude::Origin};
 use bevy::{
-    asset::Handle, ecs::bundle::Bundle, math::Vec3,
+    asset::Handle, ecs::bundle::Bundle,
     render::{
         draw::{Draw, Visible}, mesh::Mesh, pipeline::{RenderPipeline, RenderPipelines},
         render_graph::base::MainPass,
     },
-    sprite::QUAD_HANDLE,
     transform::components::{GlobalTransform, Transform}
 };
 
@@ -16,7 +15,9 @@ use bevy::{
 #[allow(missing_docs)]
 #[derive(Bundle)]
 pub struct SvgBundle {
-    pub svg: Svg,
+    pub svg: Handle<Svg>,
+    /// Origin of the coordinate system and as such the origin for the Bevy position.
+    pub origin: Origin,
     pub mesh: Handle<Mesh>,
     pub main_pass: MainPass,
     pub draw: Draw,
@@ -26,12 +27,13 @@ pub struct SvgBundle {
     pub global_transform: GlobalTransform,
 }
 
-impl SvgBundle {
-    /// Create a new [`SvgBundle`] from a [`Svg`].
-    pub fn new(svg: Svg) -> SvgBundle {
+impl Default for SvgBundle {
+    /// Create a new [`SvgBundle`].
+    fn default() -> Self {
         Self {
-            svg,
-            mesh: QUAD_HANDLE.typed(),
+            svg: Default::default(),
+            origin: Default::default(),
+            mesh: Default::default(),
             render_pipelines: RenderPipelines::from_pipelines(vec![RenderPipeline::new(
                 SVG_PIPELINE_HANDLE.typed(),
             )]),
@@ -44,23 +46,5 @@ impl SvgBundle {
             transform: Default::default(),
             global_transform: Default::default(),
         }
-    }
-
-    /// Specifies the 3D position at which the [`SvgBundle`] will be spawned.
-    pub fn at_position(mut self, translation: Vec3) -> SvgBundle {
-        self.transform = Transform::from_translation(translation);
-        self
-    }
-
-    /// Specifies a Transform.
-    pub fn with_transform(mut self, transform: Transform) -> SvgBundle {
-        self.transform = transform;
-        self
-    }
-
-    /// Scale the SVG.
-    pub fn with_scale(mut self, scale: Vec3) -> SvgBundle {
-        self.transform.scale = scale;
-        self
     }
 }

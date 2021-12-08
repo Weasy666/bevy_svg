@@ -20,22 +20,25 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBuilder::from_file("examples/assets/neutron_star.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, 0.0))
-            .is_visible(false)
-            .build()
-            .unwrap()
-        );
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        visible: Visible { is_visible: false, is_transparent: true },
+        ..Default::default()
+    });
 }
 
 /// This system toggles SVG visibility when 'V' is pressed
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<
-        (&Svg, &mut Visible),
+        (&Handle<Svg>, &mut Visible),
     >,
 ) {
     if keyboard_input.just_pressed(KeyCode::V) {

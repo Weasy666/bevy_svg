@@ -21,6 +21,9 @@ lyon_svg = "0.17"
 lyon_tessellation = "0.17"
 usvg = "0.19"
 
+anyhow = "1.0"
+thiserror = "1.0"
+
 [dev-dependencies]
 bevy = { version = "0.5", default-features = true }
 
@@ -28,14 +31,6 @@ bevy = { version = "0.5", default-features = true }
 [[example]]
 name = "2d_two_colors"
 path = "examples/2d/two_colors.rs"
-
-[[example]]
-name = "2d_two_colors_bytes"
-path = "examples/2d/two_colors_bytes.rs"
-
-[[example]]
-name = "2d_two_colors_reader"
-path = "examples/2d/two_colors_reader.rs"
 
 [[example]]
 name = "2d_two_colors_visibility"

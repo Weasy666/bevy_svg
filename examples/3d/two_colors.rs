@@ -16,13 +16,18 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(PerspectiveCameraBundle::new_3d());
-    commands.spawn_bundle(SvgBuilder::from_file("examples/assets/neutron_star.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, -1.0))
-            .scale(Vec3::new(0.01, 0.01, 1.0))
-            .build()
-            .unwrap()
-        );
+    let mut transform = Transform::from_xyz(0.0, 0.0, -1.0);
+    transform.scale = Vec3::new(0.005, 0.005, 1.0);
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        transform,
+        ..Default::default()
+    });
 }

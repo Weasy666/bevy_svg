@@ -28,6 +28,7 @@
 )]
 
 mod bundle;
+mod loader;
 mod plugin;
 mod svg;
 mod tessellation;
@@ -36,7 +37,7 @@ mod vertex_buffer;
 /// Import this module as `use bevy_svg::prelude::*` to get
 /// convenient imports.
 pub mod prelude {
-    pub use crate::{bundle::SvgBundle, plugin::SvgPlugin, svg::{Svg, SvgBuilder, Origin}};
+    pub use crate::{bundle::SvgBundle, plugin::SvgPlugin, svg::{Svg, Origin}};
     pub use lyon_tessellation::{
         FillOptions, FillRule, LineCap, LineJoin, Orientation, StrokeOptions,
     };

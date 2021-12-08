@@ -11,21 +11,20 @@
 //! that creates a mesh for each entity that has been spawned as a
 //! `SvgBundle`.
 
-use crate::{Convert, svg::Svg, tessellation};
+use crate::{Convert, svg::Svg, tessellation, loader::SvgAssetLoader, prelude::Origin};
 use bevy::{
     app::{AppBuilder, Plugin},
-    asset::{Assets, Handle, HandleUntyped},
+    asset::{AddAsset, Assets, Handle, HandleUntyped},
     ecs::{
-        query::Added,
         schedule::{StageLabel, SystemStage},
-        system::{IntoSystem, Query, ResMut}
+        system::{IntoSystem, Query, Res, ResMut}
     },
     reflect::TypeUuid,
     render::{
         mesh::Mesh,
         pipeline::PipelineDescriptor,
         shader::{Shader, ShaderStage, ShaderStages}
-    },
+    }, prelude::{info, AssetEvent, EventReader, Entity, Transform}, math::Vec3,
 };
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
@@ -46,6 +45,8 @@ impl Plugin for SvgPlugin {
         let fill_tess = FillTessellator::new();
         let stroke_tess = StrokeTessellator::new();
         app
+            .add_asset::<Svg>()
+            .init_asset_loader::<SvgAssetLoader>()
             .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
             .add_startup_system(setup.system())
@@ -74,17 +75,41 @@ fn setup(
 
 /// Bevy system which queries all [`SvgBundle`]s to complete them with a mesh and material.
 fn svg_mesh_maker(
+    mut svg_events: EventReader<AssetEvent<Svg>>,
+    svgs: Res<Assets<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (&Svg, &mut Handle<Mesh>),
-        Added<Svg>
+        (Entity, &Handle<Svg>, &mut Handle<Mesh>, &Origin, &mut Transform),
     >,
 ) {
-    for (svg, mut mesh) in query.iter_mut() {
-        let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
-        *mesh = meshes.add(buffer.convert());
+    for event in svg_events.iter() {
+        match event {
+            AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
+                let bundle = query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle).next();
+                if let Some((_, _, mut mesh, origin, mut transform)) = bundle {
+                    let svg = svgs.get(handle).unwrap();
+                    let translation = match origin {
+                        Origin::Center => transform.translation + Vec3::new(
+                            -svg.width as f32 * transform.scale.x / 2.0,
+                            svg.height as f32 * transform.scale.y / 2.0,
+                            0.0
+                        ),
+                        Origin::TopLeft => transform.translation,
+                    };
+                    transform.translation = translation;
+
+                    info!("Make mesh for SVG: {}", svg.name);
+                    let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
+                    *mesh = meshes.add(buffer.convert());
+                }
+            },
+            AssetEvent::Removed { handle } => {
+                let _bundle = query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle).next();
+                //TODO:
+            },
+        }
     }
 }
 
