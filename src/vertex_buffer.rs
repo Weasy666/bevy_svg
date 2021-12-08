@@ -1,8 +1,9 @@
-use bevy::prelude::*;
-use bevy::math::Vec3;
-use bevy::render::{
-    color::Color, mesh::{Indices, Mesh},
-    pipeline::PrimitiveTopology,
+use bevy::{
+    math::Vec3, prelude::Transform,
+    render::{
+        color::Color, mesh::{Indices, Mesh},
+        pipeline::PrimitiveTopology,
+    }
 };
 use lyon_tessellation::{self, FillVertex, FillVertexConstructor, StrokeVertex, StrokeVertexConstructor};
 use crate::Convert;
@@ -71,29 +72,41 @@ impl StrokeVertexConstructor<Vertex> for VertexConstructor {
     }
 }
 
-pub(crate) fn apply_transform(buffer: &mut VertexBuffers, transform: Transform) {
-    for mut vertex in buffer.vertices.iter_mut() {
-        let pos = transform * Vec3::new(
-            vertex.position[0],
-            vertex.position[1],
-            0.0
-        );
-
-        vertex.position[0] = pos.x;
-        vertex.position[1] = pos.y;
-    }
+pub(crate) trait BufferExt<A> {
+    fn apply_transform(&mut self, transform: Transform);
+    fn extend_one(&mut self, item: A);
+    fn extend<T: IntoIterator<Item = A>>(&mut self, iter: T);
 }
 
-pub(crate) fn merge_buffers(buffers: Vec<VertexBuffers>) -> VertexBuffers {
-    let mut buffer = VertexBuffers::new();
-    let mut offset = 0;
+impl BufferExt<VertexBuffers> for VertexBuffers {
+    fn apply_transform(&mut self, transform: Transform) {
+        for mut vertex in self.vertices.iter_mut() {
+            let pos = transform * Vec3::new(
+                vertex.position[0],
+                vertex.position[1],
+                0.0
+            );
 
-    for buf in buffers.iter() {
-        buffer.vertices.extend(&buf.vertices);
-        buffer.indices.extend(buf.indices.iter().map(|i| i + offset));
-
-        offset += buf.vertices.len() as u32;
+            vertex.position[0] = pos.x;
+            vertex.position[1] = pos.y;
+        }
     }
 
-    buffer
+    fn extend_one(&mut self, item: VertexBuffers) {
+        let offset = self.vertices.len() as u32;
+
+        self.vertices.extend(&item.vertices);
+        self.indices.extend(item.indices.iter().map(|i| i + offset));
+    }
+
+    fn extend<T: IntoIterator<Item = VertexBuffers>>(&mut self, iter: T) {
+        let mut offset = self.vertices.len() as u32;
+
+        for buf in iter {
+            self.vertices.extend(&buf.vertices);
+            self.indices.extend(buf.indices.iter().map(|i| i + offset));
+
+            offset += buf.vertices.len() as u32;
+        }
+    }
 }

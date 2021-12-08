@@ -1,6 +1,6 @@
 //! Bevy [`Bundle`] representing an SVG entity.
 
-use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::{Svg, SvgFile}};
+use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::Svg};
 use bevy::{
     asset::Handle, ecs::bundle::Bundle, math::{Vec2, Vec3},
     render::{
@@ -16,8 +16,7 @@ use bevy::{
 #[allow(missing_docs)]
 #[derive(Bundle)]
 pub struct SvgBundle {
-    marker: Svg,
-    pub svg: SvgFile,
+    pub svg: Svg,
     pub mesh: Handle<Mesh>,
     pub material: Handle<SvgMaterial>,
     pub main_pass: MainPass,
@@ -29,18 +28,16 @@ pub struct SvgBundle {
 }
 
 impl SvgBundle {
-    /// Create a new [`SvgBundle`] from a [`SvgFile`].
-    pub fn new(svg: SvgFile) -> SvgBundle {
-        let is_visible = svg.is_visible;
+    /// Create a new [`SvgBundle`] from a [`Svg`].
+    pub fn new(svg: Svg) -> SvgBundle {
         Self {
-            marker: Svg {},
             svg,
             mesh: QUAD_HANDLE.typed(),
             render_pipelines: RenderPipelines::from_pipelines(vec![RenderPipeline::new(
                 SVG_PIPELINE_HANDLE.typed(),
             )]),
             visible: Visible {
-                is_visible,
+                is_visible: true,
                 is_transparent: true,
             },
             main_pass: MainPass,
@@ -54,8 +51,6 @@ impl SvgBundle {
     /// Specifies the 3D position at which the [`SvgBundle`] will be spawned.
     pub fn at_position(mut self, translation: Vec3) -> SvgBundle {
         self.transform = Transform::from_translation(translation);
-        // Because of the different y-axis origin, we need to flip the SVG
-        self.transform.scale = Vec3::new(1.0, -1.0, 1.0);
         self
     }
 

@@ -23,4 +23,7 @@ Cargo.lock
 !.vscode/extensions.json
 *.code-workspace
 
+### Bevy ###
+wgpu_trace
+
 # End of https://www.toptal.com/developers/gitignore/api/vscode,rust,dotenv

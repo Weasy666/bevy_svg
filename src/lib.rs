@@ -30,6 +30,7 @@
 mod bundle;
 mod plugin;
 mod svg;
+mod tessellation;
 mod vertex_buffer;
 
 /// Import this module as `use bevy_svg::prelude::*` to get

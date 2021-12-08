@@ -11,20 +11,15 @@
 //! that creates a mesh for each entity that has been spawned as a
 //! `SvgBundle`.
 
-use crate::{
-    Convert,
-    svg::{DrawType, SvgFile},
-    vertex_buffer::{VertexBuffers, VertexConstructor, apply_transform, merge_buffers}
-};
+use crate::{Convert, svg::Svg, tessellation};
 use bevy::{
-    app::{AppBuilder, Plugin}, asset::{Assets, Handle},
-    asset::{AddAsset, HandleUntyped},
+    app::{AppBuilder, Plugin},
+    asset::{AddAsset, Assets, Handle, HandleUntyped},
     ecs::{
         query::Added,
         schedule::{StageLabel, SystemStage},
         system::{IntoSystem, Query, ResMut}
     },
-    log::error,
     reflect::TypeUuid,
     render::{
         mesh::Mesh,
@@ -34,7 +29,7 @@ use bevy::{
         shader::{Shader, ShaderStage, ShaderStages}
     },
 };
-use lyon_tessellation::{self, BuffersBuilder, FillOptions, FillTessellator, StrokeTessellator};
+use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
 pub const SVG_PIPELINE_HANDLE: HandleUntyped = HandleUntyped::weak_from_u64(PipelineDescriptor::TYPE_UUID, 8514826620251853414);
 
@@ -100,53 +95,15 @@ fn svg_mesh_maker(
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (&mut SvgFile, &mut Handle<Mesh>),
-        Added<SvgFile>
+        (&Svg, &mut Handle<Mesh>),
+        Added<Svg>
     >,
 ) {
-    for (mut svg, mut mesh) in query.iter_mut() {
-        let mut buffers = Vec::new();
-
-        //TODO: still need to do something about the color, it is pretty washed out
-        let mut color = None;
-        // Convert path descriptors into vertices and afterwards drop the descriptor
-        // to save memory. If one really needs to access the paths again, then they
-        // can be loaded with the `Svg` struct.
-        while let Some(path) = svg.paths.pop() {
-            let mut buffer = VertexBuffers::new();
-
-            if color.is_none() {
-                color = Some(path.color);
-            }
-
-            match path.draw_type {
-                DrawType::Fill => {
-                    if let Err(e) = fill_tess.tessellate(
-                        path.segments.clone(),
-                        &FillOptions::tolerance(0.001),
-                        &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color })
-                    ) {
-                        error!("FillTessellator error: {:?}", e)
-                    }
-                },
-                DrawType::Stroke(opts) => {
-                    if let Err(e) = stroke_tess.tessellate(
-                        path.segments.clone(),
-                        &opts,
-                        &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color })
-                    ) {
-                        error!("StrokeTessellator error: {:?}", e)
-                    }
-                }
-            }
-
-            apply_transform(&mut buffer, path.abs_transform);
-            buffers.push(buffer);
-        }
-
-        *mesh = meshes.add(merge_buffers(buffers).convert());
+    for (svg, mut mesh) in query.iter_mut() {
+        let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
+        *mesh = meshes.add(buffer.convert());
     }
-}
+            }
 
 #[derive(RenderResources, Default, TypeUuid)]
 #[uuid = "d2c5985d-e221-4257-9e3b-ff0fb87e28ba"]
