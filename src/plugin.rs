@@ -14,7 +14,7 @@
 use crate::{Convert, svg::Svg, tessellation};
 use bevy::{
     app::{AppBuilder, Plugin},
-    asset::{AddAsset, Assets, Handle, HandleUntyped},
+    asset::{Assets, Handle, HandleUntyped},
     ecs::{
         query::Added,
         schedule::{StageLabel, SystemStage},
@@ -24,8 +24,6 @@ use bevy::{
     render::{
         mesh::Mesh,
         pipeline::PipelineDescriptor,
-        render_graph::{AssetRenderResourcesNode, base, RenderGraph},
-        renderer::RenderResources,
         shader::{Shader, ShaderStage, ShaderStages}
     },
 };
@@ -47,7 +45,7 @@ impl Plugin for SvgPlugin {
     fn build(&self, app: &mut AppBuilder) {
         let fill_tess = FillTessellator::new();
         let stroke_tess = StrokeTessellator::new();
-        app.add_asset::<SvgMaterial>()
+        app
             .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
             .add_startup_system(setup.system())
@@ -63,7 +61,6 @@ impl Plugin for SvgPlugin {
 fn setup(
     mut pipelines: ResMut<Assets<PipelineDescriptor>>,
     mut shaders: ResMut<Assets<Shader>>,
-    mut render_graph: ResMut<RenderGraph>,
 ) {
     // Create a new shader pipeline
     pipelines.set_untracked(
@@ -73,20 +70,6 @@ fn setup(
             fragment: Some(shaders.add(Shader::from_glsl(ShaderStage::Fragment, FRAGMENT_SHADER))),
         })
     );
-
-    // Add an AssetRenderResourcesNode to our Render Graph. This will bind MyMaterialWithVertexColorSupport resources to our shader
-    render_graph.add_system_node(
-        "svg_material",
-        AssetRenderResourcesNode::<SvgMaterial>::new(true),
-    );
-
-    // Add a Render Graph edge connecting our new "my_material" node to the main pass node. This ensures "my_material" runs before the main pass
-    render_graph
-        .add_node_edge(
-            "svg_material",
-            base::node::MAIN_PASS,
-        )
-        .unwrap();
 }
 
 /// Bevy system which queries all [`SvgBundle`]s to complete them with a mesh and material.
@@ -103,11 +86,7 @@ fn svg_mesh_maker(
         let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
         *mesh = meshes.add(buffer.convert());
     }
-            }
-
-#[derive(RenderResources, Default, TypeUuid)]
-#[uuid = "d2c5985d-e221-4257-9e3b-ff0fb87e28ba"]
-pub struct SvgMaterial;
+}
 
 const VERTEX_SHADER: &str = r#"
 #version 450

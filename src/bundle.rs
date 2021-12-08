@@ -1,6 +1,6 @@
 //! Bevy [`Bundle`] representing an SVG entity.
 
-use crate::{plugin::{SvgMaterial, SVG_PIPELINE_HANDLE}, svg::Svg};
+use crate::{plugin::{SVG_PIPELINE_HANDLE}, svg::Svg};
 use bevy::{
     asset::Handle, ecs::bundle::Bundle, math::{Vec2, Vec3},
     render::{
@@ -18,7 +18,6 @@ use bevy::{
 pub struct SvgBundle {
     pub svg: Svg,
     pub mesh: Handle<Mesh>,
-    pub material: Handle<SvgMaterial>,
     pub main_pass: MainPass,
     pub draw: Draw,
     pub visible: Visible,
@@ -42,7 +41,6 @@ impl SvgBundle {
             },
             main_pass: MainPass,
             draw: Default::default(),
-            material: Default::default(),
             transform: Default::default(),
             global_transform: Default::default(),
         }
