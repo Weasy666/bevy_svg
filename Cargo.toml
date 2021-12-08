@@ -23,3 +23,41 @@ usvg = "0.19"
 
 [dev-dependencies]
 bevy = { version = "0.5", default-features = true }
+
+#### 2D examples ####
+[[example]]
+name = "2d_two_colors"
+path = "examples/2d/two_colors.rs"
+
+[[example]]
+name = "2d_two_colors_bytes"
+path = "examples/2d/two_colors_bytes.rs"
+
+[[example]]
+name = "2d_two_colors_reader"
+path = "examples/2d/two_colors_reader.rs"
+
+[[example]]
+name = "2d_two_colors_visibility"
+path = "examples/2d/two_colors_visibility.rs"
+
+[[example]]
+name = "2d_twinkle"
+path = "examples/2d/twinkle.rs"
+
+[[example]]
+name = "2d_complex_one_color"
+path = "examples/2d/complex_one_color.rs"
+
+#### 3D examples ####
+[[example]]
+name = "3d_two_colors"
+path = "examples/3d/two_colors.rs"
+
+[[example]]
+name = "3d_twinkle"
+path = "examples/3d/twinkle.rs"
+
+[[example]]
+name = "3d_complex_one_color"
+path = "examples/3d/complex_one_color.rs"
