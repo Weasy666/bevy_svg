@@ -12,7 +12,6 @@ pub(crate) fn generate_buffer(
     let flip_y = Transform::from_scale(Vec3::new(1.0, -1.0, 1.0));
     let mut buffers = VertexBuffers::new();
 
-    //TODO: still need to do something about the color, it is pretty washed out
     let mut color = None;
     for path in &svg.paths {
         let mut buffer = VertexBuffers::new();

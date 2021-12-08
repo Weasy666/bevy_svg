@@ -57,7 +57,7 @@ impl FillVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: FillVertex) -> Vertex {
         Vertex {
             position: [vertex.position().x, vertex.position().y, 0.0],
-            color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
+            color: self.color.as_linear_rgba_f32(),
         }
     }
 }
@@ -67,7 +67,7 @@ impl StrokeVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: StrokeVertex) -> Vertex {
         Vertex {
             position: [vertex.position().x, vertex.position().y, 0.0],
-            color: [self.color.r(), self.color.g(), self.color.b(), self.color.a()],
+            color: self.color.as_linear_rgba_f32(),
         }
     }
 }
