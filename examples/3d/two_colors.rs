@@ -21,7 +21,7 @@ fn setup(mut commands: Commands) {
     commands.spawn_bundle(SvgBuilder::from_file("examples/assets/neutron_star.svg")
             .origin(Origin::Center)
             .position(Vec3::new(0.0, 0.0, -1.0))
-            .scale(Vec2::new(0.01, 0.01))
+            .scale(Vec3::new(0.01, 0.01, 1.0))
             .build()
             .unwrap()
         );

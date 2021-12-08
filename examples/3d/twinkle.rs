@@ -21,7 +21,7 @@ fn setup(mut commands: Commands) {
     commands.spawn_bundle(SvgBuilder::from_file("examples/assets/twinkle.svg")
             .origin(Origin::Center)
             .position(Vec3::new(0.0, 0.0, -1.0))
-            .scale(Vec2::new(0.001, 0.001))
+            .scale(Vec3::new(0.001, 0.001, 1.0))
             .build()
             .unwrap()
         );

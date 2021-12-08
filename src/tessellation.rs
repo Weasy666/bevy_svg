@@ -1,4 +1,4 @@
-use bevy::{prelude::error};
+use bevy::{prelude::{error, Transform}, math::Vec3};
 use lyon_tessellation::{FillTessellator, StrokeTessellator, FillOptions, BuffersBuilder};
 
 use crate::{prelude::Svg, vertex_buffer::{VertexBuffers, VertexConstructor, BufferExt}, svg::DrawType};
@@ -9,6 +9,7 @@ pub(crate) fn generate_buffer(
     fill_tess: &mut FillTessellator,
     stroke_tess: &mut StrokeTessellator,
 ) -> VertexBuffers {
+    let flip_y = Transform::from_scale(Vec3::new(1.0, -1.0, 1.0));
     let mut buffers = VertexBuffers::new();
 
     //TODO: still need to do something about the color, it is pretty washed out
@@ -41,7 +42,8 @@ pub(crate) fn generate_buffer(
             }
         }
 
-        buffer.apply_transform(path.abs_transform);
+        // Bevy has a different y-axis origin, so we need to flip that axis
+        buffer.apply_transform(flip_y * path.abs_transform);
         buffers.extend_one(buffer);
     }
 

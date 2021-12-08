@@ -21,7 +21,7 @@ fn setup(mut commands: Commands) {
     commands.spawn_bundle(SvgBuilder::from_file("examples/assets/asteroid_field.svg")
             .origin(Origin::Center)
             .position(Vec3::new(0.0, 0.0, 0.0))
-            .scale(Vec2::new(2.0, 2.0))
+            .scale(Vec3::new(2.0, 2.0, 1.0))
             .build()
             .unwrap()
         );

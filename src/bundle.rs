@@ -2,7 +2,7 @@
 
 use crate::{plugin::{SVG_PIPELINE_HANDLE}, svg::Svg};
 use bevy::{
-    asset::Handle, ecs::bundle::Bundle, math::{Vec2, Vec3},
+    asset::Handle, ecs::bundle::Bundle, math::Vec3,
     render::{
         draw::{Draw, Visible}, mesh::Mesh, pipeline::{RenderPipeline, RenderPipelines},
         render_graph::base::MainPass,
@@ -59,8 +59,8 @@ impl SvgBundle {
     }
 
     /// Scale the SVG.
-    pub fn with_scale(mut self, scale: Vec2) -> SvgBundle {
-        self.transform.scale = Vec3::new(scale.x, -scale.y, 1.0);
+    pub fn with_scale(mut self, scale: Vec3) -> SvgBundle {
+        self.transform.scale = scale;
         self
     }
 }

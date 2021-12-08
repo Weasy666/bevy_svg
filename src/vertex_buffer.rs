@@ -84,11 +84,12 @@ impl BufferExt<VertexBuffers> for VertexBuffers {
             let pos = transform * Vec3::new(
                 vertex.position[0],
                 vertex.position[1],
-                0.0
+                vertex.position[2],
             );
 
             vertex.position[0] = pos.x;
             vertex.position[1] = pos.y;
+            vertex.position[2] = pos.z;
         }
     }
 

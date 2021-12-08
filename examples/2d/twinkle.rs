@@ -18,11 +18,12 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBuilder::from_file("examples/assets/twinkle.svg")
+    let svg_bundle = SvgBuilder::from_file("examples/assets/twinkle.svg")
             .origin(Origin::Center)
             .position(Vec3::new(0.0, 0.0, 0.0))
-            .scale(Vec2::new(0.75, 0.75))
+            .scale(Vec3::new(0.75, 0.75, 1.0))
             .build()
-            .unwrap()
-        );
+            .unwrap();
+    println!("Transform.scale: {} - Global_Transform.scale: {}", svg_bundle.transform.scale, svg_bundle.global_transform.scale);
+    commands.spawn_bundle(svg_bundle);
 }

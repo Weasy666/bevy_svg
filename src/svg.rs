@@ -1,5 +1,5 @@
 use std::{io::Read, path::PathBuf};
-use bevy::{math::{Mat4, Vec2, Vec3}, prelude::{Color, Transform, Visible}};
+use bevy::{math::{Mat4, Vec3}, prelude::{Color, Transform, Visible}};
 use lyon_geom::euclid::default::Transform2D;
 use lyon_svg::{parser::ViewBox, path::PathEvent};
 use lyon_tessellation::math::Point;
@@ -31,10 +31,7 @@ impl Svg {
 
         for node in tree.root().descendants() {
             if let usvg::NodeKind::Path(ref p) = *node.borrow() {
-                let mut t = p.transform;
-                // Bevy has a different y-axis origin, so we need to flip that axis
-                t.scale(1.0, -1.0);
-
+                let t = p.transform;
                 let abs_t = Transform::from_matrix(
                     Mat4::from_cols(
                         [t.a.abs() as f32, t.b as f32,       0.0, 0.0].into(),
@@ -115,7 +112,7 @@ pub struct SvgBuilder<'a> {
     data: Data<'a>,
     origin: Origin,
     translation: Vec3,
-    scale: Vec2,
+    scale: Vec3,
     is_visible: bool,
 }
 
@@ -128,7 +125,7 @@ impl<'a> SvgBuilder<'a> {
             data: Data::File(path),
             origin: Origin::default(),
             translation: Vec3::default(),
-            scale: Vec2::new(1.0, 1.0),
+            scale: Vec3::new(1.0, 1.0, 1.0),
             is_visible: true,
         }
     }
@@ -140,7 +137,7 @@ impl<'a> SvgBuilder<'a> {
             data: Data::Reader(Box::new(reader)),
             origin: Origin::default(),
             translation: Vec3::default(),
-            scale: Vec2::new(1.0, 1.0),
+            scale: Vec3::new(1.0, 1.0, 1.0),
             is_visible: true,
         }
     }
@@ -152,7 +149,7 @@ impl<'a> SvgBuilder<'a> {
             data: Data::Bytes(bytes),
             origin: Origin::default(),
             translation: Vec3::default(),
-            scale: Vec2::new(1.0, 1.0),
+            scale: Vec3::new(1.0, 1.0, 1.0),
             is_visible: true,
         }
     }
@@ -172,7 +169,7 @@ impl<'a> SvgBuilder<'a> {
     }
 
     /// Value by which the SVG will be scaled, default is (1.0, 1.0).
-    pub fn scale(mut self, scale: Vec2) ->  SvgBuilder<'a> {
+    pub fn scale(mut self, scale: Vec3) ->  SvgBuilder<'a> {
         self.scale = scale;
         self
     }
@@ -346,7 +343,7 @@ impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
             prev: Point::new(0.0, 0.0),
             deferred: None,
             needs_end: false,
-            // For some reason transform has sometimes negative scale values.
+            // For some reason the local transform of some paths has negative scale values.
             // Here we correct to positive values.
             scale: lyon_geom::Transform::scale(
                 if self.transform.a < 0.0 { -1.0 } else { 1.0 },
