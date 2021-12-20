@@ -6,11 +6,8 @@ For one of my personal projects i needed a way to load and display some simple S
 so i took inspiration from [`bevy_prototype_lyon`] and modified and extended it to...well...load and display
 simple SVG files. SVGs can be used/displayed in `2D` as well as in `3D`.
 
-I use [`usvg`] to load, parse and simplify a SVG or SVGZ file and [`Lyon`] to tessellate it into a vertex buffer,
-which i then convert into a [`Bevy`] mesh and draw with [shaders].
-
-Something else that i want to change, is how i load the SVG file. This would ideally use the Bevy asset manager,
-but i didn't have the time to take a deeper look at how it works or how i can integrate with it.
+Files are loaded through [`AssetLoader`], then parsed and simplified with [`usvg`] and then tessellated with [`Lyon`]
+into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn with custom [shaders].
 
 [shaders]: src/plugin.rs#L91-L119
 
@@ -18,7 +15,7 @@ but i didn't have the time to take a deeper look at how it works or how i can in
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |--------------|---------------|-------------|
-| [![Crates.io](https://img.shields.io/badge/crates.io-v0.5.0-orange)](https://crates.io/crates/bevy/0.5.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.3.2-orange)](https://crates.io/crates/bevy-svg/0.3.2) | [`bevy-0.5`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.5) |
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.5.0-orange)](https://crates.io/crates/bevy/0.5.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.4.0-orange)](https://crates.io/crates/bevy-svg/0.4.0) | [`bevy-0.5`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.5) |
 | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
 
 
@@ -62,15 +59,17 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("path/to/file.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(
-        SvgBuilder::from_file("path/to/file.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, 0.0))
-            .build()
-            .expect("File not found")
-    );
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        ..Default::default()
+    });
 }
 ```
 
@@ -89,16 +88,22 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let svg = asset_server.load("path/to/file.svg");
     commands.spawn_bundle(PerspectiveCameraBundle::new_3d());
-    commands.spawn_bundle(
-        SvgBuilder::from_file("path/to/file.svg")
-            .origin(Origin::Center)
-            .position(Vec3::new(0.0, 0.0, -1.0))
-            .scale(Vec2::new(0.01, 0.01))
-            .build()
-            .expect("File not found")
-    );
+    commands.spawn_bundle(SvgBundle {
+        svg,
+        origin: Origin::Center,
+        transform: Transform {
+            translation: Vec3::new(0.0, 0.0, 1.5),
+            scale: Vec3::new(0.05, 0.05, 1.0), // The scale depends a lot on your SVG and camera distance
+            rotation: Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
+        },
+        ..Default::default()
+    });
 }
 ```
 
@@ -107,3 +112,4 @@ fn setup(mut commands: Commands) {
 [`bevy_prototype_lyon`]: https://github.com/Nilirad/bevy_prototype_lyon
 [`Lyon`]: https://github.com/nical/lyon
 [`usvg`]: https://github.com/RazrFalcon/resvg
+[`AssetLoader`]: https://docs.rs/bevy/0.5.0/bevy/asset/trait.AssetLoader.html
