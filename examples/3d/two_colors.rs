@@ -21,13 +21,38 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("neutron_star.svg");
-    commands.spawn_bundle(PerspectiveCameraBundle::new_3d());
-    let mut transform = Transform::from_xyz(0.0, 0.0, -1.0);
-    transform.scale = Vec3::new(0.005, 0.005, 1.0);
+    commands.spawn_bundle(PerspectiveCameraBundle {
+        transform: Transform::from_xyz(5.0, 8.0, 8.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..Default::default()
+    });
+    commands.spawn_bundle(SvgBundle {
+        svg: svg.clone(),
+        origin: Origin::Center,
+        transform: Transform {
+            translation: Vec3::new(0.0, 0.0, 1.5),
+            scale: Vec3::new(0.05, 0.05, 1.0),
+            rotation: Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
+        },
+        ..Default::default()
+    });
+    commands.spawn_bundle(SvgBundle {
+        svg: svg.clone(),
+        origin: Origin::Center,
+        transform: Transform {
+            translation: Vec3::new(0.0, 0.0, 0.0),
+            scale: Vec3::new(0.05, 0.05, 1.0),
+            rotation: Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
+        },
+        ..Default::default()
+    });
     commands.spawn_bundle(SvgBundle {
         svg,
         origin: Origin::Center,
-        transform,
+        transform: Transform {
+            translation: Vec3::new(0.0, 0.0, -1.5),
+            scale: Vec3::new(0.05, 0.05, 1.0),
+            rotation: Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
+        },
         ..Default::default()
     });
 }

@@ -50,6 +50,10 @@ name = "3d_two_colors"
 path = "examples/3d/two_colors.rs"
 
 [[example]]
+name = "3d_two_colors_visibility"
+path = "examples/3d/two_colors_visibility.rs"
+
+[[example]]
 name = "3d_twinkle"
 path = "examples/3d/twinkle.rs"
 
