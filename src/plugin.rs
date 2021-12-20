@@ -87,9 +87,17 @@ fn svg_mesh_maker(
     for event in svg_events.iter() {
         match event {
             AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
-                let bundle = query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle).next();
-                if let Some((_, _, mut mesh, origin, mut transform)) = bundle {
+                let mut tesselated_mesh = None;
+                for (_, _, mut mesh, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
+                    if tesselated_mesh.is_none() {
+                        info!("Make mesh for SVG: {}", svg.name);
+                        let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
+                        tesselated_mesh = Some(meshes.add(buffer.convert()));
+                    } else {
+                        info!("Mesh for SVG `{}` already available, copying handle", svg.name);
+                    }
+
                     let translation = match origin {
                         Origin::Center => transform.translation + Vec3::new(
                             -svg.width as f32 * transform.scale.x / 2.0,
@@ -100,9 +108,7 @@ fn svg_mesh_maker(
                     };
                     transform.translation = translation;
 
-                    info!("Make mesh for SVG: {}", svg.name);
-                    let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
-                    *mesh = meshes.add(buffer.convert());
+                    *mesh = tesselated_mesh.as_ref().unwrap().clone();
                 }
             },
             AssetEvent::Removed { handle } => {
