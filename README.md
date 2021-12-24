@@ -31,12 +31,11 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 
 ## Usage
 
-This crate is not yet on crates.io because it uses Bevy master. But i am planning to publish it as soon as Bevy 0.5 is released.
-Until then, you need to copy this to your `Cargo.toml`
+Copy this to your `Cargo.toml`
 
 ```toml
 # Stable
-bevy_svg = "0.3"
+bevy_svg = "0.4"
 
 # Living on the edge (at your own risk 😅)
 bevy_svg = { git = "https://github.com/Weasy666/bevy_svg", branch = "main" }
