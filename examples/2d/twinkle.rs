@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_svg::prelude::*;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(WindowDescriptor {
             title: "twinkle".to_string(),
@@ -12,7 +12,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup.system())
+        .add_startup_system(setup)
         .run();
 }
 
@@ -24,7 +24,7 @@ fn setup(
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     let mut transform = Transform::from_xyz(0.0, 0.0, 0.0);
     transform.scale = Vec3::new(0.75, 0.75, 1.0);
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn_bundle(Svg2dBundle {
         svg,
         origin: Origin::Center,
         transform,

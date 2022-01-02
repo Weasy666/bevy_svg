@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_svg::prelude::*;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(WindowDescriptor {
             title: "two_colors".to_string(),
@@ -12,7 +12,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup.system())
+        .add_startup_system(setup)
         .run();
 }
 
@@ -22,7 +22,7 @@ fn setup(
 ) {
     let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn_bundle(Svg2dBundle {
         svg,
         origin: Origin::Center,
         ..Default::default()

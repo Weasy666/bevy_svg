@@ -1,7 +1,7 @@
 [package]
 authors = ["Daniel Wiesenberg <weasy@hotmail.de>"]
 description = "Load and draw simple SVG files in Bevy."
-edition = "2018"
+edition = "2021"
 license = "Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
@@ -14,7 +14,8 @@ exclude = ["assets", "examples"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.5", default-features = false, features = ["render", "trace"] }
+#bevy = { version = "0.6", default-features = false, features = ["render", "trace"] }
+bevy = { git = "https://github.com/Davier/bevy/", branch = "mesh2d", default-features = false, features = ["render", "trace"] }
 
 lyon_geom = "0.17"
 lyon_svg = "0.17"
@@ -25,7 +26,8 @@ anyhow = "1.0"
 thiserror = "1.0"
 
 [dev-dependencies]
-bevy = { version = "0.5", default-features = true }
+#bevy = { version = "0.6", default-features = true }
+bevy = { git = "https://github.com/Davier/bevy/", branch = "mesh2d" }
 
 #### 2D examples ####
 [[example]]
@@ -45,18 +47,18 @@ name = "2d_complex_one_color"
 path = "examples/2d/complex_one_color.rs"
 
 #### 3D examples ####
-[[example]]
-name = "3d_two_colors"
-path = "examples/3d/two_colors.rs"
+# [[example]]
+# name = "3d_two_colors"
+# path = "examples/3d/two_colors.rs"
 
-[[example]]
-name = "3d_two_colors_visibility"
-path = "examples/3d/two_colors_visibility.rs"
+# [[example]]
+# name = "3d_two_colors_visibility"
+# path = "examples/3d/two_colors_visibility.rs"
 
-[[example]]
-name = "3d_twinkle"
-path = "examples/3d/twinkle.rs"
+# [[example]]
+# name = "3d_twinkle"
+# path = "examples/3d/twinkle.rs"
 
-[[example]]
-name = "3d_complex_one_color"
-path = "examples/3d/complex_one_color.rs"
+# [[example]]
+# name = "3d_complex_one_color"
+# path = "examples/3d/complex_one_color.rs"

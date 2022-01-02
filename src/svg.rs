@@ -1,9 +1,10 @@
-use bevy::{math::Mat4, prelude::{Color, Transform}, reflect::TypeUuid};
+use bevy::{ecs::component::Component, math::Mat4, reflect::TypeUuid, render::color::Color, transform::components::Transform};
 use lyon_geom::euclid::default::Transform2D;
 use lyon_svg::{parser::ViewBox, path::PathEvent};
 use lyon_tessellation::math::Point;
 
 use crate::Convert;
+
 
 /// A loaded and deserialized SVG file.
 #[derive(Debug, TypeUuid)]
@@ -17,7 +18,7 @@ pub struct Svg {
     pub height: f64,
     /// ViewBox of the SVG.
     pub view_box: ViewBox,
-    /// All paths that make up the SVG
+    /// All paths that make up the SVG.
     pub paths: Vec<PathDescriptor>,
 }
 
@@ -28,8 +29,8 @@ impl Svg {
         let mut descriptors = Vec::new();
 
         for node in tree.root().descendants() {
-            if let usvg::NodeKind::Path(ref p) = *node.borrow() {
-                let t = p.transform;
+            if let usvg::NodeKind::Path(ref path) = *node.borrow() {
+                let t = path.transform;
                 let abs_t = Transform::from_matrix(
                     Mat4::from_cols(
                         [t.a.abs() as f32, t.b as f32,       0.0, 0.0].into(),
@@ -39,7 +40,7 @@ impl Svg {
                     )
                 );
 
-                if let Some(ref fill) = p.fill {
+                if let Some(ref fill) = path.fill {
                     let color = match fill.paint {
                         usvg::Paint::Color(c) =>
                             Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8()),
@@ -47,18 +48,18 @@ impl Svg {
                     };
 
                     descriptors.push(PathDescriptor {
-                        segments: p.convert().collect(),
+                        segments: path.convert().collect(),
                         abs_transform: abs_t,
                         color,
                         draw_type: DrawType::Fill,
                     });
                 }
 
-                if let Some(ref stroke) = p.stroke {
+                if let Some(ref stroke) = path.stroke {
                     let (color, draw_type) = stroke.convert();
 
                     descriptors.push(PathDescriptor {
-                        segments: p.convert().collect(),
+                        segments: path.convert().collect(),
                         abs_transform: abs_t,
                         color,
                         draw_type,
@@ -82,7 +83,7 @@ impl Svg {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Component, Copy, Debug, PartialEq)]
 /// Origin of the coordinate system.
 pub enum Origin {
     /// Top left of the image or viewbox, this is the default for a SVG.

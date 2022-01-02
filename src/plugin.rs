@@ -1,47 +1,48 @@
 //! Contains the plugin and its helper types.
 //!
-//! The [`SvgBundle`] provides the creation of shapes with minimal
-//! boilerplate.
+//! The [`Svg2dBundle`](crate::bundle::Svg2dBundle) provides a way to display an `SVG`-file
+//! with minimal boilerplate.
 //!
 //! ## How it works
-//! The user spawns a [`SvgBundle`](crate::bundle::SvgBundle) from a
-//! system in the [`UPDATE`](bevy::app::stage::UPDATE) stage.
+//! The user creates/loades a [`Svg2dBundle`](crate::bundle::Svg2dBundle) in a system.
 //!
-//! Then, in the [`SVG`](stage::SVG) stage, there is a system
-//! that creates a mesh for each entity that has been spawned as a
-//! `SvgBundle`.
+//! Then, in the [`Stage::SVG`](Stage::SVG), a mesh is created for each loaded [`Svg`] bundle.
+//! Each mesh is then extracted in the [`RenderStage::Extract`](bevy::render::RenderStage) and added to the
+//! [`RenderWorld`](bevy::render::RenderWorld).
+//! Afterwards it is queued in the [`RenderStage::Queue`](bevy::render::RenderStage) for actual drawing/rendering.
 
-use crate::{Convert, svg::Svg, tessellation, loader::SvgAssetLoader, prelude::Origin};
 use bevy::{
-    app::{AppBuilder, Plugin},
-    asset::{AddAsset, Assets, Handle, HandleUntyped},
+    app::{App, Plugin},
+    asset::{AddAsset, AssetEvent, Assets, Handle},
     ecs::{
+        entity::Entity,
+        event::EventReader,
         schedule::{StageLabel, SystemStage},
-        system::{IntoSystem, Query, Res, ResMut}
+        system::{Commands, Query, Res, ResMut}
     },
-    reflect::TypeUuid,
-    render::{
-        mesh::Mesh,
-        pipeline::PipelineDescriptor,
-        shader::{Shader, ShaderStage, ShaderStages}
-    }, prelude::{info, AssetEvent, EventReader, Entity, Transform}, math::Vec3,
+    log::trace,
+    math::Vec3,
+    render::mesh::Mesh,
+    sprite::Mesh2dHandle,
+    transform::components::Transform,
 };
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
-pub const SVG_PIPELINE_HANDLE: HandleUntyped = HandleUntyped::weak_from_u64(PipelineDescriptor::TYPE_UUID, 8514826620251853414);
+use crate::{Convert, loader::SvgAssetLoader, render::tessellation, svg::{Origin, Svg}};
+
 
 /// Stages for this plugin.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
 pub enum Stage {
-    /// Stage in which [`SvgBundle`](crate::bundle::SvgBundle)s get converted into drawable meshes.
+    /// Stage in which [`Svg2dBundle`](crate::bundle::Svg2dBundle)s get drawn.
     SVG,
 }
 
-/// A plugin that provides resources and a system to draw [`SvgBundle`]s in Bevy with..
+/// A plugin that provides resources and a system to draw [`Svg`]s.
 pub struct SvgPlugin;
 
 impl Plugin for SvgPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         let fill_tess = FillTessellator::new();
         let stroke_tess = StrokeTessellator::new();
         app
@@ -49,53 +50,40 @@ impl Plugin for SvgPlugin {
             .init_asset_loader::<SvgAssetLoader>()
             .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
-            .add_startup_system(setup.system())
             .add_stage_after(
                 bevy::app::CoreStage::Update,
                 Stage::SVG,
                 SystemStage::parallel(),
             )
-            .add_system_to_stage(Stage::SVG, svg_mesh_maker.system());
+            .add_system_to_stage(Stage::SVG, svg_mesh_maker)
+            .add_plugin(crate::render::Svg2dPlugin);
     }
 }
 
-fn setup(
-    mut pipelines: ResMut<Assets<PipelineDescriptor>>,
-    mut shaders: ResMut<Assets<Shader>>,
-) {
-    // Create a new shader pipeline
-    pipelines.set_untracked(
-        SVG_PIPELINE_HANDLE,
-        PipelineDescriptor::default_config(ShaderStages {
-            vertex: shaders.add(Shader::from_glsl(ShaderStage::Vertex, VERTEX_SHADER)),
-            fragment: Some(shaders.add(Shader::from_glsl(ShaderStage::Fragment, FRAGMENT_SHADER))),
-        })
-    );
-}
-
-/// Bevy system which queries all [`SvgBundle`]s to complete them with a mesh and material.
+/// Bevy system which queries for all [`Svg`](crate::svg::Svg)s and tessellates them into a mesh.
 fn svg_mesh_maker(
+    mut commands: Commands,
     mut svg_events: EventReader<AssetEvent<Svg>>,
     svgs: Res<Assets<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (Entity, &Handle<Svg>, &mut Handle<Mesh>, &Origin, &mut Transform),
+        (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, &Origin, &mut Transform),
     >,
 ) {
     for event in svg_events.iter() {
         match event {
             AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
                 let mut tesselated_mesh = None;
-                for (_, _, mut mesh, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle) {
+                for (entity, _, mesh, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
                     if tesselated_mesh.is_none() {
-                        info!("Make mesh for SVG: {}", svg.name);
+                        trace!("Make mesh for SVG: {}", svg.name);
                         let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
                         tesselated_mesh = Some(meshes.add(buffer.convert()));
                     } else {
-                        info!("Mesh for SVG `{}` already available, copying handle", svg.name);
+                        trace!("Mesh for SVG `{}` already available, copying handle", svg.name);
                     }
 
                     let translation = match origin {
@@ -108,7 +96,14 @@ fn svg_mesh_maker(
                     };
                     transform.translation = translation;
 
-                    *mesh = tesselated_mesh.as_ref().unwrap().clone();
+                    let new_mesh = tesselated_mesh.as_ref().unwrap().clone();
+                    if let Some(mut mesh) = mesh {
+                        mesh.0 = new_mesh;
+                    } else {
+                        commands
+                            .entity(entity)
+                            .insert(Mesh2dHandle(new_mesh));
+                    }
                 }
             },
             AssetEvent::Removed { handle } => {
@@ -118,33 +113,3 @@ fn svg_mesh_maker(
         }
     }
 }
-
-const VERTEX_SHADER: &str = r#"
-#version 450
-layout(location = 0) in vec3 Vertex_Position;
-layout(location = 1) in vec4 Vertex_Color;
-
-layout(location = 0) out vec4 v_color;
-
-layout(set = 0, binding = 0) uniform CameraViewProj {
-    mat4 ViewProj;
-};
-layout(set = 1, binding = 0) uniform Transform {
-    mat4 Model;
-};
-
-void main() {
-    gl_Position = ViewProj * Model * vec4(Vertex_Position, 1.0);
-    v_color = Vertex_Color;
-}
-"#;
-
-const FRAGMENT_SHADER: &str = r#"
-#version 450
-layout(location = 0) in vec4 v_color;
-layout(location = 0) out vec4 o_Target;
-
-void main() {
-    o_Target = v_color;
-}
-"#;

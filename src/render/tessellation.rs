@@ -1,7 +1,14 @@
-use bevy::{prelude::{error, Transform, info}, math::Vec3};
+use bevy::{
+    log::{error, info},
+    math::Vec3,
+    transform::components::Transform,
+};
 use lyon_tessellation::{FillTessellator, StrokeTessellator, FillOptions, BuffersBuilder};
 
-use crate::{prelude::Svg, vertex_buffer::{VertexBuffers, VertexConstructor, BufferExt}, svg::DrawType};
+use crate::{
+    render::vertex_buffer::{VertexBuffers, VertexConstructor, BufferExt},
+    svg::{DrawType, Svg},
+};
 
 
 pub(crate) fn generate_buffer(
@@ -22,12 +29,14 @@ pub(crate) fn generate_buffer(
             color = Some(path.color);
         }
 
+        // Bevy has a different y-axis origin, so we need to flip that axis
+        let transform = flip_y * path.abs_transform;
         match path.draw_type {
             DrawType::Fill => {
                 if let Err(e) = fill_tess.tessellate(
                     path.segments.clone(),
                     &FillOptions::tolerance(0.001),
-                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color })
+                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color, transform })
                 ) {
                     error!("FillTessellator error: {:?}", e)
                 }
@@ -36,15 +45,12 @@ pub(crate) fn generate_buffer(
                 if let Err(e) = stroke_tess.tessellate(
                     path.segments.clone(),
                     &opts,
-                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color })
+                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color, transform })
                 ) {
                     error!("StrokeTessellator error: {:?}", e)
                 }
             }
         }
-
-        // Bevy has a different y-axis origin, so we need to flip that axis
-        buffer.apply_transform(flip_y * path.abs_transform);
         buffers.extend_one(buffer);
     }
     info!("Tessellating SVG: {} ... Done", svg.name);

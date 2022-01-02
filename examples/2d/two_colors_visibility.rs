@@ -5,7 +5,7 @@ use bevy::{
 use bevy_svg::prelude::*;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(WindowDescriptor {
             title: "two_colors_visibility".to_string(),
@@ -15,8 +15,8 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup.system())
-        .add_system(keyboard_input_system.system())
+        .add_startup_system(setup)
+        .add_system(keyboard_input_system)
         .run();
 }
 
@@ -26,10 +26,10 @@ fn setup(
 ) {
     let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn_bundle(Svg2dBundle {
         svg,
         origin: Origin::Center,
-        visible: Visible { is_visible: false, is_transparent: true },
+        visibility: Visibility { is_visible: false },
         ..Default::default()
     });
 }
@@ -38,7 +38,7 @@ fn setup(
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<
-        (&Handle<Svg>, &mut Visible),
+        (&Handle<Svg>, &mut Visibility),
     >,
 ) {
     if keyboard_input.just_pressed(KeyCode::V) {
