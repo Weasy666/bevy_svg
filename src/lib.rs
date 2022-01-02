@@ -34,7 +34,7 @@ mod svg;
 
 /// Import this module as `use bevy_svg::prelude::*` to get convenient imports.
 pub mod prelude {
-    pub use crate::{bundle::Svg2dBundle, plugin::SvgPlugin, svg::{Svg, Origin}};
+    pub use crate::{bundle::{Svg2dBundle, Svg3dBundle}, plugin::SvgPlugin, svg::{Svg, Origin}};
     pub use lyon_tessellation::{
         FillOptions, FillRule, LineCap, LineJoin, Orientation, StrokeOptions,
     };

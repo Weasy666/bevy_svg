@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Rendering now uses the new renderer introduced in Bevy `0.6`
+- `SvgBundle` is replaced by `Svg2dBundle` and `Svg3dBundle`
+
 
 ## [0.4.0] - 2021-12-20
 ### Added

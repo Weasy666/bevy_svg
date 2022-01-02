@@ -18,7 +18,7 @@ use bevy::{
         entity::Entity,
         event::EventReader,
         schedule::{StageLabel, SystemStage},
-        system::{Commands, Query, Res, ResMut}
+        system::{Query, Res, ResMut}
     },
     log::trace,
     math::Vec3,
@@ -56,27 +56,26 @@ impl Plugin for SvgPlugin {
                 SystemStage::parallel(),
             )
             .add_system_to_stage(Stage::SVG, svg_mesh_maker)
-            .add_plugin(crate::render::Svg2dPlugin);
+            .add_plugin(crate::render::SvgPlugin);
     }
 }
 
 /// Bevy system which queries for all [`Svg`](crate::svg::Svg)s and tessellates them into a mesh.
 fn svg_mesh_maker(
-    mut commands: Commands,
     mut svg_events: EventReader<AssetEvent<Svg>>,
     svgs: Res<Assets<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut fill_tess: ResMut<FillTessellator>,
     mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
-        (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, &Origin, &mut Transform),
+        (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, Option<&mut Handle<Mesh>>, &Origin, &mut Transform),
     >,
 ) {
     for event in svg_events.iter() {
         match event {
             AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
                 let mut tesselated_mesh = None;
-                for (entity, _, mesh, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle) {
+                for (_, _, mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _, _)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
                     if tesselated_mesh.is_none() {
                         trace!("Make mesh for SVG: {}", svg.name);
@@ -97,17 +96,16 @@ fn svg_mesh_maker(
                     transform.translation = translation;
 
                     let new_mesh = tesselated_mesh.as_ref().unwrap().clone();
-                    if let Some(mut mesh) = mesh {
-                        mesh.0 = new_mesh;
-                    } else {
-                        commands
-                            .entity(entity)
-                            .insert(Mesh2dHandle(new_mesh));
+                    if let Some(mut mesh_2d) = mesh_2d {
+                        mesh_2d.0 = new_mesh.clone();
+                    }
+                    if let Some(mut mesh_3d) = mesh_3d {
+                        *mesh_3d = new_mesh;
                     }
                 }
             },
             AssetEvent::Removed { handle } => {
-                let _bundle = query.iter_mut().filter(|(_, svg, _, _, _)| svg == &handle).next();
+                let _bundle = query.iter_mut().filter(|(_, svg, _, _, _, _)| svg == &handle).next();
                 //TODO:
             },
         }

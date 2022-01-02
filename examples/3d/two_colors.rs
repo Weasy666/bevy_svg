@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_svg::prelude::*;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(WindowDescriptor {
             title: "two_colors".to_string(),
@@ -12,7 +12,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup.system())
+        .add_startup_system(setup)
         .run();
 }
 
@@ -25,7 +25,7 @@ fn setup(
         transform: Transform::from_xyz(5.0, 8.0, 8.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn_bundle(Svg3dBundle {
         svg: svg.clone(),
         origin: Origin::Center,
         transform: Transform {
@@ -35,7 +35,7 @@ fn setup(
         },
         ..Default::default()
     });
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn_bundle(Svg3dBundle {
         svg: svg.clone(),
         origin: Origin::Center,
         transform: Transform {
@@ -45,7 +45,7 @@ fn setup(
         },
         ..Default::default()
     });
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn_bundle(Svg3dBundle {
         svg,
         origin: Origin::Center,
         transform: Transform {
