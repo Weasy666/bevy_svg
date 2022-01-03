@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Rendering now uses the new renderer introduced in Bevy `0.6`
 - `SvgBundle` is replaced by `Svg2dBundle` and `Svg3dBundle`
+- Updated `usvg` to version `0.20`
 
 
 ## [0.4.0] - 2021-12-20

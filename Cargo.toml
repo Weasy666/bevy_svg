@@ -20,7 +20,7 @@ bevy = { git = "https://github.com/Davier/bevy/", branch = "mesh2d", default-fea
 lyon_geom = "0.17"
 lyon_svg = "0.17"
 lyon_tessellation = "0.17"
-usvg = "0.19"
+usvg = "0.20"
 
 anyhow = "1.0"
 thiserror = "1.0"
