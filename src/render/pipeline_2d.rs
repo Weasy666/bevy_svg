@@ -3,7 +3,7 @@ use bevy::{
     core::FloatOrd,
     core_pipeline::Transparent2d,
     ecs::{entity::Entity, query::With, world::{FromWorld, World}, system::{Query, Res, ResMut},},
-    log::info,
+    log::debug,
     render::{
         mesh::Mesh,
         render_asset::RenderAssets,
@@ -45,7 +45,7 @@ pub fn extract_svg_2d(
     mut render_world: ResMut<RenderWorld>,
     query: Query<(Entity, &ComputedVisibility, &Mesh2dHandle, &GlobalTransform), With<Handle<Svg>>>,
 ) {
-    info!("Extracting `Svg`s from `World`.");
+    debug!("Extracting `Svg`s from `World`.");
     let mut extracted_svgs = render_world.get_resource_mut::<ExtractedSvgs2d>().unwrap();
     extracted_svgs.svgs.clear();
     for (entity, computed_visibility, mesh2d_handle, global_transform) in query.iter() {
@@ -59,7 +59,7 @@ pub fn extract_svg_2d(
         });
     }
 
-    info!("Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
+    debug!("Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
 }
 
 /// Queue all extraced 2D [`Svg`]s for rendering with the [`Svg2dPipeline`] custom pipeline and [`DrawSvg2d`] draw function
@@ -75,10 +75,10 @@ pub fn queue_svg_2d(
     mut views: Query<&mut RenderPhase<Transparent2d>>,
 ) {
     if svgs_2d.svgs.is_empty() {
-        info!("No `Svg2d`s found to queue.");
+        debug!("No `Svg2d`s found to queue.");
         return;
     }
-    info!("Queuing {} `Svg2d`s for drawing/rendering.", svgs_2d.svgs.len());
+    debug!("Queuing {} `Svg2d`s for drawing/rendering.", svgs_2d.svgs.len());
     let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples);
     let draw_svg_2d = transparent_draw_functions
         .read()

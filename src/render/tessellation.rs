@@ -1,5 +1,5 @@
 use bevy::{
-    log::{error, info},
+    log::{error, debug},
     math::Vec3,
     transform::components::Transform,
 };
@@ -16,7 +16,7 @@ pub(crate) fn generate_buffer(
     fill_tess: &mut FillTessellator,
     stroke_tess: &mut StrokeTessellator,
 ) -> VertexBuffers {
-    info!("Tessellating SVG: {}", svg.name);
+    debug!("Tessellating SVG: {}", svg.name);
 
     let flip_y = Transform::from_scale(Vec3::new(1.0, -1.0, 1.0));
     let mut buffers = VertexBuffers::new();
@@ -53,7 +53,7 @@ pub(crate) fn generate_buffer(
         }
         buffers.extend_one(buffer);
     }
-    info!("Tessellating SVG: {} ... Done", svg.name);
+    debug!("Tessellating SVG: {} ... Done", svg.name);
 
     buffers
 }

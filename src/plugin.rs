@@ -20,7 +20,7 @@ use bevy::{
         schedule::{StageLabel, SystemStage},
         system::{Query, Res, ResMut}
     },
-    log::trace,
+    log::debug,
     math::Vec3,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
@@ -78,11 +78,11 @@ fn svg_mesh_maker(
                 for (_, _, mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _, _)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
                     if tesselated_mesh.is_none() {
-                        trace!("Make mesh for SVG: {}", svg.name);
+                        debug!("Make mesh for SVG: {}", svg.name);
                         let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
                         tesselated_mesh = Some(meshes.add(buffer.convert()));
                     } else {
-                        trace!("Mesh for SVG `{}` already available, copying handle", svg.name);
+                        debug!("Mesh for SVG `{}` already available, copying handle", svg.name);
                     }
 
                     let translation = match origin {

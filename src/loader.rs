@@ -1,5 +1,5 @@
 use anyhow;
-use bevy::{asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset}, log::trace};
+use bevy::{asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset}, log::debug};
 use thiserror::Error;
 
 use crate::svg::Svg;
@@ -19,7 +19,7 @@ impl AssetLoader for SvgAssetLoader {
             opts.fontdb.load_system_fonts();
             opts.fontdb.load_fonts_dir("./assets");
 
-            trace!("Parsing SVG: {}", load_context.path().display());
+            debug!("Parsing SVG: {}", load_context.path().display());
             let svg_tree = usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| {
                 FileSvgError {
                     error: err.into(),
@@ -37,7 +37,7 @@ impl AssetLoader for SvgAssetLoader {
             svg.name = name.to_string();
 
             load_context.set_default_asset(LoadedAsset::new(svg));
-            trace!("Parsing SVG: {} ... Done", load_context.path().display());
+            debug!("Parsing SVG: {} ... Done", load_context.path().display());
             Ok(())
         })
     }
