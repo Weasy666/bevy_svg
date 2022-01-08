@@ -21,7 +21,7 @@ default = ["2d", "3d"]
 
 [dependencies]
 #bevy = { version = "0.6", default-features = false, features = ["render", "trace"] }
-bevy = { git = "https://github.com/Davier/bevy/", branch = "mesh2d", default-features = false }
+copyless = "0.1"
 
 lyon_geom = "0.17"
 lyon_svg = "0.17"

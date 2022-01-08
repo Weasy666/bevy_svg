@@ -18,9 +18,22 @@ use bevy::{
     },
     transform::components::GlobalTransform, pbr::{MeshPipeline, MeshPipelineKey, SetMeshViewBindGroup, SetMeshBindGroup, DrawMesh},
 };
+use copyless::VecHelper;
 
 use crate::{render::SVG_3D_SHADER_HANDLE, svg::Svg};
 
+
+#[derive(Default)]
+pub struct ExtractedSvgs3d {
+    svgs: Vec<ExtractedSvg3d>,
+}
+
+#[derive(Clone)]
+pub struct ExtractedSvg3d {
+    pub entity: Entity,
+    pub mesh3d_handle: Handle<Mesh>,
+    pub global_transform: GlobalTransform
+}
 
 /// Extract [`Svg`]s with a [`Handle`] to a [`Mesh`] component into [`RenderWorld`].
 pub fn extract_svg_3d(
@@ -34,7 +47,7 @@ pub fn extract_svg_3d(
         if !computed_visibility.is_visible {
             continue;
         }
-        extracted_svgs.svgs.push(ExtractedSvg3d {
+        extracted_svgs.svgs.alloc().init(ExtractedSvg3d {
             entity,
             mesh3d_handle: mesh3d_handle.clone(),
             global_transform: global_transform.clone(),
@@ -90,6 +103,18 @@ pub fn queue_svg_3d(
         }
     }
 }
+
+/// Specifies how to render a [`Svg`] in 2d.
+pub type DrawSvg3d = (
+    // Set the pipeline
+    SetItemPipeline,
+    // Set the view uniform as bind group 0
+    SetMeshViewBindGroup<0>,
+    // Set the mesh uniform as bind group 1
+    SetMeshBindGroup<1>,
+    // Draw the mesh
+    DrawMesh,
+);
 
 // Pipeline for 2d [`Svg`]s.
 pub struct Svg3dPipeline {
@@ -194,28 +219,4 @@ impl SpecializedPipeline for Svg3dPipeline {
             label: Some("svg_3d_pipeline".into()),
         }
     }
-}
-
-/// Specifies how to render a [`Svg`] in 2d.
-pub type DrawSvg3d = (
-    // Set the pipeline
-    SetItemPipeline,
-    // Set the view uniform as bind group 0
-    SetMeshViewBindGroup<0>,
-    // Set the mesh uniform as bind group 1
-    SetMeshBindGroup<1>,
-    // Draw the mesh
-    DrawMesh,
-);
-
-#[derive(Default)]
-pub struct ExtractedSvgs3d {
-    svgs: Vec<ExtractedSvg3d>,
-}
-
-#[derive(Clone)]
-pub struct ExtractedSvg3d {
-    pub entity: Entity,
-    pub mesh3d_handle: Handle<Mesh>,
-    pub global_transform: GlobalTransform
 }

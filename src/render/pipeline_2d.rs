@@ -23,9 +23,105 @@ use bevy::{
     },
     transform::components::GlobalTransform,
 };
+use copyless::VecHelper;
 
 use crate::{render::SVG_2D_SHADER_HANDLE, svg::Svg};
 
+
+#[derive(Default)]
+pub struct ExtractedSvgs2d {
+    svgs: Vec<ExtractedSvg2d>,
+}
+
+#[derive(Clone)]
+pub struct ExtractedSvg2d {
+    pub entity: Entity,
+    pub mesh2d_handle: Mesh2dHandle,
+    pub global_transform: GlobalTransform
+}
+
+/// Extract [`Svg`]s with a [`Mesh2dHandle`] component into [`RenderWorld`].
+pub fn extract_svg_2d(
+    mut render_world: ResMut<RenderWorld>,
+    query: Query<(Entity, &ComputedVisibility, &Mesh2dHandle, &GlobalTransform), With<Handle<Svg>>>,
+) {
+    info!("Extracting `Svg`s from `World`.");
+    let mut extracted_svgs = render_world.get_resource_mut::<ExtractedSvgs2d>().unwrap();
+    extracted_svgs.svgs.clear();
+    for (entity, computed_visibility, mesh2d_handle, global_transform) in query.iter() {
+        if !computed_visibility.is_visible {
+            continue;
+        }
+        extracted_svgs.svgs.alloc().init(ExtractedSvg2d {
+            entity,
+            mesh2d_handle: mesh2d_handle.clone(),
+            global_transform: global_transform.clone(),
+        });
+    }
+
+    info!("Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
+}
+
+/// Queue all extraced 2D [`Svg`]s for rendering with the [`Svg2dPipeline`] custom pipeline and [`DrawSvg2d`] draw function
+#[allow(clippy::too_many_arguments)]
+pub fn queue_svg_2d(
+    transparent_draw_functions: Res<DrawFunctions<Transparent2d>>,
+    svg_2d_pipeline: Res<Svg2dPipeline>,
+    mut pipelines: ResMut<SpecializedPipelines<Svg2dPipeline>>,
+    mut pipeline_cache: ResMut<RenderPipelineCache>,
+    msaa: Res<Msaa>,
+    render_meshes: Res<RenderAssets<Mesh>>,
+    svgs_2d: ResMut<ExtractedSvgs2d>,
+    mut views: Query<&mut RenderPhase<Transparent2d>>,
+) {
+    if svgs_2d.svgs.is_empty() {
+        info!("No `Svg2d`s found to queue.");
+        return;
+    }
+    info!("Queuing {} `Svg2d`s for drawing/rendering.", svgs_2d.svgs.len());
+    let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples);
+    let draw_svg_2d = transparent_draw_functions
+        .read()
+        .get_id::<DrawSvg2d>()
+        .unwrap();
+
+    // Iterate each view (a camera is a view)
+    for mut transparent_phase in views.iter_mut() {
+        // Queue all entities visible to that view
+        for svg2d in &svgs_2d.svgs {
+            // Get our specialized pipeline
+            let mut mesh2d_key = mesh_key;
+            if let Some(mesh) = render_meshes.get(&svg2d.mesh2d_handle.0) {
+                mesh2d_key |= Mesh2dPipelineKey::from_primitive_topology(mesh.primitive_topology);
+            }
+
+            let pipeline_id = pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
+            let mesh_z = svg2d.global_transform.translation.z;
+            transparent_phase.add(Transparent2d {
+                entity: svg2d.entity,
+                draw_function: draw_svg_2d,
+                pipeline: pipeline_id,
+                // The 2d render items are sorted according to their z value before rendering,
+                // in order to get correct transparency
+                sort_key: FloatOrd(mesh_z),
+                // This material is not batched
+                batch_range: None,
+            });
+        }
+    }
+}
+
+/// Specifies how to render a [`Svg`] in 2d.
+pub type DrawSvg2d = (
+    // Set the pipeline
+    SetItemPipeline,
+    // Set the view uniform as bind group 0
+    SetMesh2dViewBindGroup<0>,
+    // Set the mesh uniform as bind group 1
+    SetMesh2dBindGroup<1>,
+    // Draw the mesh
+    DrawMesh2d,
+);
 
 /// Pipeline for 2d [`Svg`]s.
 pub struct Svg2dPipeline {
@@ -113,101 +209,6 @@ impl SpecializedPipeline for Svg2dPipeline {
                 alpha_to_coverage_enabled: false,
             },
             label: Some("svg_2d_pipeline".into()),
-        }
-    }
-}
-
-/// Specifies how to render a [`Svg`] in 2d.
-pub type DrawSvg2d = (
-    // Set the pipeline
-    SetItemPipeline,
-    // Set the view uniform as bind group 0
-    SetMesh2dViewBindGroup<0>,
-    // Set the mesh uniform as bind group 1
-    SetMesh2dBindGroup<1>,
-    // Draw the mesh
-    DrawMesh2d,
-);
-
-#[derive(Default)]
-pub struct ExtractedSvgs2d {
-    svgs: Vec<ExtractedSvg2d>,
-}
-
-#[derive(Clone)]
-pub struct ExtractedSvg2d {
-    pub entity: Entity,
-    pub mesh2d_handle: Mesh2dHandle,
-    pub global_transform: GlobalTransform
-}
-
-/// Extract [`Svg`]s with a [`Mesh2dHandle`] component into [`RenderWorld`].
-pub fn extract_svg_2d(
-    mut render_world: ResMut<RenderWorld>,
-    query: Query<(Entity, &ComputedVisibility, &Mesh2dHandle, &GlobalTransform), With<Handle<Svg>>>,
-) {
-    info!("Extracting `Svg`s from `World`.");
-    let mut extracted_svgs = render_world.get_resource_mut::<ExtractedSvgs2d>().unwrap();
-    extracted_svgs.svgs.clear();
-    for (entity, computed_visibility, mesh2d_handle, global_transform) in query.iter() {
-        if !computed_visibility.is_visible {
-            continue;
-        }
-        extracted_svgs.svgs.push(ExtractedSvg2d {
-            entity,
-            mesh2d_handle: mesh2d_handle.clone(),
-            global_transform: global_transform.clone(),
-        });
-    }
-
-    info!("Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
-}
-
-/// Queue all extraced 2D [`Svg`]s for rendering with the [`Svg2dPipeline`] custom pipeline and [`DrawSvg2d`] draw function
-#[allow(clippy::too_many_arguments)]
-pub fn queue_svg_2d(
-    transparent_draw_functions: Res<DrawFunctions<Transparent2d>>,
-    svg_2d_pipeline: Res<Svg2dPipeline>,
-    mut pipelines: ResMut<SpecializedPipelines<Svg2dPipeline>>,
-    mut pipeline_cache: ResMut<RenderPipelineCache>,
-    msaa: Res<Msaa>,
-    render_meshes: Res<RenderAssets<Mesh>>,
-    svgs_2d: ResMut<ExtractedSvgs2d>,
-    mut views: Query<&mut RenderPhase<Transparent2d>>,
-) {
-    if svgs_2d.svgs.is_empty() {
-        info!("No `Svg2d`s found to queue.");
-        return;
-    }
-    info!("Queuing {} `Svg2d`s for drawing/rendering.", svgs_2d.svgs.len());
-    let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples);
-    let draw_svg_2d = transparent_draw_functions
-        .read()
-        .get_id::<DrawSvg2d>()
-        .unwrap();
-
-    // Iterate each view (a camera is a view)
-    for mut transparent_phase in views.iter_mut() {
-        // Queue all entities visible to that view
-        for svg2d in &svgs_2d.svgs {
-            // Get our specialized pipeline
-            let mut mesh2d_key = mesh_key;
-            if let Some(mesh) = render_meshes.get(&svg2d.mesh2d_handle.0) {
-                mesh2d_key |= Mesh2dPipelineKey::from_primitive_topology(mesh.primitive_topology);
-            }
-
-            let pipeline_id = pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
-            let mesh_z = svg2d.global_transform.translation.z;
-            transparent_phase.add(Transparent2d {
-                entity: svg2d.entity,
-                draw_function: draw_svg_2d,
-                pipeline: pipeline_id,
-                // The 2d render items are sorted according to their z value before rendering,
-                // in order to get correct transparency
-                sort_key: FloatOrd(mesh_z),
-                // This material is not batched
-                batch_range: None,
-            });
         }
     }
 }
