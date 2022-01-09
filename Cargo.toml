@@ -1,12 +1,12 @@
 [package]
 authors = ["Daniel Wiesenberg <weasy@hotmail.de>"]
-description = "Load and draw simple SVG files in Bevy."
+description = "Load and draw SVG files in Bevy."
 edition = "2021"
 license = "Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
 repository = "https://github.com/Weasy666/bevy_svg/"
-version = "0.4.0"
+version = "0.6.0"
 keywords = ["gamedev", "graphics", "bevy", "svg"]
 categories = ["Graphics", "Game engines", "Rendering"]
 exclude = ["assets", "examples"]
@@ -16,11 +16,11 @@ exclude = ["assets", "examples"]
 [features]
 default = ["2d", "3d"]
 
-2d = ["bevy/bevy_core_pipeline", "bevy/bevy_render"]
-3d = ["bevy/bevy_core_pipeline", "bevy/bevy_render"]
+2d = ["bevy/bevy_sprite"]
+3d = ["bevy/bevy_pbr"]
 
 [dependencies]
-#bevy = { version = "0.6", default-features = false, features = ["render", "trace"] }
+bevy = { version = "0.6", default-features = false, features = ["bevy_core_pipeline", "bevy_render"] }
 copyless = "0.1"
 
 lyon_geom = "0.17"
@@ -32,8 +32,7 @@ anyhow = "1.0"
 thiserror = "1.0"
 
 [dev-dependencies]
-#bevy = { version = "0.6", default-features = true }
-bevy = { git = "https://github.com/Davier/bevy/", branch = "mesh2d" }
+bevy = { version = "0.6", default-features = true }
 
 #### 2D examples ####
 [[example]]

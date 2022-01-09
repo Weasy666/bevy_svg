@@ -5,12 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.6.0] - 2022-01-09
+### Added
+- Added features `2d` and `3d`, both are activae on default, but can be used separately if needed.
+
 ### Changed
 - Rendering now uses the new renderer introduced in Bevy `0.6`
 - `SvgBundle` is replaced by `Svg2dBundle` and `Svg3dBundle`
-- Added features `2d` and `3d`, both are activated on default, but can be used separately if needed.
 - Updated `usvg` to version `0.20`
 
+## [0.5.0]
+Skipped this version number to be in sync with bevy.
 
 ## [0.4.0] - 2021-12-20
 ### Added
