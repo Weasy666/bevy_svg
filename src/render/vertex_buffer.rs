@@ -6,6 +6,7 @@ use bevy::{
     },
     transform::components::Transform,
 };
+use copyless::VecHelper;
 use lyon_tessellation::{self, FillVertex, FillVertexConstructor, StrokeVertex, StrokeVertexConstructor};
 
 use crate::Convert;
@@ -30,13 +31,13 @@ impl Convert<Mesh> for VertexBuffers {
         let mut positions = Vec::with_capacity(self.vertices.len());
         let mut colors = Vec::with_capacity(self.vertices.len());
 
-        self.vertices.iter().for_each(|v| {
-            positions.push(v.position);
-            colors.push(v.color);
-        });
+        for vert in self.vertices.into_iter() {
+            positions.alloc().init(vert.position);
+            colors.alloc().init(vert.color);
+        }
 
         let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        mesh.set_indices(Some(Indices::U32(self.indices.clone())));
+        mesh.set_indices(Some(Indices::U32(self.indices)));
         mesh.set_attribute(
             Mesh::ATTRIBUTE_POSITION,
             positions
@@ -100,18 +101,26 @@ impl BufferExt<VertexBuffers> for VertexBuffers {
     fn extend_one(&mut self, item: VertexBuffers) {
         let offset = self.vertices.len() as u32;
 
-        self.vertices.extend(&item.vertices);
-        self.indices.extend(item.indices.iter().map(|i| i + offset));
+        for vert in item.vertices.into_iter() {
+            self.vertices.alloc().init(vert);
+        }
+        for idx in item.indices.into_iter() {
+            self.indices.alloc().init(idx + offset);
+        }
     }
 
     fn extend<T: IntoIterator<Item = VertexBuffers>>(&mut self, iter: T) {
         let mut offset = self.vertices.len() as u32;
 
-        for buf in iter {
-            self.vertices.extend(&buf.vertices);
-            self.indices.extend(buf.indices.iter().map(|i| i + offset));
-
-            offset += buf.vertices.len() as u32;
+        for buf in iter.into_iter() {
+            let num_verts = buf.vertices.len() as u32;
+            for vert in buf.vertices.into_iter() {
+                self.vertices.alloc().init(vert);
+            }
+            for idx in buf.indices.into_iter() {
+                self.indices.alloc().init(idx + offset);
+            }
+            offset += num_verts;
         }
     }
 }

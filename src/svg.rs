@@ -1,4 +1,5 @@
 use bevy::{ecs::component::Component, math::Mat4, reflect::TypeUuid, render::color::Color, transform::components::Transform};
+use copyless::VecHelper;
 use lyon_geom::euclid::default::Transform2D;
 use lyon_svg::{parser::ViewBox, path::PathEvent};
 use lyon_tessellation::math::Point;
@@ -47,7 +48,7 @@ impl Svg {
                         _ => Color::default(),
                     };
 
-                    descriptors.push(PathDescriptor {
+                    descriptors.alloc().init(PathDescriptor {
                         segments: path.convert().collect(),
                         abs_transform: abs_t,
                         color,
@@ -58,7 +59,7 @@ impl Svg {
                 if let Some(ref stroke) = path.stroke {
                     let (color, draw_type) = stroke.convert();
 
-                    descriptors.push(PathDescriptor {
+                    descriptors.alloc().init(PathDescriptor {
                         segments: path.convert().collect(),
                         abs_transform: abs_t,
                         color,
