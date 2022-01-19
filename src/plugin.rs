@@ -18,17 +18,17 @@ use bevy::{
         entity::Entity,
         event::EventReader,
         schedule::{StageLabel, SystemStage},
-        system::{Query, Res, ResMut}
+        system::{Commands, Query, Res}
     },
     log::debug,
     math::Vec3,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
-    transform::components::Transform,
+    transform::components::Transform, prelude::DespawnRecursiveExt,
 };
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
-use crate::{Convert, loader::SvgAssetLoader, render::tessellation, svg::{Origin, Svg}};
+use crate::{loader::SvgAssetLoader, render, svg::{Origin, Svg}};
 
 
 /// Stages for this plugin.
@@ -55,18 +55,16 @@ impl Plugin for SvgPlugin {
                 Stage::SVG,
                 SystemStage::parallel(),
             )
-            .add_system_to_stage(Stage::SVG, svg_mesh_maker)
-            .add_plugin(crate::render::SvgPlugin);
+            .add_system_to_stage(Stage::SVG, svg_mesh_linker)
+            .add_plugin(render::SvgPlugin);
     }
 }
 
-/// Bevy system which queries for all [`Svg`](crate::svg::Svg)s and tessellates them into a mesh.
-fn svg_mesh_maker(
+/// Bevy system which queries for all [`Svg`] bundles and adds the correct [`Mesh`] to them.
+fn svg_mesh_linker(
+    mut commands: Commands,
     mut svg_events: EventReader<AssetEvent<Svg>>,
     svgs: Res<Assets<Svg>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut fill_tess: ResMut<FillTessellator>,
-    mut stroke_tess: ResMut<StrokeTessellator>,
     mut query: Query<
         (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, Option<&mut Handle<Mesh>>, &Origin, &mut Transform),
     >,
@@ -74,39 +72,28 @@ fn svg_mesh_maker(
     for event in svg_events.iter() {
         match event {
             AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
-                let mut tesselated_mesh = None;
-                for (_, _, mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, _, _, _, _)| svg == &handle) {
+                for (.., mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
-                    if tesselated_mesh.is_none() {
-                        debug!("Make mesh for SVG: {}", svg.name);
-                        let buffer = tessellation::generate_buffer(&svg, &mut fill_tess, &mut stroke_tess);
-                        tesselated_mesh = Some(meshes.add(buffer.convert()));
-                    } else {
-                        debug!("Mesh for SVG `{}` already available, copying handle", svg.name);
-                    }
+                    debug!("Svg `{}` created. Adding mesh component to entity.", svg.name);
 
                     let translation = match origin {
                         Origin::Center => transform.translation + Vec3::new(
-                            -svg.width as f32 * transform.scale.x / 2.0,
-                            svg.height as f32 * transform.scale.y / 2.0,
+                            -svg.size.x * transform.scale.x / 2.0,
+                            svg.size.y * transform.scale.y / 2.0,
                             0.0
                         ),
                         Origin::TopLeft => transform.translation,
                     };
                     transform.translation = translation;
 
-                    let new_mesh = tesselated_mesh.as_ref().unwrap().clone();
-                    if let Some(mut mesh_2d) = mesh_2d {
-                        mesh_2d.0 = new_mesh.clone();
-                    }
-                    if let Some(mut mesh_3d) = mesh_3d {
-                        *mesh_3d = new_mesh;
-                    }
+                    mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
+                    mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
                 }
             },
             AssetEvent::Removed { handle } => {
-                let _bundle = query.iter_mut().filter(|(_, svg, _, _, _, _)| svg == &handle).next();
-                //TODO:
+                for (entity, ..) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+                    commands.entity(entity).despawn_recursive();
+                }
             },
         }
     }

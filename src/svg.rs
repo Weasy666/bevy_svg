@@ -1,4 +1,4 @@
-use bevy::{ecs::component::Component, math::Mat4, reflect::TypeUuid, render::color::Color, transform::components::Transform};
+use bevy::{asset::Handle, ecs::component::Component, math::{Mat4, Vec2}, reflect::TypeUuid, render::{color::Color, mesh::Mesh}, transform::components::Transform};
 use copyless::VecHelper;
 use lyon_geom::euclid::default::Transform2D;
 use lyon_svg::{parser::ViewBox, path::PathEvent};
@@ -13,14 +13,14 @@ use crate::Convert;
 pub struct Svg {
     /// The name of the file.
     pub name: String,
-    /// Width of the SVG.
-    pub width: f64,
-    /// Height of the SVG.
-    pub height: f64,
+    /// Size of the SVG.
+    pub size: Vec2,
     /// ViewBox of the SVG.
     pub view_box: ViewBox,
     /// All paths that make up the SVG.
     pub paths: Vec<PathDescriptor>,
+    /// The fully tessellated paths as [`Mesh`].
+    pub mesh: Handle<Mesh>,
 }
 
 impl Svg {
@@ -71,8 +71,7 @@ impl Svg {
 
         Svg {
             name: Default::default(),
-            width: size.width(),
-            height: size.height(),
+            size: Vec2::new(size.width() as f32, size.height() as f32),
             view_box: ViewBox {
                 x: view_box.rect.x(),
                 y: view_box.rect.y(),
@@ -80,6 +79,7 @@ impl Svg {
                 h: view_box.rect.height(),
             },
             paths: descriptors,
+            mesh: Default::default(),
         }
     }
 }

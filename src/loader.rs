@@ -1,8 +1,9 @@
 use anyhow;
-use bevy::{asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset}, log::debug};
+use bevy::{asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset}, log::debug, render::mesh::Mesh};
+use lyon_tessellation::{FillTessellator, StrokeTessellator};
 use thiserror::Error;
 
-use crate::svg::Svg;
+use crate::{svg::Svg, Convert, render::tessellation};
 
 
 #[derive(Default)]
@@ -19,7 +20,7 @@ impl AssetLoader for SvgAssetLoader {
             opts.fontdb.load_system_fonts();
             opts.fontdb.load_fonts_dir("./assets");
 
-            debug!("Parsing SVG: {}", load_context.path().display());
+            debug!("Parsing SVG: {} ...", load_context.path().display());
             let svg_tree = usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| {
                 FileSvgError {
                     error: err.into(),
@@ -35,9 +36,17 @@ impl AssetLoader for SvgAssetLoader {
                 }
             )?.to_string_lossy();
             svg.name = name.to_string();
+            debug!("Parsing SVG: {} ... Done", load_context.path().display());
+
+            debug!("Tessellating SVG: {} ...", load_context.path().display());
+            let buffer = tessellation::generate_buffer(&svg, &mut FillTessellator::new(), &mut StrokeTessellator::new());
+            debug!("Tessellating SVG: {} ... Done", load_context.path().display());
+            let mesh: Mesh = buffer.convert();
+            let mesh_handle = load_context.set_labeled_asset("mesh", LoadedAsset::new(mesh));
+            svg.mesh = mesh_handle;
 
             load_context.set_default_asset(LoadedAsset::new(svg));
-            debug!("Parsing SVG: {} ... Done", load_context.path().display());
+
             Ok(())
         })
     }
