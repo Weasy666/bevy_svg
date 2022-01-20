@@ -11,6 +11,8 @@
 //! [`RenderWorld`](bevy::render::RenderWorld).
 //! Afterwards it is queued in the [`RenderStage::Queue`](bevy::render::RenderStage) for actual drawing/rendering.
 
+use std::ops::Deref;
+
 use bevy::{
     app::{App, Plugin},
     asset::{AddAsset, AssetEvent, Assets, Handle},
@@ -18,10 +20,10 @@ use bevy::{
         entity::Entity,
         event::EventReader,
         schedule::{StageLabel, SystemStage},
-        system::{Commands, Query, Res}
+        system::{Commands, Query, Res, ResMut}
     },
     log::debug,
-    math::Vec3,
+    math::Vec3Swizzles,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
     transform::components::Transform, prelude::DespawnRecursiveExt,
@@ -64,6 +66,7 @@ impl Plugin for SvgPlugin {
 fn svg_mesh_linker(
     mut commands: Commands,
     mut svg_events: EventReader<AssetEvent<Svg>>,
+    mut meshes: ResMut<Assets<Mesh>>,
     svgs: Res<Assets<Svg>>,
     mut query: Query<
         (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, Option<&mut Handle<Mesh>>, &Origin, &mut Transform),
@@ -71,23 +74,36 @@ fn svg_mesh_linker(
 ) {
     for event in svg_events.iter() {
         match event {
-            AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
+            AssetEvent::Created { handle } => {
                 for (.., mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
                     debug!("Svg `{}` created. Adding mesh component to entity.", svg.name);
-
-                    let translation = match origin {
-                        Origin::Center => transform.translation + Vec3::new(
-                            -svg.size.x * transform.scale.x / 2.0,
-                            svg.size.y * transform.scale.y / 2.0,
-                            0.0
-                        ),
-                        Origin::TopLeft => transform.translation,
-                    };
-                    transform.translation = translation;
+                    let scaled_size = svg.size * transform.scale.xy();
+                    transform.translation += origin.compute_translation(scaled_size);
 
                     mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
                     mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
+                }
+            },
+            AssetEvent::Modified { handle } => {
+                for (.., mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+                    let svg = svgs.get(handle).unwrap();
+                    debug!("Svg `{}` modified. Changing mesh component of entity.", svg.name);
+                    let scaled_size = svg.size * transform.scale.xy();
+                    transform.translation += origin.compute_translation(scaled_size);
+
+                    mesh_2d.filter(|mesh| mesh.0 != svg.mesh)
+                        .map(|mut mesh| {
+                            let old_mesh = mesh.0.clone();
+                            mesh.0 = svg.mesh.clone();
+                            meshes.remove(old_mesh);
+                        });
+                    mesh_3d.filter(|mesh| mesh.deref() != &svg.mesh)
+                        .map(|mut mesh| {
+                            let old_mesh = mesh.clone();
+                            *mesh = svg.mesh.clone();
+                            meshes.remove(old_mesh);
+                        });
                 }
             },
             AssetEvent::Removed { handle } => {

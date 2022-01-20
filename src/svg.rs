@@ -1,4 +1,4 @@
-use bevy::{asset::Handle, ecs::component::Component, math::{Mat4, Vec2}, reflect::TypeUuid, render::{color::Color, mesh::Mesh}, transform::components::Transform};
+use bevy::{asset::Handle, ecs::component::Component, math::{Mat4, Vec2, Vec3}, reflect::TypeUuid, render::{color::Color, mesh::Mesh}, transform::components::Transform};
 use copyless::VecHelper;
 use lyon_geom::euclid::default::Transform2D;
 use lyon_svg::{parser::ViewBox, path::PathEvent};
@@ -87,15 +87,52 @@ impl Svg {
 #[derive(Clone, Component, Copy, Debug, PartialEq)]
 /// Origin of the coordinate system.
 pub enum Origin {
-    /// Top left of the image or viewbox, this is the default for a SVG.
-    TopLeft,
+    /// Bottom left of the image or viewbox.
+    BottomLeft,
+    /// Bottom right of the image or viewbox.
+    BottomRight,
     /// Center of the image or viewbox.
     Center,
+    /// Top left of the image or viewbox, this is the default for a SVG.
+    TopLeft,
+    /// Top right of the image or viewbox.
+    TopRight,
 }
 
 impl Default for Origin {
     fn default() -> Self {
         Origin::TopLeft
+    }
+}
+
+impl Origin {
+    /// Computes the translation for an origin. The resulting translation needs to be added
+    /// to the translation of the SVG.
+    pub fn compute_translation(&self, scaled_size: Vec2) -> Vec3 {
+        match self {
+            Origin::BottomLeft => Vec3::new(
+                0.0,
+                scaled_size.y,
+                0.0
+            ),
+            Origin::BottomRight => Vec3::new(
+                -scaled_size.x,
+                scaled_size.y,
+                0.0
+            ),
+            Origin::Center => Vec3::new(
+                -scaled_size.x / 2.0,
+                scaled_size.y / 2.0,
+                0.0
+            ),
+            // Standard SVG origin is top left, so we don't need to do anything
+            Origin::TopLeft => Vec3::ZERO,
+            Origin::TopRight => Vec3::new(
+                -scaled_size.x,
+                0.0,
+                0.0
+            ),
+        }
     }
 }
 
