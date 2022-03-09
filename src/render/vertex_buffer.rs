@@ -17,7 +17,7 @@ use crate::Convert;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) struct Vertex {
     position: [f32; 3],
-    color: [f32; 4],
+    color: u32,
 }
 
 /// The index type of a Bevy [`Mesh`](bevy::render::mesh::Mesh).
@@ -38,11 +38,11 @@ impl Convert<Mesh> for VertexBuffers {
 
         let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
         mesh.set_indices(Some(Indices::U32(self.indices)));
-        mesh.set_attribute(
+        mesh.insert_attribute(
             Mesh::ATTRIBUTE_POSITION,
             positions
         );
-        mesh.set_attribute(
+        mesh.insert_attribute(
             Mesh::ATTRIBUTE_COLOR,
             colors
         );
@@ -69,7 +69,7 @@ impl FillVertexConstructor<Vertex> for VertexConstructor {
 
         Vertex {
             position: [pos.x, pos.y, pos.z],
-            color: self.color.as_linear_rgba_f32(),
+            color: self.color.as_linear_rgba_u32(),
         }
     }
 }
@@ -86,7 +86,7 @@ impl StrokeVertexConstructor<Vertex> for VertexConstructor {
 
         Vertex {
             position: [pos.x, pos.y, pos.z],
-            color: self.color.as_linear_rgba_f32(),
+            color: self.color.as_linear_rgba_u32(),
         }
     }
 }

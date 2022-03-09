@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added missing origins `BottomLeft`, `BottomRight`, `TopRight`
+
+### Changed
+- Tessellation of a SVG file will now happen on load in the `AssetLoader`
+- Use [`copyless`](https://crates.io/crates/copyless) to avoid unnecessary allocations.
+- Update mesh vertex buffer layout. This includes changing vertex color from `[f32, 4]` to `u32`.
+
+### Fixed
+- Typos in `README.md`
 
 
 ## [0.6.0] - 2022-01-09
