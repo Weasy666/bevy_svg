@@ -60,7 +60,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup.system())
+        .add_startup_system(setup)
         .run();
 }
 
@@ -72,7 +72,7 @@ fn setup(
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     commands.spawn_bundle(SvgBundle {
         svg,
-        origin: Origin::Center,
+        origin: Origin::Center, // Origin::TopLeft is the default
         ..Default::default()
     });
 }
@@ -89,7 +89,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup.system())
+        .add_startup_system(setup)
         .run();
 }
 
@@ -101,7 +101,7 @@ fn setup(
     commands.spawn_bundle(PerspectiveCameraBundle::new_3d());
     commands.spawn_bundle(SvgBundle {
         svg,
-        origin: Origin::Center,
+        origin: Origin::Center, // Origin::TopLeft is the default
         transform: Transform {
             translation: Vec3::new(0.0, 0.0, 1.5),
             scale: Vec3::new(0.05, 0.05, 1.0), // The scale you need depends a lot on your SVG and camera distance
