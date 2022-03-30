@@ -30,42 +30,45 @@ impl Svg {
         let mut descriptors = Vec::new();
 
         for node in tree.root().descendants() {
-            if let usvg::NodeKind::Path(ref path) = *node.borrow() {
-                let t = path.transform;
-                let abs_t = Transform::from_matrix(
-                    Mat4::from_cols(
-                        [t.a.abs() as f32, t.b as f32,       0.0, 0.0].into(),
-                        [t.c as f32,       t.d.abs() as f32, 0.0, 0.0].into(),
-                        [0.0,              0.0,              1.0, 0.0].into(),
-                        [t.e as f32,       t.f as f32,       0.0, 1.0].into()
-                    )
-                );
+            match *node.borrow() {
+                usvg::NodeKind::Path(ref path) => {
+                    let t = path.transform;
+                    let abs_t = Transform::from_matrix(
+                        Mat4::from_cols(
+                            [t.a.abs() as f32, t.b as f32,       0.0, 0.0].into(),
+                            [t.c as f32,       t.d.abs() as f32, 0.0, 0.0].into(),
+                            [0.0,              0.0,              1.0, 0.0].into(),
+                            [t.e as f32,       t.f as f32,       0.0, 1.0].into()
+                        )
+                    );
 
-                if let Some(ref fill) = path.fill {
-                    let color = match fill.paint {
-                        usvg::Paint::Color(c) =>
-                            Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8()),
-                        _ => Color::default(),
-                    };
+                    if let Some(ref fill) = path.fill {
+                        let color = match fill.paint {
+                            usvg::Paint::Color(c) =>
+                                Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8()),
+                            _ => Color::default(),
+                        };
 
-                    descriptors.alloc().init(PathDescriptor {
-                        segments: path.convert().collect(),
-                        abs_transform: abs_t,
-                        color,
-                        draw_type: DrawType::Fill,
-                    });
-                }
+                        descriptors.alloc().init(PathDescriptor {
+                            segments: path.convert().collect(),
+                            abs_transform: abs_t,
+                            color,
+                            draw_type: DrawType::Fill,
+                        });
+                    }
 
-                if let Some(ref stroke) = path.stroke {
-                    let (color, draw_type) = stroke.convert();
+                    if let Some(ref stroke) = path.stroke {
+                        let (color, draw_type) = stroke.convert();
 
-                    descriptors.alloc().init(PathDescriptor {
-                        segments: path.convert().collect(),
-                        abs_transform: abs_t,
-                        color,
-                        draw_type,
-                    });
-                }
+                        descriptors.alloc().init(PathDescriptor {
+                            segments: path.convert().collect(),
+                            abs_transform: abs_t,
+                            color,
+                            draw_type,
+                        });
+                    }
+                },
+                _ => {}
             }
         }
 
@@ -121,8 +124,8 @@ impl Origin {
                 0.0
             ),
             Origin::Center => Vec3::new(
-                -scaled_size.x / 2.0,
-                scaled_size.y / 2.0,
+                -scaled_size.x * 0.5,
+                scaled_size.y * 0.5,
                 0.0
             ),
             // Standard SVG origin is top left, so we don't need to do anything
