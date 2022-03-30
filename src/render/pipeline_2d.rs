@@ -1,9 +1,10 @@
 use bevy::{
-    asset::Handle,
+    asset::{Assets, Handle},
     core::FloatOrd,
     core_pipeline::Transparent2d,
-    ecs::{entity::Entity, query::With, world::{FromWorld, World}, system::{Query, Res, ResMut},},
+    ecs::{entity::Entity, world::{FromWorld, World}, system::{Query, Res, ResMut}},
     log::debug,
+    math::{Vec3, Vec3Swizzles},
     render::{
         mesh::Mesh,
         render_asset::RenderAssets,
@@ -19,13 +20,13 @@ use bevy::{
     },
     sprite::{
         DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey,
-        SetMesh2dBindGroup, SetMesh2dViewBindGroup,
+        SetMesh2dBindGroup, SetMesh2dViewBindGroup, Mesh2dUniform,
     },
     transform::components::GlobalTransform,
 };
 use copyless::VecHelper;
 
-use crate::{render::SVG_2D_SHADER_HANDLE, svg::Svg};
+use crate::{render::SVG_2D_SHADER_HANDLE, svg::{Origin, Svg}};
 
 
 #[derive(Default)]
@@ -37,29 +38,55 @@ pub struct ExtractedSvgs2d {
 pub struct ExtractedSvg2d {
     pub entity: Entity,
     pub mesh2d_handle: Mesh2dHandle,
-    pub global_transform: GlobalTransform
+    pub origin_offset: Vec3,
+    pub z: f32,
 }
 
 /// Extract [`Svg`]s with a [`Mesh2dHandle`] component into [`RenderWorld`].
 pub fn extract_svg_2d(
     mut render_world: ResMut<RenderWorld>,
-    query: Query<(Entity, &ComputedVisibility, &Mesh2dHandle, &GlobalTransform), With<Handle<Svg>>>,
+    svgs: Res<Assets<Svg>>,
+    query: Query<(Entity, &ComputedVisibility, &Handle<Svg>, &Mesh2dHandle, &Origin, &GlobalTransform)>,
 ) {
     debug!("Extracting `Svg`s from `World`.");
     let mut extracted_svgs = render_world.get_resource_mut::<ExtractedSvgs2d>().unwrap();
     extracted_svgs.svgs.clear();
-    for (entity, computed_visibility, mesh2d_handle, global_transform) in query.iter() {
+    for (entity, computed_visibility, svg_handle, mesh2d_handle, origin, global_transform) in query.iter() {
         if !computed_visibility.is_visible {
             continue;
         }
-        extracted_svgs.svgs.alloc().init(ExtractedSvg2d {
-            entity,
-            mesh2d_handle: mesh2d_handle.clone(),
-            global_transform: global_transform.clone(),
-        });
+
+        if let Some(svg) = svgs.get(svg_handle) {
+            let mut transform = global_transform.clone();
+            let scaled_size = svg.size * transform.scale.xy();
+            transform.translation += origin.compute_translation(scaled_size);
+
+            extracted_svgs.svgs.alloc().init(ExtractedSvg2d {
+                entity,
+                mesh2d_handle: mesh2d_handle.clone(),
+                origin_offset: origin.compute_translation(scaled_size),
+                z: global_transform.translation.z,
+            });
+        }
     }
 
     debug!("Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
+}
+
+pub fn prepare_svg_2d(
+    svgs_2d: ResMut<ExtractedSvgs2d>,
+    mut query: Query<(Entity, &mut Mesh2dUniform)>,
+) {
+    for svg2d in &svgs_2d.svgs {
+        // Get the Uniform (aka data that will be send to the shader) and apply the origin offset
+        // to the translation.
+        if let Ok((_, mut uniform)) = query.get_mut(svg2d.entity) {
+            let column = uniform.transform.col_mut(3);
+            column.x += svg2d.origin_offset.x;
+            column.y += svg2d.origin_offset.y;
+            column.z += svg2d.origin_offset.z;
+        }
+    }
 }
 
 /// Queue all extraced 2D [`Svg`]s for rendering with the [`Svg2dPipeline`] custom pipeline and [`DrawSvg2d`] draw function
@@ -96,14 +123,13 @@ pub fn queue_svg_2d(
             }
 
             let pipeline_id = pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
-            let mesh_z = svg2d.global_transform.translation.z;
             transparent_phase.add(Transparent2d {
                 entity: svg2d.entity,
                 draw_function: draw_svg_2d,
                 pipeline: pipeline_id,
                 // The 2d render items are sorted according to their z value before rendering,
                 // in order to get correct transparency
-                sort_key: FloatOrd(mesh_z),
+                sort_key: FloatOrd(svg2d.z),
                 // This material is not batched
                 batch_range: None,
             });

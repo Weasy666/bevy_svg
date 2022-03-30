@@ -1,8 +1,10 @@
 use bevy::{
-    asset::Handle,
+    asset::{Assets, Handle},
     core_pipeline::Transparent3d,
     ecs::{entity::Entity, query::With, world::{FromWorld, World}, system::{Query, Res, ResMut},},
     log::debug,
+    math::{Vec3, Vec3Swizzles},
+    pbr::MeshUniform,
     render::{
         mesh::Mesh,
         render_asset::RenderAssets,
@@ -20,7 +22,7 @@ use bevy::{
 };
 use copyless::VecHelper;
 
-use crate::{render::SVG_3D_SHADER_HANDLE, svg::Svg};
+use crate::{render::SVG_3D_SHADER_HANDLE, svg::{Origin, Svg}};
 
 
 #[derive(Default)]
@@ -32,29 +34,55 @@ pub struct ExtractedSvgs3d {
 pub struct ExtractedSvg3d {
     pub entity: Entity,
     pub mesh3d_handle: Handle<Mesh>,
-    pub global_transform: GlobalTransform
+    pub origin_offset: Vec3,
+    pub z: f32,
 }
 
 /// Extract [`Svg`]s with a [`Handle`] to a [`Mesh`] component into [`RenderWorld`].
 pub fn extract_svg_3d(
     mut render_world: ResMut<RenderWorld>,
-    query: Query<(Entity, &ComputedVisibility, &Handle<Mesh>, &GlobalTransform), With<Handle<Svg>>>,
+    svgs: Res<Assets<Svg>>,
+    query: Query<(Entity, &ComputedVisibility, &Handle<Svg>, &Handle<Mesh>, &Origin, &GlobalTransform), With<Handle<Svg>>>,
 ) {
     debug!("Extracting `Svg`s from `World`.");
     let mut extracted_svgs = render_world.get_resource_mut::<ExtractedSvgs3d>().unwrap();
     extracted_svgs.svgs.clear();
-    for (entity, computed_visibility, mesh3d_handle, global_transform) in query.iter() {
+    for (entity, computed_visibility, svg_handle, mesh3d_handle, origin, global_transform) in query.iter() {
         if !computed_visibility.is_visible {
             continue;
         }
-        extracted_svgs.svgs.alloc().init(ExtractedSvg3d {
-            entity,
-            mesh3d_handle: mesh3d_handle.clone(),
-            global_transform: global_transform.clone(),
-        });
+
+        if let Some(svg) = svgs.get(svg_handle) {
+            let mut transform = global_transform.clone();
+            let scaled_size = svg.size * transform.scale.xy();
+            transform.translation += origin.compute_translation(scaled_size);
+
+            extracted_svgs.svgs.alloc().init(ExtractedSvg3d {
+                entity,
+                mesh3d_handle: mesh3d_handle.clone(),
+                origin_offset: origin.compute_translation(scaled_size),
+                z: global_transform.translation.z,
+            });
+        }
     }
 
     debug!("Extracted {} `Svg3d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
+}
+
+pub fn prepare_svg_3d(
+    svgs_2d: ResMut<ExtractedSvgs3d>,
+    mut query: Query<(Entity, &mut MeshUniform)>,
+) {
+    for svg2d in &svgs_2d.svgs {
+        // Get the Uniform (aka data that will be send to the shader) and apply the origin offset
+        // to the translation.
+        if let Ok((_, mut uniform)) = query.get_mut(svg2d.entity) {
+            let column = uniform.transform.col_mut(3);
+            column.x += svg2d.origin_offset.x;
+            column.y += svg2d.origin_offset.y;
+            column.z += svg2d.origin_offset.z;
+        }
+    }
 }
 
 /// Queue all extraced 3D [`Svg`]s for rendering with the [`Svg3dPipeline`] custom pipeline and [`DrawSvg3d`] draw function
@@ -91,14 +119,11 @@ pub fn queue_svg_3d(
             }
 
             let pipeline_id = pipelines.specialize(&mut pipeline_cache, &svg_3d_pipeline, mesh3d_key);
-            let mesh_z = svg3d.global_transform.translation.z;
             transparent_phase.add(Transparent3d {
                 entity: svg3d.entity,
                 draw_function: draw_svg_3d,
                 pipeline: pipeline_id,
-                // The 2d render items are sorted according to their z value before rendering,
-                // in order to get correct transparency
-                distance: mesh_z,
+                distance: svg3d.z,
             });
         }
     }

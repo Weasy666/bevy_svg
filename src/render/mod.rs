@@ -59,6 +59,7 @@ impl Plugin for SvgPlugin {
             .init_resource::<SpecializedRenderPipelines<pipeline_2d::Svg2dPipeline>>()
             .init_resource::<pipeline_2d::ExtractedSvgs2d>()
             .add_system_to_stage(RenderStage::Extract, pipeline_2d::extract_svg_2d)
+            .add_system_to_stage(RenderStage::Prepare, pipeline_2d::prepare_svg_2d)
             .add_system_to_stage(RenderStage::Queue, pipeline_2d::queue_svg_2d);
         #[cfg(feature = "3d")]
         render_app
@@ -67,6 +68,7 @@ impl Plugin for SvgPlugin {
             .init_resource::<SpecializedRenderPipelines<pipeline_3d::Svg3dPipeline>>()
             .init_resource::<pipeline_3d::ExtractedSvgs3d>()
             .add_system_to_stage(RenderStage::Extract, pipeline_3d::extract_svg_3d)
+            .add_system_to_stage(RenderStage::Prepare, pipeline_3d::prepare_svg_3d)
             .add_system_to_stage(RenderStage::Queue, pipeline_3d::queue_svg_3d);
     }
 }

@@ -24,14 +24,12 @@ use bevy::{
     },
     hierarchy::DespawnRecursiveExt,
     log::debug,
-    math::Vec3Swizzles,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
-    transform::components::Transform,
 };
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
-use crate::{loader::SvgAssetLoader, render, svg::{Origin, Svg}};
+use crate::{loader::SvgAssetLoader, render, svg::Svg};
 
 
 /// Stages for this plugin.
@@ -70,29 +68,23 @@ fn svg_mesh_linker(
     mut meshes: ResMut<Assets<Mesh>>,
     svgs: Res<Assets<Svg>>,
     mut query: Query<
-        (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, Option<&mut Handle<Mesh>>, &Origin, &mut Transform),
+        (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, Option<&mut Handle<Mesh>>),
     >,
 ) {
     for event in svg_events.iter() {
         match event {
             AssetEvent::Created { handle } => {
-                for (.., mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
                     debug!("Svg `{}` created. Adding mesh component to entity.", svg.name);
-                    let scaled_size = svg.size * transform.scale.xy();
-                    transform.translation += origin.compute_translation(scaled_size);
-
                     mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
                     mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
                 }
             },
             AssetEvent::Modified { handle } => {
-                for (.., mesh_2d, mesh_3d, origin, mut transform) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
                     let svg = svgs.get(handle).unwrap();
                     debug!("Svg `{}` modified. Changing mesh component of entity.", svg.name);
-                    let scaled_size = svg.size * transform.scale.xy();
-                    transform.translation += origin.compute_translation(scaled_size);
-
                     mesh_2d.filter(|mesh| mesh.0 != svg.mesh)
                         .map(|mut mesh| {
                             let old_mesh = mesh.0.clone();
