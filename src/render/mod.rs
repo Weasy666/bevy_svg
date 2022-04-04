@@ -4,7 +4,7 @@ use bevy::{
     reflect::TypeUuid,
     render::{
         render_phase::AddRenderCommand,
-        render_resource::{Shader, SpecializedPipelines},
+        render_resource::{Shader, SpecializedRenderPipelines},
         RenderApp, RenderStage,
     },
 };
@@ -56,7 +56,7 @@ impl Plugin for SvgPlugin {
         render_app
             .add_render_command::<Transparent2d, pipeline_2d::DrawSvg2d>()
             .init_resource::<pipeline_2d::Svg2dPipeline>()
-            .init_resource::<SpecializedPipelines<pipeline_2d::Svg2dPipeline>>()
+            .init_resource::<SpecializedRenderPipelines<pipeline_2d::Svg2dPipeline>>()
             .init_resource::<pipeline_2d::ExtractedSvgs2d>()
             .add_system_to_stage(RenderStage::Extract, pipeline_2d::extract_svg_2d)
             .add_system_to_stage(RenderStage::Queue, pipeline_2d::queue_svg_2d);
@@ -64,7 +64,7 @@ impl Plugin for SvgPlugin {
         render_app
             .add_render_command::<Transparent3d, pipeline_3d::DrawSvg3d>()
             .init_resource::<pipeline_3d::Svg3dPipeline>()
-            .init_resource::<SpecializedPipelines<pipeline_3d::Svg3dPipeline>>()
+            .init_resource::<SpecializedRenderPipelines<pipeline_3d::Svg3dPipeline>>()
             .init_resource::<pipeline_3d::ExtractedSvgs3d>()
             .add_system_to_stage(RenderStage::Extract, pipeline_3d::extract_svg_3d)
             .add_system_to_stage(RenderStage::Queue, pipeline_3d::queue_svg_3d);

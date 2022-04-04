@@ -10,8 +10,8 @@ use bevy::{
         render_phase::{DrawFunctions, RenderPhase, SetItemPipeline},
         render_resource::{
             BlendState, ColorTargetState, ColorWrites, FragmentState, FrontFace,
-            MultisampleState, PolygonMode, PrimitiveState, RenderPipelineCache,
-            RenderPipelineDescriptor, Shader, SpecializedPipeline, SpecializedPipelines, TextureFormat,
+            MultisampleState, PolygonMode, PrimitiveState, PipelineCache,
+            RenderPipelineDescriptor, Shader, SpecializedRenderPipeline, SpecializedRenderPipelines, TextureFormat,
             VertexBufferLayout, VertexFormat, VertexState, VertexStepMode,
         },
         texture::BevyDefault,
@@ -67,8 +67,8 @@ pub fn extract_svg_2d(
 pub fn queue_svg_2d(
     transparent_draw_functions: Res<DrawFunctions<Transparent2d>>,
     svg_2d_pipeline: Res<Svg2dPipeline>,
-    mut pipelines: ResMut<SpecializedPipelines<Svg2dPipeline>>,
-    mut pipeline_cache: ResMut<RenderPipelineCache>,
+    mut pipelines: ResMut<SpecializedRenderPipelines<Svg2dPipeline>>,
+    mut pipeline_cache: ResMut<PipelineCache>,
     msaa: Res<Msaa>,
     render_meshes: Res<RenderAssets<Mesh>>,
     svgs_2d: ResMut<ExtractedSvgs2d>,
@@ -137,7 +137,7 @@ impl FromWorld for Svg2dPipeline {
 }
 
 // Specializie the `Mesh2dPipeline` to draw [`Svg`]s in 2D.
-impl SpecializedPipeline for Svg2dPipeline {
+impl SpecializedRenderPipeline for Svg2dPipeline {
     type Key = Mesh2dPipelineKey;
 
     fn specialize(&self, key: Self::Key) -> RenderPipelineDescriptor {

@@ -30,11 +30,11 @@ impl AssetLoader for SvgAssetLoader {
 
             let mut svg = Svg::from_tree(svg_tree);
             let name = &load_context.path().file_name().ok_or_else(||
-                FileSvgError {
-                    error: SvgError::InvalidFileName(load_context.path().display().to_string()),
-                    path: format!("{}", load_context.path().display()),
-                }
-            )?.to_string_lossy();
+                    FileSvgError {
+                        error: SvgError::InvalidFileName(load_context.path().display().to_string()),
+                        path: format!("{}", load_context.path().display()),
+                    }
+                )?.to_string_lossy();
             svg.name = name.to_string();
             debug!("Parsing SVG: {} ... Done", load_context.path().display());
 

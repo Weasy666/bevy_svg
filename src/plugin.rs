@@ -22,11 +22,12 @@ use bevy::{
         schedule::{StageLabel, SystemStage},
         system::{Commands, Query, Res, ResMut}
     },
+    hierarchy::DespawnRecursiveExt,
     log::debug,
     math::Vec3Swizzles,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
-    transform::components::Transform, prelude::DespawnRecursiveExt,
+    transform::components::Transform,
 };
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
