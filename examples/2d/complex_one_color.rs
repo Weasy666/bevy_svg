@@ -21,7 +21,7 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("asteroid_field.svg");
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(Camera2dBundle::default());
     let mut transform = Transform::from_xyz(0.0, 0.0, 0.0);
     transform.scale = Vec3::new(2.0, 2.0, 1.0);
     commands.spawn_bundle(Svg2dBundle {

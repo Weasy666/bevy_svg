@@ -154,7 +154,7 @@ pub enum DrawType {
 }
 
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
-struct PathConvIter<'a> {
+pub(crate) struct PathConvIter<'a> {
     iter: std::slice::Iter<'a, usvg::PathSegment>,
     prev: Point,
     first: Point,

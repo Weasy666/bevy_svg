@@ -21,7 +21,7 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("neutron_star.svg");
-    commands.spawn_bundle(PerspectiveCameraBundle {
+    commands.spawn_bundle(Camera3dBundle {
         transform: Transform::from_xyz(5.0, 8.0, 8.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });

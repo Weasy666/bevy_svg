@@ -21,7 +21,7 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("asteroid_field.svg");
-    commands.spawn_bundle(PerspectiveCameraBundle::new_3d());
+    commands.spawn_bundle(Camera3dBundle::default());
     commands.spawn_bundle(Svg3dBundle {
         svg,
         origin: Origin::Center,
