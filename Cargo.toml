@@ -23,10 +23,11 @@ default = ["2d", "3d"]
 bevy = { version = "0.8", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_render"] }
 copyless = "0.1"
 
-lyon_geom = "0.17"
-lyon_svg = "0.17"
-lyon_tessellation = "0.17"
+lyon_geom = "1.0"
+lyon_tessellation = "1.0"
+lyon_path = "1.0"
 usvg = "0.20"
+svgtypes = "0.8"
 
 anyhow = "1.0"
 thiserror = "1.0"

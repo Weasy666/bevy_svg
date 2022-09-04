@@ -1,8 +1,9 @@
 use bevy::{asset::Handle, ecs::component::Component, math::{Mat4, Vec2, Vec3}, reflect::TypeUuid, render::{color::Color, mesh::Mesh}, transform::components::Transform};
 use copyless::VecHelper;
 use lyon_geom::euclid::default::Transform2D;
-use lyon_svg::{parser::ViewBox, path::PathEvent};
+use lyon_path::PathEvent;
 use lyon_tessellation::math::Point;
+use svgtypes::ViewBox;
 
 use crate::Convert;
 
