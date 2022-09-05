@@ -111,6 +111,12 @@ fn setup(
 }
 ```
 
+## License
+
+bevy_svg is licensed under either of the following, at your option:
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
+ * MIT License ([LICENSE-MIT](LICENSE-MIT) or https://choosealicense.com/licenses/mit)
 
 [`Bevy`]: https://bevyengine.org
 [`bevy_prototype_lyon`]: https://github.com/Nilirad/bevy_prototype_lyon

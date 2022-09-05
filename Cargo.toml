@@ -2,7 +2,7 @@
 authors = ["Daniel Wiesenberg <weasy@hotmail.de>"]
 description = "Load and draw SVG files in Bevy."
 edition = "2021"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
 repository = "https://github.com/Weasy666/bevy_svg/"
