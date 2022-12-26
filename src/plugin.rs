@@ -13,6 +13,7 @@
 
 use std::ops::Deref;
 
+use crate::resources::{FillTessellator, StrokeTessellator};
 use bevy::{
     app::{App, Plugin},
     asset::{AddAsset, AssetEvent, Assets, Handle},
@@ -27,7 +28,6 @@ use bevy::{
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
 };
-use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
 use crate::{loader::SvgAssetLoader, render, svg::Svg};
 
@@ -43,8 +43,8 @@ pub struct SvgPlugin;
 
 impl Plugin for SvgPlugin {
     fn build(&self, app: &mut App) {
-        let fill_tess = FillTessellator::new();
-        let stroke_tess = StrokeTessellator::new();
+        let fill_tess = FillTessellator::default();
+        let stroke_tess = StrokeTessellator::default();
         app.add_asset::<Svg>()
             .init_asset_loader::<SvgAssetLoader>()
             .insert_resource(fill_tess)

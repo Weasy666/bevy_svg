@@ -11,6 +11,7 @@ use bevy::{
     math::{Vec3, Vec3Swizzles},
     pbr::MeshUniform,
     pbr::{DrawMesh, MeshPipeline, MeshPipelineKey, SetMeshBindGroup, SetMeshViewBindGroup},
+    prelude::Resource,
     render::{
         mesh::Mesh,
         render_asset::RenderAssets,
@@ -34,12 +35,12 @@ use crate::{
     svg::{Origin, Svg},
 };
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 pub struct ExtractedSvgs3d {
     svgs: Vec<ExtractedSvg3d>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Resource)]
 pub struct ExtractedSvg3d {
     pub entity: Entity,
     pub mesh3d_handle: Handle<Mesh>,
@@ -170,6 +171,7 @@ pub type DrawSvg3d = (
 );
 
 // Pipeline for 2d [`Svg`]s.
+#[derive(Resource)]
 pub struct Svg3dPipeline {
     mesh3d_pipeline: MeshPipeline,
 }

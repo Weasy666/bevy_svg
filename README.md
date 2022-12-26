@@ -56,12 +56,14 @@ Then use it like this.
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
-        .insert_resource(WindowDescriptor {
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
             title: "SVG Plugin".to_string(),
             ..Default::default()
-        })
-        .add_plugins(DefaultPlugins)
-        .add_plugin(bevy_svg::prelude::SvgPlugin)
+        },
+            ..Default::default()
+        }))
+                .add_plugin(bevy_svg::prelude::SvgPlugin)
         .add_startup_system(setup)
         .run();
 }
@@ -71,8 +73,8 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("path/to/file.svg");
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn(OrthographicCameraBundle::new_2d());
+    commands.spawn(SvgBundle {
         svg,
         origin: Origin::Center, // Origin::TopLeft is the default
         ..Default::default()
@@ -85,12 +87,14 @@ fn setup(
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
-        .insert_resource(WindowDescriptor {
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
             title: "SVG Plugin".to_string(),
             ..Default::default()
-        })
-        .add_plugins(DefaultPlugins)
-        .add_plugin(bevy_svg::prelude::SvgPlugin)
+        },
+            ..Default::default()
+        }))
+                .add_plugin(bevy_svg::prelude::SvgPlugin)
         .add_startup_system(setup)
         .run();
 }
@@ -100,8 +104,8 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("path/to/file.svg");
-    commands.spawn_bundle(PerspectiveCameraBundle::new_3d());
-    commands.spawn_bundle(SvgBundle {
+    commands.spawn(PerspectiveCameraBundle::new_3d());
+    commands.spawn(SvgBundle {
         svg,
         origin: Origin::Center, // Origin::TopLeft is the default
         transform: Transform {

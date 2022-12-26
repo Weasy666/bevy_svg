@@ -8,6 +8,7 @@ use bevy::{
     },
     log::debug,
     math::{Vec3, Vec3Swizzles},
+    prelude::Resource,
     render::{
         mesh::Mesh,
         render_asset::RenderAssets,
@@ -36,12 +37,12 @@ use crate::{
     svg::{Origin, Svg},
 };
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 pub struct ExtractedSvgs2d {
     svgs: Vec<ExtractedSvg2d>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Resource)]
 pub struct ExtractedSvg2d {
     pub entity: Entity,
     pub mesh2d_handle: Mesh2dHandle,
@@ -173,6 +174,7 @@ pub type DrawSvg2d = (
 );
 
 /// Pipeline for 2d [`Svg`]s.
+#[derive(Resource)]
 pub struct Svg2dPipeline {
     mesh2d_pipeline: Mesh2dPipeline,
 }
