@@ -1,16 +1,18 @@
 use bevy::{
     math::Vec3,
     render::{
-        color::Color, mesh::{Indices, Mesh},
+        color::Color,
+        mesh::{Indices, Mesh},
         render_resource::PrimitiveTopology,
     },
     transform::components::Transform,
 };
 use copyless::VecHelper;
-use lyon_tessellation::{self, FillVertex, FillVertexConstructor, StrokeVertex, StrokeVertexConstructor};
+use lyon_tessellation::{
+    self, FillVertex, FillVertexConstructor, StrokeVertex, StrokeVertexConstructor,
+};
 
 use crate::Convert;
-
 
 /// A vertex with all the necessary attributes to be inserted into a Bevy
 /// [`Mesh`](bevy::render::mesh::Mesh).
@@ -55,11 +57,7 @@ pub(crate) struct VertexConstructor {
 impl FillVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: FillVertex) -> Vertex {
         let vertex = vertex.position();
-        let pos = self.transform * Vec3::new(
-            vertex.x,
-            vertex.y,
-            0.0,
-        );
+        let pos = self.transform * Vec3::new(vertex.x, vertex.y, 0.0);
 
         Vertex {
             position: [pos.x, pos.y, pos.z],
@@ -72,11 +70,7 @@ impl FillVertexConstructor<Vertex> for VertexConstructor {
 impl StrokeVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: StrokeVertex) -> Vertex {
         let vertex = vertex.position();
-        let pos = self.transform * Vec3::new(
-            vertex.x,
-            vertex.y,
-            0.0,
-        );
+        let pos = self.transform * Vec3::new(vertex.x, vertex.y, 0.0);
 
         Vertex {
             position: [pos.x, pos.y, pos.z],
@@ -91,7 +85,6 @@ pub(crate) trait BufferExt<A> {
 }
 
 impl BufferExt<VertexBuffers> for VertexBuffers {
-
     fn extend_one(&mut self, item: VertexBuffers) {
         let offset = self.vertices.len() as u32;
 

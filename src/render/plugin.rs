@@ -1,8 +1,8 @@
 use bevy::{
     app::{App, Plugin},
     asset::Assets,
-    render::RenderApp,
     render::render_resource::Shader,
+    render::RenderApp,
 };
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
@@ -10,7 +10,6 @@ use lyon_tessellation::{FillTessellator, StrokeTessellator};
 use crate::render::svg2d;
 #[cfg(feature = "3d")]
 use crate::render::svg3d;
-
 
 /// Plugin that renders [`Svg`](crate::svg::Svg)s in 2D
 pub struct SvgPlugin;
@@ -31,9 +30,7 @@ impl Plugin for SvgPlugin {
         );
         let fill_tess = FillTessellator::new();
         let stroke_tess = StrokeTessellator::new();
-        app
-            .insert_resource(fill_tess)
-            .insert_resource(stroke_tess);
+        app.insert_resource(fill_tess).insert_resource(stroke_tess);
         // Register our custom draw function and pipeline, and add our render systems
         if let Ok(render_app) = app.get_sub_app_mut(RenderApp) {
             #[cfg(feature = "2d")]

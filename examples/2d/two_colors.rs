@@ -16,10 +16,7 @@ fn main() {
         .run();
 }
 
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(Camera2dBundle::default());
     commands.spawn_bundle(Svg2dBundle {

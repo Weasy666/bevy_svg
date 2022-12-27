@@ -1,10 +1,13 @@
 use anyhow;
-use bevy::{asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset}, log::debug, render::mesh::Mesh};
+use bevy::{
+    asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset},
+    log::debug,
+    render::mesh::Mesh,
+};
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 use thiserror::Error;
 
-use crate::{svg::Svg, Convert, render::tessellation};
-
+use crate::{render::tessellation, svg::Svg, Convert};
 
 #[derive(Default)]
 pub struct SvgAssetLoader;
@@ -21,26 +24,34 @@ impl AssetLoader for SvgAssetLoader {
             opts.fontdb.load_fonts_dir("./assets");
 
             debug!("Parsing SVG: {} ...", load_context.path().display());
-            let svg_tree = usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| {
-                FileSvgError {
+            let svg_tree =
+                usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| FileSvgError {
                     error: err.into(),
                     path: format!("{}", load_context.path().display()),
-                }
-            })?;
+                })?;
 
             let mut svg = Svg::from_tree(svg_tree);
-            let name = &load_context.path().file_name().ok_or_else(||
-                    FileSvgError {
-                        error: SvgError::InvalidFileName(load_context.path().display().to_string()),
-                        path: format!("{}", load_context.path().display()),
-                    }
-                )?.to_string_lossy();
+            let name = &load_context
+                .path()
+                .file_name()
+                .ok_or_else(|| FileSvgError {
+                    error: SvgError::InvalidFileName(load_context.path().display().to_string()),
+                    path: format!("{}", load_context.path().display()),
+                })?
+                .to_string_lossy();
             svg.name = name.to_string();
             debug!("Parsing SVG: {} ... Done", load_context.path().display());
 
             debug!("Tessellating SVG: {} ...", load_context.path().display());
-            let buffer = tessellation::generate_buffer(&svg, &mut FillTessellator::new(), &mut StrokeTessellator::new());
-            debug!("Tessellating SVG: {} ... Done", load_context.path().display());
+            let buffer = tessellation::generate_buffer(
+                &svg,
+                &mut FillTessellator::new(),
+                &mut StrokeTessellator::new(),
+            );
+            debug!(
+                "Tessellating SVG: {} ... Done",
+                load_context.path().display()
+            );
             let mesh: Mesh = buffer.convert();
             let mesh_handle = load_context.set_labeled_asset("mesh", LoadedAsset::new(mesh));
             svg.mesh = mesh_handle;

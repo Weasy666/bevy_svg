@@ -16,10 +16,7 @@ fn main() {
         .run();
 }
 
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("asteroid_field.svg");
     commands.spawn_bundle(Camera2dBundle::default());
     let mut transform = Transform::from_xyz(0.0, 0.0, 0.0);

@@ -1,33 +1,40 @@
 use bevy::{
     asset::{Assets, Handle},
     core_pipeline::core_2d::Transparent2d,
-    ecs::{entity::Entity, world::{FromWorld, World}, system::{Query, Res, ResMut}},
+    ecs::{
+        entity::Entity,
+        system::{Query, Res, ResMut},
+        world::{FromWorld, World},
+    },
     log::debug,
     math::{Vec3, Vec3Swizzles},
     render::{
-        Extract, mesh::Mesh,
+        mesh::Mesh,
         render_asset::RenderAssets,
         render_phase::{DrawFunctions, RenderPhase, SetItemPipeline},
         render_resource::{
-            BlendState, ColorTargetState, ColorWrites, FragmentState, FrontFace,
-            MultisampleState, PolygonMode, PrimitiveState, PipelineCache,
-            RenderPipelineDescriptor, Shader, SpecializedRenderPipeline, SpecializedRenderPipelines, TextureFormat,
+            BlendState, ColorTargetState, ColorWrites, FragmentState, FrontFace, MultisampleState,
+            PipelineCache, PolygonMode, PrimitiveState, RenderPipelineDescriptor, Shader,
+            SpecializedRenderPipeline, SpecializedRenderPipelines, TextureFormat,
             VertexBufferLayout, VertexFormat, VertexState, VertexStepMode,
         },
         texture::BevyDefault,
         view::{ComputedVisibility, Msaa},
+        Extract,
     },
     sprite::{
-        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey,
-        SetMesh2dBindGroup, SetMesh2dViewBindGroup, Mesh2dUniform,
+        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey, Mesh2dUniform,
+        SetMesh2dBindGroup, SetMesh2dViewBindGroup,
     },
     transform::components::Transform,
     utils::FloatOrd,
 };
 use copyless::VecHelper;
 
-use crate::{render::svg2d::SVG_2D_SHADER_HANDLE, svg::{Origin, Svg}};
-
+use crate::{
+    render::svg2d::SVG_2D_SHADER_HANDLE,
+    svg::{Origin, Svg},
+};
 
 #[derive(Default)]
 pub struct ExtractedSvgs2d {
@@ -46,11 +53,21 @@ pub struct ExtractedSvg2d {
 pub fn extract_svg_2d(
     mut extracted_svgs: ResMut<ExtractedSvgs2d>,
     svgs: Extract<Res<Assets<Svg>>>,
-    query: Extract<Query<(Entity, &ComputedVisibility, &Handle<Svg>, &Mesh2dHandle, &Origin, &Transform)>>,
+    query: Extract<
+        Query<(
+            Entity,
+            &ComputedVisibility,
+            &Handle<Svg>,
+            &Mesh2dHandle,
+            &Origin,
+            &Transform,
+        )>,
+    >,
 ) {
     debug!("Extracting `Svg`s from `World`.");
     extracted_svgs.svgs.clear();
-    for (entity, computed_visibility, svg_handle, mesh2d_handle, origin, transform) in query.iter() {
+    for (entity, computed_visibility, svg_handle, mesh2d_handle, origin, transform) in query.iter()
+    {
         if !computed_visibility.is_visible() {
             continue;
         }
@@ -69,7 +86,10 @@ pub fn extract_svg_2d(
         }
     }
 
-    debug!("Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
+    debug!(
+        "Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.",
+        extracted_svgs.svgs.len()
+    );
 }
 
 pub fn prepare_svg_2d(
@@ -104,7 +124,10 @@ pub fn queue_svg_2d(
         debug!("No `Svg2d`s found to queue.");
         return;
     }
-    debug!("Queuing {} `Svg2d`s for drawing/rendering.", svgs_2d.svgs.len());
+    debug!(
+        "Queuing {} `Svg2d`s for drawing/rendering.",
+        svgs_2d.svgs.len()
+    );
     let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples);
     let draw_svg_2d = transparent_draw_functions
         .read()
@@ -121,7 +144,8 @@ pub fn queue_svg_2d(
                 mesh2d_key |= Mesh2dPipelineKey::from_primitive_topology(mesh.primitive_topology);
             }
 
-            let pipeline_id = pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
+            let pipeline_id =
+                pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
             transparent_phase.add(Transparent2d {
                 entity: svg2d.entity,
                 draw_function: draw_svg_2d,
@@ -182,7 +206,10 @@ impl SpecializedRenderPipeline for Svg2dPipeline {
                 entry_point: "vertex".into(),
                 shader_defs: Vec::new(),
                 // Use our custom vertex buffer
-                buffers: vec![VertexBufferLayout::from_vertex_formats(VertexStepMode::Vertex, formats)],
+                buffers: vec![VertexBufferLayout::from_vertex_formats(
+                    VertexStepMode::Vertex,
+                    formats,
+                )],
             },
             fragment: Some(FragmentState {
                 // Use our custom shader

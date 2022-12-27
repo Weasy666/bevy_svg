@@ -1,4 +1,11 @@
-use bevy::{asset::Handle, ecs::component::Component, math::{Mat4, Vec2, Vec3}, reflect::TypeUuid, render::{color::Color, mesh::Mesh}, transform::components::Transform};
+use bevy::{
+    asset::Handle,
+    ecs::component::Component,
+    math::{Mat4, Vec2, Vec3},
+    reflect::TypeUuid,
+    render::{color::Color, mesh::Mesh},
+    transform::components::Transform,
+};
 use copyless::VecHelper;
 use lyon_geom::euclid::default::Transform2D;
 use lyon_path::PathEvent;
@@ -6,7 +13,6 @@ use lyon_tessellation::math::Point;
 use svgtypes::ViewBox;
 
 use crate::Convert;
-
 
 /// A loaded and deserialized SVG file.
 #[derive(Debug, TypeUuid)]
@@ -34,19 +40,18 @@ impl Svg {
             match *node.borrow() {
                 usvg::NodeKind::Path(ref path) => {
                     let t = path.transform;
-                    let abs_t = Transform::from_matrix(
-                        Mat4::from_cols(
-                            [t.a.abs() as f32, t.b as f32,       0.0, 0.0].into(),
-                            [t.c as f32,       t.d.abs() as f32, 0.0, 0.0].into(),
-                            [0.0,              0.0,              1.0, 0.0].into(),
-                            [t.e as f32,       t.f as f32,       0.0, 1.0].into()
-                        )
-                    );
+                    let abs_t = Transform::from_matrix(Mat4::from_cols(
+                        [t.a.abs() as f32, t.b as f32, 0.0, 0.0].into(),
+                        [t.c as f32, t.d.abs() as f32, 0.0, 0.0].into(),
+                        [0.0, 0.0, 1.0, 0.0].into(),
+                        [t.e as f32, t.f as f32, 0.0, 1.0].into(),
+                    ));
 
                     if let Some(ref fill) = path.fill {
                         let color = match fill.paint {
-                            usvg::Paint::Color(c) =>
-                                Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8()),
+                            usvg::Paint::Color(c) => {
+                                Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8())
+                            }
                             _ => Color::default(),
                         };
 
@@ -68,7 +73,7 @@ impl Svg {
                             draw_type,
                         });
                     }
-                },
+                }
                 _ => {}
             }
         }
@@ -114,28 +119,12 @@ impl Origin {
     /// to the translation of the SVG.
     pub fn compute_translation(&self, scaled_size: Vec2) -> Vec3 {
         match self {
-            Origin::BottomLeft => Vec3::new(
-                0.0,
-                scaled_size.y,
-                0.0
-            ),
-            Origin::BottomRight => Vec3::new(
-                -scaled_size.x,
-                scaled_size.y,
-                0.0
-            ),
-            Origin::Center => Vec3::new(
-                -scaled_size.x * 0.5,
-                scaled_size.y * 0.5,
-                0.0
-            ),
+            Origin::BottomLeft => Vec3::new(0.0, scaled_size.y, 0.0),
+            Origin::BottomRight => Vec3::new(-scaled_size.x, scaled_size.y, 0.0),
+            Origin::Center => Vec3::new(-scaled_size.x * 0.5, scaled_size.y * 0.5, 0.0),
             // Standard SVG origin is top left, so we don't need to do anything
             Origin::TopLeft => Vec3::ZERO,
-            Origin::TopRight => Vec3::new(
-                -scaled_size.x,
-                0.0,
-                0.0
-            ),
+            Origin::TopRight => Vec3::new(-scaled_size.x, 0.0, 0.0),
         }
     }
 }
@@ -264,8 +253,8 @@ impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
             // Here we correct to positive values.
             scale: lyon_geom::Transform::scale(
                 if self.transform.a < 0.0 { -1.0 } else { 1.0 },
-                if self.transform.d < 0.0 { -1.0 } else { 1.0 }
-            )
+                if self.transform.d < 0.0 { -1.0 } else { 1.0 },
+            ),
         }
     }
 }
@@ -273,8 +262,7 @@ impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
 impl Convert<(Color, DrawType)> for &usvg::Stroke {
     fn convert(self) -> (Color, DrawType) {
         let color = match self.paint {
-            usvg::Paint::Color(c) =>
-                Color::rgba_u8(c.red, c.green, c.blue, self.opacity.to_u8()),
+            usvg::Paint::Color(c) => Color::rgba_u8(c.red, c.green, c.blue, self.opacity.to_u8()),
             _ => Color::default(),
         };
 

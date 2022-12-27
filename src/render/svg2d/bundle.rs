@@ -10,7 +10,6 @@ use bevy::{
 
 use crate::svg::{Origin, Svg};
 
-
 /// A Bevy [`Bundle`] representing an SVG entity.
 #[allow(missing_docs)]
 #[derive(Bundle)]

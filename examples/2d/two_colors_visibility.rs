@@ -1,6 +1,6 @@
 use bevy::{
     input::{keyboard::KeyCode, Input},
-    prelude::*
+    prelude::*,
 };
 use bevy_svg::prelude::*;
 
@@ -20,10 +20,7 @@ fn main() {
         .run();
 }
 
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("neutron_star.svg");
     commands.spawn_bundle(Camera2dBundle::default());
     commands.spawn_bundle(Svg2dBundle {
@@ -37,9 +34,7 @@ fn setup(
 /// This system toggles SVG visibility when 'V' is pressed
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<
-        (&Handle<Svg>, &mut Visibility),
-    >,
+    mut query: Query<(&Handle<Svg>, &mut Visibility)>,
 ) {
     if keyboard_input.just_pressed(KeyCode::V) {
         for (_, mut visible) in query.iter_mut() {

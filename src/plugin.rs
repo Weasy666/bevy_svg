@@ -20,7 +20,7 @@ use bevy::{
         entity::Entity,
         event::EventReader,
         schedule::{StageLabel, SystemStage},
-        system::{Commands, Query, Res, ResMut}
+        system::{Commands, Query, Res, ResMut},
     },
     hierarchy::DespawnRecursiveExt,
     log::debug,
@@ -30,7 +30,6 @@ use bevy::{
 use lyon_tessellation::{FillTessellator, StrokeTessellator};
 
 use crate::{loader::SvgAssetLoader, render, svg::Svg};
-
 
 /// Stages for this plugin.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
@@ -46,8 +45,7 @@ impl Plugin for SvgPlugin {
     fn build(&self, app: &mut App) {
         let fill_tess = FillTessellator::new();
         let stroke_tess = StrokeTessellator::new();
-        app
-            .add_asset::<Svg>()
+        app.add_asset::<Svg>()
             .init_asset_loader::<SvgAssetLoader>()
             .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
@@ -67,43 +65,54 @@ fn svg_mesh_linker(
     mut svg_events: EventReader<AssetEvent<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
     svgs: Res<Assets<Svg>>,
-    mut query: Query<
-        (Entity, &Handle<Svg>, Option<&mut Mesh2dHandle>, Option<&mut Handle<Mesh>>),
-    >,
+    mut query: Query<(
+        Entity,
+        &Handle<Svg>,
+        Option<&mut Mesh2dHandle>,
+        Option<&mut Handle<Mesh>>,
+    )>,
 ) {
     for event in svg_events.iter() {
         match event {
             AssetEvent::Created { handle } => {
-                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle)
+                {
                     let svg = svgs.get(handle).unwrap();
-                    debug!("Svg `{}` created. Adding mesh component to entity.", svg.name);
+                    debug!(
+                        "Svg `{}` created. Adding mesh component to entity.",
+                        svg.name
+                    );
                     mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
                     mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
                 }
-            },
+            }
             AssetEvent::Modified { handle } => {
-                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle)
+                {
                     let svg = svgs.get(handle).unwrap();
-                    debug!("Svg `{}` modified. Changing mesh component of entity.", svg.name);
-                    mesh_2d.filter(|mesh| mesh.0 != svg.mesh)
-                        .map(|mut mesh| {
-                            let old_mesh = mesh.0.clone();
-                            mesh.0 = svg.mesh.clone();
-                            meshes.remove(old_mesh);
-                        });
-                    mesh_3d.filter(|mesh| mesh.deref() != &svg.mesh)
+                    debug!(
+                        "Svg `{}` modified. Changing mesh component of entity.",
+                        svg.name
+                    );
+                    mesh_2d.filter(|mesh| mesh.0 != svg.mesh).map(|mut mesh| {
+                        let old_mesh = mesh.0.clone();
+                        mesh.0 = svg.mesh.clone();
+                        meshes.remove(old_mesh);
+                    });
+                    mesh_3d
+                        .filter(|mesh| mesh.deref() != &svg.mesh)
                         .map(|mut mesh| {
                             let old_mesh = mesh.clone();
                             *mesh = svg.mesh.clone();
                             meshes.remove(old_mesh);
                         });
                 }
-            },
+            }
             AssetEvent::Removed { handle } => {
                 for (entity, ..) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
                     commands.entity(entity).despawn_recursive();
                 }
-            },
+            }
         }
     }
 }

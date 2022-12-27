@@ -1,29 +1,38 @@
 use bevy::{
     asset::{Assets, Handle},
     core_pipeline::core_3d::Transparent3d,
-    ecs::{entity::Entity, query::With, world::{FromWorld, World}, system::{Query, Res, ResMut},},
+    ecs::{
+        entity::Entity,
+        query::With,
+        system::{Query, Res, ResMut},
+        world::{FromWorld, World},
+    },
     log::debug,
     math::{Vec3, Vec3Swizzles},
     pbr::MeshUniform,
+    pbr::{DrawMesh, MeshPipeline, MeshPipelineKey, SetMeshBindGroup, SetMeshViewBindGroup},
     render::{
-        Extract, mesh::Mesh,
+        mesh::Mesh,
         render_asset::RenderAssets,
         render_phase::{DrawFunctions, RenderPhase, SetItemPipeline},
         render_resource::{
-            BlendState, ColorTargetState, ColorWrites, FragmentState, FrontFace,
-            MultisampleState, PolygonMode, PrimitiveState, PipelineCache,
-            RenderPipelineDescriptor, Shader, SpecializedRenderPipeline, SpecializedRenderPipelines, TextureFormat,
+            BlendState, ColorTargetState, ColorWrites, FragmentState, FrontFace, MultisampleState,
+            PipelineCache, PolygonMode, PrimitiveState, RenderPipelineDescriptor, Shader,
+            SpecializedRenderPipeline, SpecializedRenderPipelines, TextureFormat,
             VertexBufferLayout, VertexFormat, VertexState, VertexStepMode,
         },
         texture::BevyDefault,
         view::{ComputedVisibility, Msaa},
+        Extract,
     },
-    transform::components::Transform, pbr::{MeshPipeline, MeshPipelineKey, SetMeshViewBindGroup, SetMeshBindGroup, DrawMesh},
+    transform::components::Transform,
 };
 use copyless::VecHelper;
 
-use crate::{render::svg3d::SVG_3D_SHADER_HANDLE, svg::{Origin, Svg}};
-
+use crate::{
+    render::svg3d::SVG_3D_SHADER_HANDLE,
+    svg::{Origin, Svg},
+};
 
 #[derive(Default)]
 pub struct ExtractedSvgs3d {
@@ -42,11 +51,24 @@ pub struct ExtractedSvg3d {
 pub fn extract_svg_3d(
     mut extracted_svgs: ResMut<ExtractedSvgs3d>,
     svgs: Extract<Res<Assets<Svg>>>,
-    query: Extract<Query<(Entity, &ComputedVisibility, &Handle<Svg>, &Handle<Mesh>, &Origin, &Transform), With<Handle<Svg>>>>,
+    query: Extract<
+        Query<
+            (
+                Entity,
+                &ComputedVisibility,
+                &Handle<Svg>,
+                &Handle<Mesh>,
+                &Origin,
+                &Transform,
+            ),
+            With<Handle<Svg>>,
+        >,
+    >,
 ) {
     debug!("Extracting `Svg`s from `World`.");
     extracted_svgs.svgs.clear();
-    for (entity, computed_visibility, svg_handle, mesh3d_handle, origin, transform) in query.iter() {
+    for (entity, computed_visibility, svg_handle, mesh3d_handle, origin, transform) in query.iter()
+    {
         if !computed_visibility.is_visible() {
             continue;
         }
@@ -65,7 +87,10 @@ pub fn extract_svg_3d(
         }
     }
 
-    debug!("Extracted {} `Svg3d`s from `World` and inserted them into `RenderWorld`.", extracted_svgs.svgs.len());
+    debug!(
+        "Extracted {} `Svg3d`s from `World` and inserted them into `RenderWorld`.",
+        extracted_svgs.svgs.len()
+    );
 }
 
 pub fn prepare_svg_3d(
@@ -100,7 +125,10 @@ pub fn queue_svg_3d(
         debug!("No `Svg3d`s found to queue.");
         return;
     }
-    debug!("Queuing {} `Svg3d`s for drawing/rendering.", svgs_3d.svgs.len());
+    debug!(
+        "Queuing {} `Svg3d`s for drawing/rendering.",
+        svgs_3d.svgs.len()
+    );
     let mesh_key = MeshPipelineKey::from_msaa_samples(msaa.samples);
     let draw_svg_3d = transparent_draw_functions
         .read()
@@ -117,7 +145,8 @@ pub fn queue_svg_3d(
                 mesh3d_key |= MeshPipelineKey::from_primitive_topology(mesh.primitive_topology);
             }
 
-            let pipeline_id = pipelines.specialize(&mut pipeline_cache, &svg_3d_pipeline, mesh3d_key);
+            let pipeline_id =
+                pipelines.specialize(&mut pipeline_cache, &svg_3d_pipeline, mesh3d_key);
             transparent_phase.add(Transparent3d {
                 entity: svg3d.entity,
                 draw_function: draw_svg_3d,
@@ -174,7 +203,10 @@ impl SpecializedRenderPipeline for Svg3dPipeline {
                 entry_point: "vertex".into(),
                 shader_defs: Vec::new(),
                 // Use our custom vertex buffer
-                buffers: vec![VertexBufferLayout::from_vertex_formats(VertexStepMode::Vertex, formats)],
+                buffers: vec![VertexBufferLayout::from_vertex_formats(
+                    VertexStepMode::Vertex,
+                    formats,
+                )],
             },
             fragment: Some(FragmentState {
                 // Use our custom shader

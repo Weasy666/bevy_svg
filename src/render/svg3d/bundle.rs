@@ -5,13 +5,12 @@ use bevy::{
     ecs::bundle::Bundle,
     render::{
         mesh::Mesh,
-        view::{ComputedVisibility, Visibility}
+        view::{ComputedVisibility, Visibility},
     },
     transform::components::{GlobalTransform, Transform},
 };
 
 use crate::svg::{Origin, Svg};
-
 
 /// A Bevy [`Bundle`] representing an SVG entity.
 #[allow(missing_docs)]
