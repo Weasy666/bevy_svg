@@ -63,7 +63,7 @@ fn main() {
         },
             ..Default::default()
         }))
-                .add_plugin(bevy_svg::prelude::SvgPlugin)
+        .add_plugin(bevy_svg::prelude::SvgPlugin)
         .add_startup_system(setup)
         .run();
 }
