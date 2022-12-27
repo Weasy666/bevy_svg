@@ -58,9 +58,9 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
-            title: "SVG Plugin".to_string(),
-            ..Default::default()
-        },
+                title: "SVG Plugin".to_string(),
+                ..Default::default()
+            },
             ..Default::default()
         }))
         .add_plugin(bevy_svg::prelude::SvgPlugin)
@@ -89,12 +89,12 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
-            title: "SVG Plugin".to_string(),
-            ..Default::default()
-        },
+                title: "SVG Plugin".to_string(),
+                ..Default::default()
+            },
             ..Default::default()
         }))
-                .add_plugin(bevy_svg::prelude::SvgPlugin)
+        .add_plugin(bevy_svg::prelude::SvgPlugin)
         .add_startup_system(setup)
         .run();
 }
