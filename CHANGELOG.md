@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- add new example
+- add common lib for examples with shared functionallity
 ### Changed
 - Fix README example and also add `bevy_svg::prelude::*`
 - Update bevy to `0.9`
+- Add common lib to every example
 
 ### Fixed
 - Change how the origin is applied (Fixes #11)
