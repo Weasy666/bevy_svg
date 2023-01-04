@@ -37,34 +37,38 @@ bevy = { version = "0.9", default-features = true }
 
 #### 2D examples ####
 [[example]]
-name = "2d_two_colors"
-path = "examples/2d/two_colors.rs"
+name = "2d_complex_one_color"
+path = "examples/2d/complex_one_color.rs"
 
 [[example]]
-name = "2d_two_colors_visibility"
-path = "examples/2d/two_colors_visibility.rs"
+name = "2d_multiple_translation"
+path = "examples/2d/multiple_translation.rs"
 
 [[example]]
 name = "2d_twinkle"
 path = "examples/2d/twinkle.rs"
 
 [[example]]
-name = "2d_complex_one_color"
-path = "examples/2d/complex_one_color.rs"
+name = "2d_two_colors"
+path = "examples/2d/two_colors.rs"
 
 #### 3D examples ####
 [[example]]
-name = "3d_two_colors"
-path = "examples/3d/two_colors.rs"
+name = "3d_complex_one_color"
+path = "examples/3d/complex_one_color.rs"
 
 [[example]]
-name = "3d_two_colors_visibility"
-path = "examples/3d/two_colors_visibility.rs"
+name = "3d_multiple_perspective"
+path = "examples/3d/multiple_perspective.rs"
+
+[[example]]
+name = "3d_multiple_translation"
+path = "examples/3d/multiple_translation.rs"
 
 [[example]]
 name = "3d_twinkle"
 path = "examples/3d/twinkle.rs"
 
 [[example]]
-name = "3d_complex_one_color"
-path = "examples/3d/complex_one_color.rs"
+name = "3d_two_colors"
+path = "examples/3d/two_colors.rs"
