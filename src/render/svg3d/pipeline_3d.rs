@@ -9,7 +9,6 @@ use bevy::{
     },
     log::debug,
     math::{Vec3, Vec3Swizzles},
-    pbr::MeshUniform,
     pbr::{DrawMesh, MeshPipeline, MeshPipelineKey, SetMeshBindGroup, SetMeshViewBindGroup},
     prelude::Resource,
     render::{
@@ -31,8 +30,9 @@ use bevy::{
 use copyless::VecHelper;
 
 use crate::{
+    origin::Origin,
     render::svg3d::SVG_3D_SHADER_HANDLE,
-    svg::{Origin, Svg},
+    svg::Svg,
 };
 
 #[derive(Default, Resource)]
@@ -92,22 +92,6 @@ pub fn extract_svg_3d(
         "Extracted {} `Svg3d`s from `World` and inserted them into `RenderWorld`.",
         extracted_svgs.svgs.len()
     );
-}
-
-pub fn prepare_svg_3d(
-    svgs_2d: ResMut<ExtractedSvgs3d>,
-    mut query: Query<(Entity, &mut MeshUniform)>,
-) {
-    for svg2d in &svgs_2d.svgs {
-        // Get the Uniform (aka data that will be send to the shader) and apply the origin offset
-        // to the translation.
-        if let Ok((_, mut uniform)) = query.get_mut(svg2d.entity) {
-            let column = uniform.transform.col_mut(3);
-            column.x += svg2d.origin_offset.x;
-            column.y += svg2d.origin_offset.y;
-            column.z += svg2d.origin_offset.z;
-        }
-    }
 }
 
 /// Queue all extraced 3D [`Svg`]s for rendering with the [`Svg3dPipeline`] custom pipeline and [`DrawSvg3d`] draw function

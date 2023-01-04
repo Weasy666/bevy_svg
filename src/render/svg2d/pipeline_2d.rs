@@ -24,7 +24,7 @@ use bevy::{
         Extract,
     },
     sprite::{
-        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey, Mesh2dUniform,
+        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey,
         SetMesh2dBindGroup, SetMesh2dViewBindGroup,
     },
     transform::components::Transform,
@@ -33,8 +33,9 @@ use bevy::{
 use copyless::VecHelper;
 
 use crate::{
+    origin::Origin,
     render::svg2d::SVG_2D_SHADER_HANDLE,
-    svg::{Origin, Svg},
+    svg::Svg,
 };
 
 #[derive(Default, Resource)]
@@ -91,22 +92,6 @@ pub fn extract_svg_2d(
         "Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.",
         extracted_svgs.svgs.len()
     );
-}
-
-pub fn prepare_svg_2d(
-    svgs_2d: ResMut<ExtractedSvgs2d>,
-    mut query: Query<(Entity, &mut Mesh2dUniform)>,
-) {
-    for svg2d in &svgs_2d.svgs {
-        // Get the Uniform (aka data that will be send to the shader) and apply the origin offset
-        // to the translation.
-        if let Ok((_, mut uniform)) = query.get_mut(svg2d.entity) {
-            let column = uniform.transform.col_mut(3);
-            column.x += svg2d.origin_offset.x;
-            column.y += svg2d.origin_offset.y;
-            column.z += svg2d.origin_offset.z;
-        }
-    }
 }
 
 /// Queue all extraced 2D [`Svg`]s for rendering with the [`Svg2dPipeline`] custom pipeline and [`DrawSvg2d`] draw function

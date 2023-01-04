@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Fix README example and also add `bevy_svg::prelude::*`
+- Update bevy to `0.9`
+
+### Fixed
+- Change how the origin is applied (Fixes #11)
 
 ## [0.8.0] - 2022-09-23
 ### Changed
