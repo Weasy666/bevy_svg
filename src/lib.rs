@@ -27,6 +27,7 @@
 )]
 
 mod loader;
+mod origin;
 mod plugin;
 mod render;
 mod resources;
@@ -39,8 +40,9 @@ pub mod prelude {
     #[cfg(feature = "3d")]
     pub use crate::render::Svg3dBundle;
     pub use crate::{
+        origin::Origin,
         plugin::SvgPlugin,
-        svg::{Origin, Svg},
+        svg::Svg,
     };
     pub use lyon_tessellation::{
         FillOptions, FillRule, LineCap, LineJoin, Orientation, StrokeOptions,

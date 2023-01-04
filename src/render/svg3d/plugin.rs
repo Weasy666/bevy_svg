@@ -19,7 +19,6 @@ impl Plugin for RenderPlugin {
             .init_resource::<pipeline_3d::ExtractedSvgs3d>()
             .add_render_command::<Transparent3d, pipeline_3d::DrawSvg3d>()
             .add_system_to_stage(RenderStage::Extract, pipeline_3d::extract_svg_3d)
-            .add_system_to_stage(RenderStage::Prepare, pipeline_3d::prepare_svg_3d)
             .add_system_to_stage(RenderStage::Queue, pipeline_3d::queue_svg_3d);
     }
 }

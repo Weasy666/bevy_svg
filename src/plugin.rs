@@ -13,14 +13,13 @@
 
 use std::ops::Deref;
 
-use crate::resources::{FillTessellator, StrokeTessellator};
 use bevy::{
     app::{App, Plugin},
     asset::{AddAsset, AssetEvent, Assets, Handle},
     ecs::{
         entity::Entity,
         event::EventReader,
-        schedule::{StageLabel, SystemStage},
+        schedule::{IntoSystemDescriptor, StageLabel, SystemLabel, SystemStage},
         system::{Commands, Query, Res, ResMut},
     },
     hierarchy::DespawnRecursiveExt,
@@ -29,10 +28,16 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 
-use crate::{loader::SvgAssetLoader, render, svg::Svg};
+use crate::{
+    loader::SvgAssetLoader,
+    origin,
+    render,
+    resources::{FillTessellator, StrokeTessellator},
+    svg::Svg,
+};
 
 /// Stages for this plugin.
-#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel, SystemLabel)]
 pub enum Stage {
     /// Stage in which [`Svg2dBundle`](crate::bundle::Svg2dBundle)s get drawn.
     SVG,
@@ -50,11 +55,16 @@ impl Plugin for SvgPlugin {
             .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
             .add_stage_after(
-                bevy::app::CoreStage::Update,
+                bevy::app::CoreStage::PostUpdate,
                 Stage::SVG,
                 SystemStage::parallel(),
             )
             .add_system_to_stage(Stage::SVG, svg_mesh_linker)
+            .add_system_to_stage(Stage::SVG, origin::add_origin_state)
+            .add_system_to_stage(
+                bevy::app::CoreStage::PostUpdate,
+                origin::apply_origin.after(bevy::transform::TransformSystem::TransformPropagate),
+            )
             .add_plugin(render::SvgPlugin);
     }
 }

@@ -10,7 +10,7 @@ use bevy::{
     transform::components::{GlobalTransform, Transform},
 };
 
-use crate::svg::{Origin, Svg};
+use crate::{origin::Origin, svg::Svg};
 
 /// A Bevy [`Bundle`] representing an SVG entity.
 #[allow(missing_docs)]
