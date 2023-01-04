@@ -15,6 +15,7 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | TO BE RELEASED | [`main`](https://github.com/Weasy666/bevy_svg/tree/main) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy/0.8.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy-svg/0.8.0) | [`bevy-0.8`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.8) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy/0.7.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy-svg/0.7.0) | [`bevy-0.7`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.7) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy/0.6.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy-svg/0.6.0) | [`bevy-0.6`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.6) |
@@ -53,6 +54,8 @@ Then use it like this.
 
 ### 2D
 ```rust
+use bevy_svg::prelude::*;
+
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
@@ -73,8 +76,8 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("path/to/file.svg");
-    commands.spawn(OrthographicCameraBundle::new_2d());
-    commands.spawn(SvgBundle {
+    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Svg2dBundle {
         svg,
         origin: Origin::Center, // Origin::TopLeft is the default
         ..Default::default()
@@ -84,6 +87,8 @@ fn setup(
 
 ### 3D
 ```rust
+use bevy_svg::prelude::*;
+
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
@@ -104,13 +109,15 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let svg = asset_server.load("path/to/file.svg");
-    commands.spawn(PerspectiveCameraBundle::new_3d());
-    commands.spawn(SvgBundle {
+    commands.spawn(Camera3dBundle::default());
+    commands.spawn(Svg3dBundle {
         svg,
         origin: Origin::Center, // Origin::TopLeft is the default
         transform: Transform {
-            translation: Vec3::new(0.0, 0.0, 1.5),
-            scale: Vec3::new(0.05, 0.05, 1.0), // The scale you need depends a lot on your SVG and camera distance
+            translation: Vec3::new(0.0, 0.0, -600.0),
+            // The scale you need depends a lot on your SVG and camera distance it
+            // is currently rather unpredictable, so you need to try it out a bit
+            scale: Vec3::new(1.0, 1.0, 1.0),
             rotation: Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
         },
         ..Default::default()
@@ -129,4 +136,4 @@ bevy_svg is licensed under either of the following, at your option:
 [`bevy_prototype_lyon`]: https://github.com/Nilirad/bevy_prototype_lyon
 [`Lyon`]: https://github.com/nical/lyon
 [`usvg`]: https://github.com/RazrFalcon/resvg
-[`AssetLoader`]: https://docs.rs/bevy/0.7/bevy/asset/trait.AssetLoader.html
+[`AssetLoader`]: https://docs.rs/bevy/0.9/bevy/asset/trait.AssetLoader.html
