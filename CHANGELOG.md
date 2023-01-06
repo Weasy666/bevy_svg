@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- add new example
+- add new examples
 - add common lib for examples with shared functionallity
+
 ### Changed
 - Fix README example and also add `bevy_svg::prelude::*`
 - Update bevy to `0.9`
