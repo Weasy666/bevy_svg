@@ -96,19 +96,23 @@ fn setup_legend(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
+
+#[derive(Component)]
+pub struct DontChange;
+
 /// This system toggles SVG visibility when 'V' is pressed and toggles through
 /// origin when 'O' is pressed.
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Origin, &mut Visibility), With<Handle<Svg>>>,
+    mut svg_query: Query<(&mut Origin, &mut Visibility), (With<Handle<Svg>>, Without<DontChange>)>,
     mut ui_query: Query<&mut Visibility, (With<Text>, Or<(With<FpsText>, With<OriginText>)>, Without<Handle<Svg>>)>,
 ) {
     if keyboard_input.just_pressed(KeyCode::V) {
-        for (_, mut visible) in query.iter_mut() {
+        for (_, mut visible) in svg_query.iter_mut() {
             visible.is_visible = !visible.is_visible;
         }
     } else if keyboard_input.just_pressed(KeyCode::O) {
-        for (mut origin, _) in query.iter_mut() {
+        for (mut origin, _) in svg_query.iter_mut() {
             *origin = match origin.as_ref() {
                 Origin::BottomLeft => Origin::BottomRight,
                 Origin::BottomRight => Origin::TopRight,
