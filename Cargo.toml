@@ -26,8 +26,8 @@ copyless = "0.1"
 lyon_geom = "1.0"
 lyon_tessellation = "1.0"
 lyon_path = "1.0"
-usvg = "0.20"
-svgtypes = "0.8"
+usvg = "0.27"
+svgtypes = "0.9"
 
 anyhow = "1.0"
 thiserror = "1.0"
@@ -47,6 +47,10 @@ path = "examples/2d/multiple_translation.rs"
 [[example]]
 name = "2d_origin_check"
 path = "examples/2d/origin_check.rs"
+
+[[example]]
+name = "2d_preloading"
+path = "examples/2d/preloading.rs"
 
 [[example]]
 name = "2d_twinkle"

@@ -31,11 +31,11 @@ pub struct Svg {
 
 impl Svg {
     pub(crate) fn from_tree(tree: usvg::Tree) -> Svg {
-        let view_box = tree.svg_node().view_box;
-        let size = tree.svg_node().size;
+        let view_box = tree.view_box;
+        let size = tree.size;
         let mut descriptors = Vec::new();
 
-        for node in tree.root().descendants() {
+        for node in tree.root.descendants() {
             match *node.borrow() {
                 usvg::NodeKind::Path(ref path) => {
                     let t = path.transform;
@@ -108,7 +108,7 @@ pub enum DrawType {
 
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
 pub(crate) struct PathConvIter<'a> {
-    iter: std::slice::Iter<'a, usvg::PathSegment>,
+    iter: usvg::PathSegmentsIter<'a>,
     prev: Point,
     first: Point,
     needs_end: bool,
@@ -204,10 +204,16 @@ impl Convert<Point> for (&f64, &f64) {
     }
 }
 
+impl Convert<Point> for (f64, f64) {
+    fn convert(self) -> Point {
+        Point::new(self.0 as f32, self.1 as f32)
+    }
+}
+
 impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
     fn convert(self) -> PathConvIter<'a> {
         PathConvIter {
-            iter: self.data.iter(),
+            iter: self.data.segments(),
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
             deferred: None,
@@ -241,7 +247,7 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
         };
 
         let opt = lyon_tessellation::StrokeOptions::tolerance(0.01)
-            .with_line_width(self.width.value() as f32)
+            .with_line_width(self.width.get() as f32)
             .with_line_cap(linecap)
             .with_line_join(linejoin);
 
