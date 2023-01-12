@@ -6,16 +6,16 @@ mod common;
 
 fn main() {
     App::new()
-    .insert_resource(Msaa { samples: 4 })
-    .add_plugins(DefaultPlugins.set(WindowPlugin {
-        window: WindowDescriptor {
-            title: "3d_multiple_translation".to_string(),
-            width: 600.0,
-            height: 600.0,
+        .insert_resource(Msaa { samples: 4 })
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                title: "3d_multiple_translation".to_string(),
+                width: 600.0,
+                height: 600.0,
+                ..Default::default()
+            },
             ..Default::default()
-        },
-        ..Default::default()
-    }))
+        }))
         .add_plugin(common::CommonPlugin)
         .add_plugin(bevy_svg::prelude::SvgPlugin)
         .add_startup_system(setup)
@@ -37,7 +37,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             },
             ..Default::default()
         },
-        Direction::Up
+        Direction::Up,
     ));
 
     let svg = asset_server.load("neutron_star.svg");
@@ -51,7 +51,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             },
             ..Default::default()
         },
-        Direction::Up
+        Direction::Up,
     ));
 }
 
@@ -61,7 +61,10 @@ enum Direction {
     Down,
 }
 
-fn svg_movement(time: Res<Time>, mut svg_position: Query<(&mut Direction, &mut Transform), With<Handle<Svg>>>) {
+fn svg_movement(
+    time: Res<Time>,
+    mut svg_position: Query<(&mut Direction, &mut Transform), With<Handle<Svg>>>,
+) {
     for (mut direction, mut transform) in &mut svg_position {
         match *direction {
             Direction::Up => transform.translation.y += 150.0 * time.delta_seconds(),

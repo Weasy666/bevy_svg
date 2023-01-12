@@ -6,10 +6,10 @@ use bevy::{
         query::{Changed, Or, With, Without},
         system::{Commands, Query, Res},
     },
-    math::{Vec2, Vec3},
+    math::{Vec2, Vec3, Vec3Swizzles},
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
-    transform::components::{GlobalTransform, Transform}, math::Vec3Swizzles,
+    transform::components::{GlobalTransform, Transform},
 };
 
 use crate::svg::Svg;
@@ -47,21 +47,26 @@ impl Origin {
 
 #[derive(Clone, Component, Copy, Debug, PartialEq)]
 pub(crate) struct OriginState {
-    previous: Origin
+    previous: Origin,
 }
 
 /// Checkes if a "new" SVG bundle was added by looking for a missing OriginState
 /// and then adds it to the entity.
 pub(crate) fn add_origin_state(
     mut commands: Commands,
-    query: Query<Entity, (
-        With<Handle<Svg>>,
-        Or<(With<Mesh2dHandle>, With<Handle<Mesh>>)>,
-        Without<OriginState>,
-    )>,
+    query: Query<
+        Entity,
+        (
+            With<Handle<Svg>>,
+            Or<(With<Mesh2dHandle>, With<Handle<Mesh>>)>,
+            Without<OriginState>,
+        ),
+    >,
 ) {
     for entity in &query {
-        commands.entity(entity).insert(OriginState { previous: Origin::default() });
+        commands.entity(entity).insert(OriginState {
+            previous: Origin::default(),
+        });
     }
 }
 
@@ -69,23 +74,39 @@ pub(crate) fn add_origin_state(
 /// needs to be applied.
 pub(crate) fn apply_origin(
     svgs: Res<Assets<Svg>>,
-    mut query: Query<(
-        Entity,
-        &Handle<Svg>,
-        &Origin,
-        &mut OriginState,
-        &Transform,
-        Changed<Transform>,
-        &mut GlobalTransform,
-    ),
-        Or<(Changed<Origin>, Changed<Transform>, Changed<Mesh2dHandle>, Changed<Handle<Mesh>>)>
+    mut query: Query<
+        (
+            Entity,
+            &Handle<Svg>,
+            &Origin,
+            &mut OriginState,
+            &Transform,
+            Changed<Transform>,
+            &mut GlobalTransform,
+        ),
+        Or<(
+            Changed<Origin>,
+            Changed<Transform>,
+            Changed<Mesh2dHandle>,
+            Changed<Handle<Mesh>>,
+        )>,
     >,
 ) {
-    for (_, svg_handle, origin, mut origin_state, transform, transform_changed, mut global_transform) in &mut query {
+    for (
+        _,
+        svg_handle,
+        origin,
+        mut origin_state,
+        transform,
+        transform_changed,
+        mut global_transform,
+    ) in &mut query
+    {
         if let Some(svg) = svgs.get(svg_handle) {
             if origin_state.previous != *origin {
                 let scaled_size = svg.size * transform.scale.xy();
-                let reverse_origin_translation = origin_state.previous.compute_translation(scaled_size);
+                let reverse_origin_translation =
+                    origin_state.previous.compute_translation(scaled_size);
                 let origin_translation = origin.compute_translation(scaled_size);
 
                 let gtrans = global_transform.translation_mut();

@@ -10,8 +10,7 @@ pub struct CommonPlugin;
 
 impl Plugin for CommonPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        app.add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_startup_system(setup_legend)
             .add_startup_system(setup_fps_counter)
             .add_startup_system(setup_origin_text)
@@ -25,77 +24,74 @@ fn setup_legend(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraMono-Medium.ttf");
 
-    commands.spawn((
-        TextBundle::from_sections([
-            TextSection::new(
-                "Key Info",
-                TextStyle {
-                    font: font_bold.clone(),
-                    font_size: 30.0,
-                    color: Color::WHITE,
-                },
-            ),
-            TextSection::new(
-                "\nF",
-                TextStyle {
-                    font: font_bold.clone(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ),
-            TextSection::new(
-                " - Toggle Frame Diagnostics",
-                TextStyle {
-                    font: font_medium.clone(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ),
-            TextSection::new(
-                "\nO",
-                TextStyle {
-                    font: font_bold.clone(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ),
-            TextSection::new(
-                " - Cycle through Origins",
-                TextStyle {
-                    font: font_medium.clone(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ),
-            TextSection::new(
-                "\nV",
-                TextStyle {
-                    font: font_bold.clone(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ),
-            TextSection::new(
-                " - Toggle visibility",
-                TextStyle {
-                    font: font_medium.clone(),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ),
-        ])
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            position: UiRect {
-                top: Val::Px(5.0),
-                right: Val::Px(15.0),
-                ..default()
+    commands.spawn((TextBundle::from_sections([
+        TextSection::new(
+            "Key Info",
+            TextStyle {
+                font: font_bold.clone(),
+                font_size: 30.0,
+                color: Color::WHITE,
             },
+        ),
+        TextSection::new(
+            "\nF",
+            TextStyle {
+                font: font_bold.clone(),
+                font_size: 20.0,
+                color: Color::WHITE,
+            },
+        ),
+        TextSection::new(
+            " - Toggle Frame Diagnostics",
+            TextStyle {
+                font: font_medium.clone(),
+                font_size: 20.0,
+                color: Color::WHITE,
+            },
+        ),
+        TextSection::new(
+            "\nO",
+            TextStyle {
+                font: font_bold.clone(),
+                font_size: 20.0,
+                color: Color::WHITE,
+            },
+        ),
+        TextSection::new(
+            " - Cycle through Origins",
+            TextStyle {
+                font: font_medium.clone(),
+                font_size: 20.0,
+                color: Color::WHITE,
+            },
+        ),
+        TextSection::new(
+            "\nV",
+            TextStyle {
+                font: font_bold.clone(),
+                font_size: 20.0,
+                color: Color::WHITE,
+            },
+        ),
+        TextSection::new(
+            " - Toggle visibility",
+            TextStyle {
+                font: font_medium.clone(),
+                font_size: 20.0,
+                color: Color::WHITE,
+            },
+        ),
+    ])
+    .with_style(Style {
+        position_type: PositionType::Absolute,
+        position: UiRect {
+            top: Val::Px(5.0),
+            right: Val::Px(15.0),
             ..default()
-        }),
-    ));
+        },
+        ..default()
+    }),));
 }
-
 
 #[derive(Component)]
 pub struct DontChange;
@@ -105,7 +101,14 @@ pub struct DontChange;
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>,
     mut svg_query: Query<(&mut Origin, &mut Visibility), (With<Handle<Svg>>, Without<DontChange>)>,
-    mut ui_query: Query<&mut Visibility, (With<Text>, Or<(With<FpsText>, With<OriginText>)>, Without<Handle<Svg>>)>,
+    mut ui_query: Query<
+        &mut Visibility,
+        (
+            With<Text>,
+            Or<(With<FpsText>, With<OriginText>)>,
+            Without<Handle<Svg>>,
+        ),
+    >,
 ) {
     if keyboard_input.just_pressed(KeyCode::V) {
         for (_, mut visible) in svg_query.iter_mut() {
@@ -139,7 +142,10 @@ struct FpsValues {
 
 impl Default for FpsValues {
     fn default() -> Self {
-        Self { min: 10000.0, max: 0.0 }
+        Self {
+            min: 10000.0,
+            max: 0.0,
+        }
     }
 }
 
@@ -223,7 +229,11 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-fn fps_text_update_system(diagnostics: Res<Diagnostics>, mut fps_values: Local<FpsValues>, mut query: Query<&mut Text, With<FpsText>>) {
+fn fps_text_update_system(
+    diagnostics: Res<Diagnostics>,
+    mut fps_values: Local<FpsValues>,
+    mut query: Query<&mut Text, With<FpsText>>,
+) {
     for mut text in &mut query {
         if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
             if let Some(fps_smoothed) = fps.smoothed() {
@@ -264,7 +274,7 @@ fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
                 font: font_medium.clone(),
                 font_size: 20.0,
                 color: Color::GOLD,
-            })
+            }),
         ])
         .with_style(Style {
             position_type: PositionType::Absolute,

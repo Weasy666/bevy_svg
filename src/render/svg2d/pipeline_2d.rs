@@ -24,19 +24,15 @@ use bevy::{
         Extract,
     },
     sprite::{
-        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey,
-        SetMesh2dBindGroup, SetMesh2dViewBindGroup,
+        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey, SetMesh2dBindGroup,
+        SetMesh2dViewBindGroup,
     },
     transform::components::Transform,
     utils::FloatOrd,
 };
 use copyless::VecHelper;
 
-use crate::{
-    origin::Origin,
-    render::svg2d::SVG_2D_SHADER_HANDLE,
-    svg::Svg,
-};
+use crate::{origin::Origin, render::svg2d::SVG_2D_SHADER_HANDLE, svg::Svg};
 
 #[derive(Default, Resource)]
 pub struct ExtractedSvgs2d {

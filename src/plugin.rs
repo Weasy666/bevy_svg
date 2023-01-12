@@ -31,8 +31,7 @@ use bevy::{
 
 use crate::{
     loader::SvgAssetLoader,
-    origin,
-    render,
+    origin, render,
     resources::{FillTessellator, StrokeTessellator},
     svg::Svg,
 };

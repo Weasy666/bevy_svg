@@ -29,11 +29,7 @@ use bevy::{
 };
 use copyless::VecHelper;
 
-use crate::{
-    origin::Origin,
-    render::svg3d::SVG_3D_SHADER_HANDLE,
-    svg::Svg,
-};
+use crate::{origin::Origin, render::svg3d::SVG_3D_SHADER_HANDLE, svg::Svg};
 
 #[derive(Default, Resource)]
 pub struct ExtractedSvgs3d {

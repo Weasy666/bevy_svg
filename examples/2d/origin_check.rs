@@ -36,6 +36,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             origin: Origin::TopLeft,
             ..Default::default()
         },
-        common::DontChange
+        common::DontChange,
     ));
 }
