@@ -15,7 +15,7 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
-| [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | TO BE RELEASED | [`main`](https://github.com/Weasy666/bevy_svg/tree/main) |
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0--alpha2-orange)](https://crates.io/crates/bevy-svg/v0.9.0-alpha2) | [`main`](https://github.com/Weasy666/bevy_svg/tree/main) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy/0.8.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy-svg/0.8.0) | [`bevy-0.8`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.8) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy/0.7.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy-svg/0.7.0) | [`bevy-0.7`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.7) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy/0.6.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy-svg/0.6.0) | [`bevy-0.6`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.6) |
