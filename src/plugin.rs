@@ -137,17 +137,7 @@ fn svg_mesh_linker(
             "Svg handle for entity `{:?}` modified. Changing mesh component of entity.",
             entity
         );
-        mesh_2d.filter(|mesh| mesh.0 != svg.mesh).map(|mut mesh| {
-            let old_mesh = mesh.0.clone();
-            mesh.0 = svg.mesh.clone();
-            meshes.remove(old_mesh);
-        });
-        mesh_3d
-            .filter(|mesh| mesh.deref() != &svg.mesh)
-            .map(|mut mesh| {
-                let old_mesh = mesh.clone();
-                *mesh = svg.mesh.clone();
-                meshes.remove(old_mesh);
-            });
+        mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
+        mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
     }
 }
