@@ -19,6 +19,7 @@ use bevy::{
     ecs::{
         entity::Entity,
         event::EventReader,
+        query::{Added, Changed, Or},
         schedule::{IntoSystemDescriptor, StageLabel, SystemLabel, SystemStage},
         system::{Commands, Query, Res, ResMut},
     },
@@ -81,6 +82,7 @@ fn svg_mesh_linker(
         Option<&mut Mesh2dHandle>,
         Option<&mut Handle<Mesh>>,
     )>,
+    changed_handles: Query<Entity, Or<(Changed<Handle<Svg>>, Added<Handle<Svg>>)>>,
 ) {
     for event in svg_events.iter() {
         match event {
@@ -124,5 +126,28 @@ fn svg_mesh_linker(
                 }
             }
         }
+    }
+
+    // Ensure all correct meshes are set for entities which have had modified handles
+    for entity in changed_handles.iter() {
+        let Ok((.., handle, mesh_2d, mesh_3d))
+            = query.get_mut(entity) else { continue };
+        let Some(svg) = svgs.get(handle) else { continue };
+        debug!(
+            "Svg handle for entity `{:?}` modified. Changing mesh component of entity.",
+            entity
+        );
+        mesh_2d.filter(|mesh| mesh.0 != svg.mesh).map(|mut mesh| {
+            let old_mesh = mesh.0.clone();
+            mesh.0 = svg.mesh.clone();
+            meshes.remove(old_mesh);
+        });
+        mesh_3d
+            .filter(|mesh| mesh.deref() != &svg.mesh)
+            .map(|mut mesh| {
+                let old_mesh = mesh.clone();
+                *mesh = svg.mesh.clone();
+                meshes.remove(old_mesh);
+            });
     }
 }
