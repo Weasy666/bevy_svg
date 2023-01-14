@@ -1,13 +1,12 @@
 use bevy::{
-    asset::{Assets, Handle},
     core_pipeline::core_2d::Transparent2d,
     ecs::{
+        component::Component,
         entity::Entity,
-        system::{Query, Res, ResMut},
+        system::{Commands, Local, Query, Res, ResMut},
         world::{FromWorld, World},
     },
     log::debug,
-    math::{Vec3, Vec3Swizzles},
     prelude::Resource,
     render::{
         mesh::Mesh,
@@ -20,74 +19,45 @@ use bevy::{
             VertexBufferLayout, VertexFormat, VertexState, VertexStepMode,
         },
         texture::BevyDefault,
-        view::{ComputedVisibility, Msaa},
+        view::{ComputedVisibility, ExtractedView, Msaa, ViewTarget, VisibleEntities},
         Extract,
     },
     sprite::{
-        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey, SetMesh2dBindGroup,
-        SetMesh2dViewBindGroup,
+        DrawMesh2d, Mesh2dHandle, Mesh2dPipeline, Mesh2dPipelineKey, Mesh2dUniform,
+        SetMesh2dBindGroup, SetMesh2dViewBindGroup,
     },
-    transform::components::Transform,
     utils::FloatOrd,
 };
 use copyless::VecHelper;
 
-use crate::{origin::Origin, render::svg2d::SVG_2D_SHADER_HANDLE, svg::Svg};
+use crate::render::svg2d::SVG_2D_SHADER_HANDLE;
 
-#[derive(Default, Resource)]
-pub struct ExtractedSvgs2d {
-    svgs: Vec<ExtractedSvg2d>,
-}
-
-#[derive(Clone, Resource)]
-pub struct ExtractedSvg2d {
-    pub entity: Entity,
-    pub mesh2d_handle: Mesh2dHandle,
-    pub origin_offset: Vec3,
-    pub z: f32,
-}
+#[derive(Clone, Component)]
+pub struct ExtractedSvg2d(Mesh2dHandle);
 
 /// Extract [`Svg`]s with a [`Mesh2dHandle`] component into [`RenderWorld`].
 pub fn extract_svg_2d(
-    mut extracted_svgs: ResMut<ExtractedSvgs2d>,
-    svgs: Extract<Res<Assets<Svg>>>,
-    query: Extract<
-        Query<(
-            Entity,
-            &ComputedVisibility,
-            &Handle<Svg>,
-            &Mesh2dHandle,
-            &Origin,
-            &Transform,
-        )>,
-    >,
+    mut commands: Commands,
+    mut extracted_svgs: Local<Vec<(Entity, ExtractedSvg2d)>>,
+    query: Extract<Query<(Entity, &ComputedVisibility, &Mesh2dHandle)>>,
 ) {
     debug!("Extracting `Svg`s from `World`.");
-    extracted_svgs.svgs.clear();
-    for (entity, computed_visibility, svg_handle, mesh2d_handle, origin, transform) in query.iter()
-    {
+    for (entity, computed_visibility, mesh2d_handle) in query.iter() {
         if !computed_visibility.is_visible() {
             continue;
         }
 
-        if let Some(svg) = svgs.get(svg_handle) {
-            let mut transform = transform.clone();
-            let scaled_size = svg.size * transform.scale.xy();
-            transform.translation += origin.compute_translation(scaled_size);
-
-            extracted_svgs.svgs.alloc().init(ExtractedSvg2d {
-                entity,
-                mesh2d_handle: mesh2d_handle.clone(),
-                origin_offset: origin.compute_translation(scaled_size),
-                z: transform.translation.z,
-            });
-        }
+        extracted_svgs
+            .alloc()
+            .init((entity, ExtractedSvg2d(mesh2d_handle.clone())));
     }
 
     debug!(
         "Extracted {} `Svg2d`s from `World` and inserted them into `RenderWorld`.",
-        extracted_svgs.svgs.len()
+        extracted_svgs.len()
     );
+    commands.insert_or_spawn_batch(extracted_svgs.to_vec());
+    extracted_svgs.clear();
 }
 
 /// Queue all extraced 2D [`Svg`]s for rendering with the [`Svg2dPipeline`] custom pipeline and [`DrawSvg2d`] draw function
@@ -99,47 +69,54 @@ pub fn queue_svg_2d(
     mut pipeline_cache: ResMut<PipelineCache>,
     msaa: Res<Msaa>,
     render_meshes: Res<RenderAssets<Mesh>>,
-    svgs_2d: ResMut<ExtractedSvgs2d>,
-    mut views: Query<&mut RenderPhase<Transparent2d>>,
+    svgs_2d: Query<(&ExtractedSvg2d, &Mesh2dUniform)>,
+    mut views: Query<(
+        &ExtractedView,
+        &VisibleEntities,
+        &mut RenderPhase<Transparent2d>,
+    )>,
 ) {
-    if svgs_2d.svgs.is_empty() {
+    if svgs_2d.is_empty() {
         debug!("No `Svg2d`s found to queue.");
         return;
     }
-    debug!(
-        "Queuing {} `Svg2d`s for drawing/rendering.",
-        svgs_2d.svgs.len()
-    );
-    let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples);
     let draw_svg_2d = transparent_draw_functions
         .read()
         .get_id::<DrawSvg2d>()
         .unwrap();
 
+    let mut num_svgs = 0;
     // Iterate each view (a camera is a view)
-    for mut transparent_phase in views.iter_mut() {
-        // Queue all entities visible to that view
-        for svg2d in &svgs_2d.svgs {
-            // Get our specialized pipeline
-            let mut mesh2d_key = mesh_key;
-            if let Some(mesh) = render_meshes.get(&svg2d.mesh2d_handle.0) {
-                mesh2d_key |= Mesh2dPipelineKey::from_primitive_topology(mesh.primitive_topology);
-            }
+    for (view, visible_entities, mut transparent_phase) in views.iter_mut() {
+        let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples)
+            | Mesh2dPipelineKey::from_hdr(view.hdr);
 
-            let pipeline_id =
-                pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
-            transparent_phase.add(Transparent2d {
-                entity: svg2d.entity,
-                draw_function: draw_svg_2d,
-                pipeline: pipeline_id,
-                // The 2d render items are sorted according to their z value before rendering,
-                // in order to get correct transparency
-                sort_key: FloatOrd(svg2d.z),
-                // This material is not batched
-                batch_range: None,
-            });
+        // Queue all entities visible to that view
+        for visible_entity in &visible_entities.entities {
+            if let Ok((extraced_svg, mesh2d_uniform)) = svgs_2d.get(*visible_entity) {
+                // Get our specialized pipeline
+                let mut mesh2d_key = mesh_key;
+                if let Some(mesh) = render_meshes.get(&extraced_svg.0 .0) {
+                    mesh2d_key |=
+                        Mesh2dPipelineKey::from_primitive_topology(mesh.primitive_topology);
+                }
+                let pipeline_id =
+                    pipelines.specialize(&mut pipeline_cache, &svg_2d_pipeline, mesh2d_key);
+                num_svgs += 1;
+                transparent_phase.add(Transparent2d {
+                    entity: *visible_entity,
+                    draw_function: draw_svg_2d,
+                    pipeline: pipeline_id,
+                    // The 2d render items are sorted according to their z value before rendering,
+                    // in order to get correct transparency
+                    sort_key: FloatOrd(mesh2d_uniform.transform.w_axis.z),
+                    // This material is not batched
+                    batch_range: None,
+                });
+            }
         }
     }
+    debug!("Queued {} `Svg2d`s for drawing/rendering.", num_svgs);
 }
 
 /// Specifies how to render a [`Svg`] in 2d.
@@ -162,9 +139,9 @@ pub struct Svg2dPipeline {
 
 impl FromWorld for Svg2dPipeline {
     fn from_world(world: &mut World) -> Self {
-        Self {
+        return Self {
             mesh2d_pipeline: Mesh2dPipeline::from_world(world),
-        }
+        };
     }
 }
 
@@ -182,7 +159,7 @@ impl SpecializedRenderPipeline for Svg2dPipeline {
             VertexFormat::Float32x4,
         ];
 
-        RenderPipelineDescriptor {
+        return RenderPipelineDescriptor {
             vertex: VertexState {
                 // Use our custom shader
                 shader: SVG_2D_SHADER_HANDLE.typed::<Shader>(),
@@ -200,7 +177,11 @@ impl SpecializedRenderPipeline for Svg2dPipeline {
                 shader_defs: Vec::new(),
                 entry_point: "fragment".into(),
                 targets: vec![Some(ColorTargetState {
-                    format: TextureFormat::bevy_default(),
+                    format: if key.contains(Mesh2dPipelineKey::HDR) {
+                        ViewTarget::TEXTURE_FORMAT_HDR
+                    } else {
+                        TextureFormat::bevy_default()
+                    },
                     blend: Some(BlendState::ALPHA_BLENDING),
                     write_mask: ColorWrites::ALL,
                 })],
@@ -228,6 +209,6 @@ impl SpecializedRenderPipeline for Svg2dPipeline {
                 alpha_to_coverage_enabled: false,
             },
             label: Some("svg_2d_pipeline".into()),
-        }
+        };
     }
 }

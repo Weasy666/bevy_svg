@@ -77,7 +77,7 @@ impl Svg {
             }
         }
 
-        Svg {
+        return Svg {
             name: Default::default(),
             size: Vec2::new(size.width() as f32, size.height() as f32),
             view_box: ViewBox {
@@ -88,7 +88,7 @@ impl Svg {
             },
             paths: descriptors,
             mesh: Default::default(),
-        }
+        };
     }
 }
 
@@ -199,12 +199,14 @@ impl<'l> Iterator for PathConvIter<'l> {
 }
 
 impl Convert<Point> for (&f64, &f64) {
+    #[inline]
     fn convert(self) -> Point {
         Point::new((*self.0) as f32, (*self.1) as f32)
     }
 }
 
 impl Convert<Point> for (f64, f64) {
+    #[inline]
     fn convert(self) -> Point {
         Point::new(self.0 as f32, self.1 as f32)
     }
@@ -212,7 +214,7 @@ impl Convert<Point> for (f64, f64) {
 
 impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
     fn convert(self) -> PathConvIter<'a> {
-        PathConvIter {
+        return PathConvIter {
             iter: self.data.segments(),
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
@@ -224,15 +226,18 @@ impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
                 if self.transform.a < 0.0 { -1.0 } else { 1.0 },
                 if self.transform.d < 0.0 { -1.0 } else { 1.0 },
             ),
-        }
+        };
     }
 }
 
 impl Convert<(Color, DrawType)> for &usvg::Stroke {
+    #[inline]
     fn convert(self) -> (Color, DrawType) {
         let color = match self.paint {
             usvg::Paint::Color(c) => Color::rgba_u8(c.red, c.green, c.blue, self.opacity.to_u8()),
-            _ => Color::default(),
+            usvg::Paint::LinearGradient(_)
+            | usvg::Paint::RadialGradient(_)
+            | usvg::Paint::Pattern(_) => Color::default(),
         };
 
         let linecap = match self.linecap {
@@ -251,6 +256,6 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
             .with_line_cap(linecap)
             .with_line_join(linejoin);
 
-        (color, DrawType::Stroke(opt))
+        return (color, DrawType::Stroke(opt));
     }
 }
