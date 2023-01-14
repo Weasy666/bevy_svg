@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - add new examples
 - add common lib for examples with shared functionallity
+- support for HDR rendering
 
 ### Changed
 - Fix README example and also add `bevy_svg::prelude::*`
 - Update bevy to `0.9`
 - Add common lib to every example
 - Update usvg to `0.27` and svgtypes to `0.9`
+- Rendering now takes view visibility into account
 
 ### Fixed
 - Change how the origin is applied (Fixes #11)

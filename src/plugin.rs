@@ -27,6 +27,7 @@ use bevy::{
     log::debug,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
+    transform::TransformSystem,
 };
 
 use crate::{
@@ -63,7 +64,7 @@ impl Plugin for SvgPlugin {
             .add_system_to_stage(Stage::SVG, origin::add_origin_state)
             .add_system_to_stage(
                 bevy::app::CoreStage::PostUpdate,
-                origin::apply_origin.after(bevy::transform::TransformSystem::TransformPropagate),
+                origin::apply_origin.after(TransformSystem::TransformPropagate),
             )
             .add_plugin(render::SvgPlugin);
     }

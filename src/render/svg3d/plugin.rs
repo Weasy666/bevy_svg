@@ -16,7 +16,6 @@ impl Plugin for RenderPlugin {
         // Register our custom draw function and pipeline, and add our render systems
         app.init_resource::<pipeline_3d::Svg3dPipeline>()
             .init_resource::<SpecializedRenderPipelines<pipeline_3d::Svg3dPipeline>>()
-            .init_resource::<pipeline_3d::ExtractedSvgs3d>()
             .add_render_command::<Transparent3d, pipeline_3d::DrawSvg3d>()
             .add_system_to_stage(RenderStage::Extract, pipeline_3d::extract_svg_3d)
             .add_system_to_stage(RenderStage::Queue, pipeline_3d::queue_svg_3d);
