@@ -7,7 +7,7 @@ so i took inspiration from [`bevy_prototype_lyon`] and modified and extended it 
 simple SVG files. SVGs can be used/displayed in `2D` as well as in `3D`.
 
 Files are loaded through [`AssetLoader`], then parsed and simplified with [`usvg`] and then tessellated with [`Lyon`]
-into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn with custom [shaders].
+into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn with custom shaders.
 
 > *Note:* The SVG support is currently rather basic, i'd like to expand that in the future.
 
@@ -15,7 +15,7 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
-| [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0--alpha3-orange)](https://crates.io/crates/bevy-svg/v0.9.0-alpha3) | [`main`](https://github.com/Weasy666/bevy_svg/tree/main) |
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy-svg/0.9.0) | [`bevy-0.9`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.9) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy/0.8.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy-svg/0.8.0) | [`bevy-0.8`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.8) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy/0.7.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy-svg/0.7.0) | [`bevy-0.7`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.7) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy/0.6.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy-svg/0.6.0) | [`bevy-0.6`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.6) |
@@ -39,12 +39,12 @@ Copy this to your `Cargo.toml`
 
 ```toml
 # Stable
-bevy_svg = "0.9.0-alpha3"
+bevy_svg = "0.9.0"
 
 # 2D and 3D are available on default, if you only want/need one, use the following
-bevy_svg = { version = "0.9.0-alpha3", default-features = false, features = "2d" }
+bevy_svg = { version = "0.9.0", default-features = false, features = "2d" }
 # or
-bevy_svg = { version = "0.9.0-alpha3", default-features = false, features = "3d" }
+bevy_svg = { version = "0.9.0", default-features = false, features = "3d" }
 
 # Living on the edge (at your own risk 😅)
 bevy_svg = { git = "https://github.com/Weasy666/bevy_svg", branch = "main" }
