@@ -15,12 +15,20 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.10.0-orange)](https://crates.io/crates/bevy/0.10.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.10.0-alpha1-orange)](https://crates.io/crates/bevy-svg/0.10.0) | [`bevy-0.10`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.10) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy-svg/0.9.0) | [`bevy-0.9`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.9) |
+| [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
+
+<details><summary>Old versions</summary>
+
+| `Bevy` version | `bevy_svg` version | Branch      |
+|----------------|--------------------|-------------|
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy/0.8.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy-svg/0.8.0) | [`bevy-0.8`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.8) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy/0.7.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy-svg/0.7.0) | [`bevy-0.7`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.7) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy/0.6.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.6.0-orange)](https://crates.io/crates/bevy-svg/0.6.0) | [`bevy-0.6`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.6) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.5.0-orange)](https://crates.io/crates/bevy/0.5.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.4.0-orange)](https://crates.io/crates/bevy-svg/0.4.0) | [`bevy-0.5`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.5) |
-| [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
+
+</details>
 
 
 ## Examples
@@ -39,12 +47,12 @@ Copy this to your `Cargo.toml`
 
 ```toml
 # Stable
-bevy_svg = "0.9.0"
+bevy_svg = "0.10.0-alpha1"
 
 # 2D and 3D are available on default, if you only want/need one, use the following
-bevy_svg = { version = "0.9.0", default-features = false, features = "2d" }
+bevy_svg = { version = "0.10.0-alpha1", default-features = false, features = "2d" }
 # or
-bevy_svg = { version = "0.9.0", default-features = false, features = "3d" }
+bevy_svg = { version = "0.10.0-alpha1", default-features = false, features = "3d" }
 
 # Living on the edge (at your own risk 😅)
 bevy_svg = { git = "https://github.com/Weasy666/bevy_svg", branch = "main" }
@@ -58,12 +66,12 @@ use bevy_svg::prelude::*;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
-            window: WindowDescriptor {
+            primary_window: Some(Window {
                 title: "SVG Plugin".to_string(),
                 ..Default::default()
-            },
+            }),
             ..Default::default()
         }))
         .add_plugin(bevy_svg::prelude::SvgPlugin)
@@ -91,12 +99,12 @@ use bevy_svg::prelude::*;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
-            window: WindowDescriptor {
+            primary_window: Some(Window {
                 title: "SVG Plugin".to_string(),
                 ..Default::default()
-            },
+            }),
             ..Default::default()
         }))
         .add_plugin(bevy_svg::prelude::SvgPlugin)
