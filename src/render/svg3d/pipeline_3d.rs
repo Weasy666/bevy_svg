@@ -90,7 +90,7 @@ pub fn queue_svg_3d(
     // Iterate each view (a camera is a view)
     for (view, visible_entities, mut transparent_phase) in views.iter_mut() {
         let mesh_key =
-            MeshPipelineKey::from_msaa_samples(msaa.samples) | MeshPipelineKey::from_hdr(view.hdr);
+            MeshPipelineKey::from_msaa_samples(msaa.samples()) | MeshPipelineKey::from_hdr(view.hdr);
 
         // Queue all entities visible to that view
         for visible_entity in &visible_entities.entities {
@@ -183,12 +183,12 @@ impl SpecializedRenderPipeline for Svg3dPipeline {
                 })],
             }),
             // Use the two standard uniforms for 3d meshes
-            layout: Some(vec![
+            layout: vec![
                 // Bind group 0 is the view uniform
                 self.mesh3d_pipeline.view_layout.clone(),
                 // Bind group 1 is the mesh uniform
                 self.mesh3d_pipeline.mesh_layout.clone(),
-            ]),
+            ],
             primitive: PrimitiveState {
                 front_face: FrontFace::Cw,
                 cull_mode: None,
@@ -220,6 +220,7 @@ impl SpecializedRenderPipeline for Svg3dPipeline {
                 alpha_to_coverage_enabled: false,
             },
             label: Some("svg_3d_pipeline".into()),
+            push_constant_ranges: Vec::new(),
         };
     }
 }

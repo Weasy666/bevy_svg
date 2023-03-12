@@ -92,38 +92,38 @@ pub(crate) fn apply_origin(
         )>,
     >,
 ) {
-    for (
-        _,
-        svg_handle,
-        origin,
-        mut origin_state,
-        transform,
-        transform_changed,
-        mut global_transform,
-    ) in &mut query
-    {
-        if let Some(svg) = svgs.get(svg_handle) {
-            if origin_state.previous != *origin {
-                let scaled_size = svg.size * transform.scale.xy();
-                let reverse_origin_translation =
-                    origin_state.previous.compute_translation(scaled_size);
-                let origin_translation = origin.compute_translation(scaled_size);
+    // for (
+    //     _,
+    //     svg_handle,
+    //     origin,
+    //     mut origin_state,
+    //     transform,
+    //     transform_changed,
+    //     mut global_transform,
+    // ) in &mut query
+    // {
+    //     if let Some(svg) = svgs.get(svg_handle) {
+    //         if origin_state.previous != *origin {
+    //             let scaled_size = svg.size * transform.scale.xy();
+    //             let reverse_origin_translation =
+    //                 origin_state.previous.compute_translation(scaled_size);
+    //             let origin_translation = origin.compute_translation(scaled_size);
 
-                let gtrans = global_transform.translation_mut();
-                gtrans.x += origin_translation.x - reverse_origin_translation.x;
-                gtrans.y += origin_translation.y - reverse_origin_translation.y;
-                gtrans.z += origin_translation.z - reverse_origin_translation.z;
+    //             let gtrans = global_transform.translation_mut();
+    //             gtrans.x += origin_translation.x - reverse_origin_translation.x;
+    //             gtrans.y += origin_translation.y - reverse_origin_translation.y;
+    //             gtrans.z += origin_translation.z - reverse_origin_translation.z;
 
-                origin_state.previous = origin.clone();
-            } else if transform_changed {
-                let scaled_size = svg.size * transform.scale.xy();
-                let origin_translation = origin.compute_translation(scaled_size);
+    //             origin_state.previous = origin.clone();
+    //         } else if transform_changed {
+    //             let scaled_size = svg.size * transform.scale.xy();
+    //             let origin_translation = origin.compute_translation(scaled_size);
 
-                let gtrans = global_transform.translation_mut();
-                gtrans.x += origin_translation.x;
-                gtrans.y += origin_translation.y;
-                gtrans.z += origin_translation.z;
-            }
-        }
-    }
+    //             let gtrans = global_transform.translation_mut();
+    //             gtrans.x += origin_translation.x;
+    //             gtrans.y += origin_translation.y;
+    //             gtrans.z += origin_translation.z;
+    //         }
+    //     }
+    // }
 }

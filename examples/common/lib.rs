@@ -112,7 +112,10 @@ fn keyboard_input_system(
 ) {
     if keyboard_input.just_pressed(KeyCode::V) {
         for (_, mut visible) in svg_query.iter_mut() {
-            visible.is_visible = !visible.is_visible;
+            *visible = match *visible {
+                Visibility::Hidden => Visibility::Inherited,
+                Visibility::Visible | Visibility::Inherited => Visibility::Hidden,
+            };
         }
     } else if keyboard_input.just_pressed(KeyCode::O) {
         for (mut origin, _) in svg_query.iter_mut() {
@@ -126,7 +129,10 @@ fn keyboard_input_system(
         }
     } else if keyboard_input.just_pressed(KeyCode::F) {
         for mut visible in &mut ui_query {
-            visible.is_visible = !visible.is_visible;
+            *visible = match *visible {
+                Visibility::Hidden => Visibility::Inherited,
+                Visibility::Visible | Visibility::Inherited => Visibility::Hidden,
+            };
         }
     }
 }

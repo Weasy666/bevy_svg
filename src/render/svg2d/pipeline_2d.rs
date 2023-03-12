@@ -88,7 +88,7 @@ pub fn queue_svg_2d(
     let mut num_svgs = 0;
     // Iterate each view (a camera is a view)
     for (view, visible_entities, mut transparent_phase) in views.iter_mut() {
-        let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples)
+        let mesh_key = Mesh2dPipelineKey::from_msaa_samples(msaa.samples())
             | Mesh2dPipelineKey::from_hdr(view.hdr);
 
         // Queue all entities visible to that view
@@ -187,12 +187,12 @@ impl SpecializedRenderPipeline for Svg2dPipeline {
                 })],
             }),
             // Use the two standard uniforms for 2d meshes
-            layout: Some(vec![
+            layout: vec![
                 // Bind group 0 is the view uniform
                 self.mesh2d_pipeline.view_layout.clone(),
                 // Bind group 1 is the mesh uniform
                 self.mesh2d_pipeline.mesh_layout.clone(),
-            ]),
+            ],
             primitive: PrimitiveState {
                 front_face: FrontFace::Cw,
                 cull_mode: None,
@@ -209,6 +209,7 @@ impl SpecializedRenderPipeline for Svg2dPipeline {
                 alpha_to_coverage_enabled: false,
             },
             label: Some("svg_2d_pipeline".into()),
+            push_constant_ranges: Vec::new(),
         };
     }
 }

@@ -6,10 +6,11 @@ license = "MIT OR Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
 repository = "https://github.com/Weasy666/bevy_svg/"
-version = "0.9.0"
+version = "0.10.0-alpha1"
 keywords = ["gamedev", "graphics", "bevy", "svg"]
 categories = ["Graphics", "Game engines", "Rendering"]
 exclude = ["assets", "examples"]
+rust-version = "1.67"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -20,7 +21,7 @@ default = ["2d", "3d"]
 3d = ["bevy/bevy_pbr"]
 
 [dependencies]
-bevy = { version = "0.9", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_render"] }
+bevy = { version = "0.10", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_render"] }
 copyless = "0.1"
 
 lyon_geom = "1.0"
@@ -33,7 +34,7 @@ anyhow = "1.0"
 thiserror = "1.0"
 
 [dev-dependencies]
-bevy = { version = "0.9", default-features = true }
+bevy = { version = "0.10", default-features = true }
 
 #### 2D examples ####
 [[example]]

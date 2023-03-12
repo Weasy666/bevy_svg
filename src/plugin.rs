@@ -14,20 +14,19 @@
 use std::ops::Deref;
 
 use bevy::{
-    app::{App, Plugin},
+    app::{App, CoreSet, Plugin},
     asset::{AddAsset, AssetEvent, Assets, Handle},
     ecs::{
         entity::Entity,
         event::EventReader,
         query::{Added, Changed, Or},
-        schedule::{IntoSystemDescriptor, StageLabel, SystemLabel, SystemStage},
+        schedule::{IntoSystemConfig, IntoSystemSetConfig, SystemSet},
         system::{Commands, Query, Res, ResMut},
     },
     hierarchy::DespawnRecursiveExt,
     log::debug,
     render::mesh::Mesh,
     sprite::Mesh2dHandle,
-    transform::TransformSystem,
 };
 
 use crate::{
@@ -38,10 +37,16 @@ use crate::{
 };
 
 /// Stages for this plugin.
-#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel, SystemLabel)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+#[system_set(base)]
 pub enum Stage {
     /// Stage in which [`Svg2dBundle`](crate::bundle::Svg2dBundle)s get drawn.
     SVG,
+}
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+pub enum SvgSystem {
+    ExtractSvgs,
 }
 
 /// A plugin that provides resources and a system to draw [`Svg`]s.
@@ -55,16 +60,17 @@ impl Plugin for SvgPlugin {
             .init_asset_loader::<SvgAssetLoader>()
             .insert_resource(fill_tess)
             .insert_resource(stroke_tess)
-            .add_stage_after(
-                bevy::app::CoreStage::PostUpdate,
-                Stage::SVG,
-                SystemStage::parallel(),
+            .configure_set(
+                Stage::SVG.after(CoreSet::PostUpdate)
             )
-            .add_system_to_stage(Stage::SVG, svg_mesh_linker)
-            .add_system_to_stage(Stage::SVG, origin::add_origin_state)
-            .add_system_to_stage(
-                bevy::app::CoreStage::PostUpdate,
-                origin::apply_origin.after(TransformSystem::TransformPropagate),
+            .add_system(
+                svg_mesh_linker.in_base_set(Stage::SVG)
+            )
+            .add_system(
+                origin::add_origin_state.in_base_set(Stage::SVG)
+            )
+            .add_system(
+                origin::apply_origin.in_base_set(CoreSet::PostUpdate)
             )
             .add_plugin(render::SvgPlugin);
     }

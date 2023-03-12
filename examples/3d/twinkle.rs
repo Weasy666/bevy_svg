@@ -6,14 +6,13 @@ mod common;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
-            window: WindowDescriptor {
+            primary_window: Some(Window {
                 title: "3d_twinkle".to_string(),
-                width: 600.0,
-                height: 600.0,
+                resolution: (600., 600.).into(),
                 ..Default::default()
-            },
+            }),
             ..Default::default()
         }))
         .add_plugin(common::CommonPlugin)
