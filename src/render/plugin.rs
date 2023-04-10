@@ -1,9 +1,7 @@
-use crate::resources::{FillTessellator, StrokeTessellator};
+use crate::{resources::{FillTessellator, StrokeTessellator}, prelude::Svg};
 use bevy::{
     app::{App, Plugin},
-    asset::Assets,
-    render::render_resource::Shader,
-    render::RenderApp,
+    asset::{Assets, Handle},
 };
 
 #[cfg(feature = "2d")]
@@ -27,10 +25,7 @@ impl Plugin for SvgPlugin {
         #[cfg(feature = "2d")]
         app.add_plugin(svg2d::RenderPlugin);
 
-        // Register our custom draw function and pipeline, and add our render systems
-        if let Ok(render_app) = app.get_sub_app_mut(RenderApp) {
-            #[cfg(feature = "3d")]
-            render_app.add_plugin(svg3d::RenderPlugin);
-        }
+        #[cfg(feature = "3d")]
+        app.add_plugin(svg3d::RenderPlugin);
     }
 }

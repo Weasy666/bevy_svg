@@ -43,11 +43,6 @@ pub enum Stage {
     SVG,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
-pub enum SvgSystem {
-    ExtractSvgs,
-}
-
 /// A plugin that provides resources and a system to draw [`Svg`]s.
 pub struct SvgPlugin;
 

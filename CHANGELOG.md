@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update bevy to `0.10`
 - because `GlobalTransform.translation_mut()` was made private we now replace the `GlobalTransform` of an `Svg` when its `Origin` changes.
 
+### Removed
+- custom pipelines for 2D and 3D
+
 ## [0.9.0] - 2023-01-17
 ### Added
 - add new examples
