@@ -7,9 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Update bevy to `0.10`
-
-### Removed
-- `apply_origin` code commented out, because `GlobalTransform.translation_mut()` was made private. This means, that changing the origin does currently not change anything on the positioning of the `Svg` it will always appear as `Origin::TopLeft`.
+- because `GlobalTransform.translation_mut()` was made private we now replace the `GlobalTransform` of an `Svg` when its `Origin` changes.
 
 ## [0.9.0] - 2023-01-17
 ### Added
