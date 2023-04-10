@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.10.0] - 2023-04-10
 ### Changed
 - Update bevy to `0.10`
 - because `GlobalTransform.translation_mut()` was made private we now replace the `GlobalTransform` of an `Svg` when its `Origin` changes.
