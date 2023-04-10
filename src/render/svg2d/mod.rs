@@ -1,7 +1,6 @@
 use bevy::{asset::HandleUntyped, reflect::TypeUuid, render::render_resource::Shader};
 
 mod bundle;
-mod pipeline_2d;
 mod plugin;
 
 /// Handle to the custom shader with a unique random ID

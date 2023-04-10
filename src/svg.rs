@@ -1,8 +1,8 @@
 use bevy::{
     asset::Handle,
     math::{Mat4, Vec2},
-    reflect::TypeUuid,
-    render::{color::Color, mesh::Mesh},
+    reflect::{FromReflect, Reflect, TypeUuid, std_traits::ReflectDefault},
+    render::{color::Color, mesh::Mesh, render_resource::AsBindGroup},
     transform::components::Transform,
 };
 use copyless::VecHelper;
@@ -14,19 +14,33 @@ use svgtypes::ViewBox;
 use crate::Convert;
 
 /// A loaded and deserialized SVG file.
-#[derive(Debug, TypeUuid)]
-#[uuid = "d2c5985d-e221-4257-9e3b-ff0fb87e28ba"]
+#[derive(AsBindGroup, Reflect, FromReflect, Debug, Clone, TypeUuid)]
+#[reflect(Default, Debug)]
+#[uuid = "ad47a360-355d-4955-9fd8-678412a77f12"]
 pub struct Svg {
     /// The name of the file.
     pub name: String,
     /// Size of the SVG.
     pub size: Vec2,
+    #[reflect(ignore)]
     /// ViewBox of the SVG.
     pub view_box: ViewBox,
+    #[reflect(ignore)]
     /// All paths that make up the SVG.
     pub paths: Vec<PathDescriptor>,
     /// The fully tessellated paths as [`Mesh`].
     pub mesh: Handle<Mesh>,
+}
+
+impl Default for Svg {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            size: Default::default(),
+            view_box: ViewBox { x: 0., y: 0., w: 0., h: 0. },
+            paths: Default::default(),
+            mesh: Default::default() }
+    }
 }
 
 impl Svg {
@@ -92,7 +106,7 @@ impl Svg {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PathDescriptor {
     pub segments: Vec<PathEvent>,
     pub abs_transform: Transform,
@@ -100,7 +114,7 @@ pub struct PathDescriptor {
     pub draw_type: DrawType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DrawType {
     Fill,
     Stroke(lyon_tessellation::StrokeOptions),

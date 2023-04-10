@@ -1,31 +1,31 @@
 use bevy::{
-    app::{App, IntoSystemAppConfig, Plugin},
-    core_pipeline::core_2d::Transparent2d,
-    ecs::schedule::IntoSystemConfig,
-    render::{
-        ExtractSchedule,
-        render_phase::AddRenderCommand, render_resource::SpecializedRenderPipelines, RenderSet,
-    },
+    app::{App, Plugin},
+    asset::{AddAsset, load_internal_asset},
+    render::render_resource::{Shader, ShaderRef},
+    sprite::{Material2d, Material2dPlugin},
 };
 
-use crate::{render::svg2d::pipeline_2d, plugin::SvgSystem};
+use crate::{render::svg2d::{SVG_2D_SHADER_HANDLE}, svg::Svg};
 
 /// Plugin that renders [`Svg`](crate::svg::Svg)s in 2D
 pub struct RenderPlugin;
 
 impl Plugin for RenderPlugin {
     fn build(&self, app: &mut App) {
-        // Register our custom draw function and pipeline, and add our render systems
-        app.init_resource::<pipeline_2d::Svg2dPipeline>()
-            .init_resource::<SpecializedRenderPipelines<pipeline_2d::Svg2dPipeline>>()
-            .add_render_command::<Transparent2d, pipeline_2d::DrawSvg2d>()
-            .add_system(
-                pipeline_2d::extract_svg_2d
-                    .in_set(SvgSystem::ExtractSvgs)
-                    .in_schedule(ExtractSchedule),
-            )
-            .add_system(
-                pipeline_2d::queue_svg_2d.in_set(RenderSet::Queue)
-            );
+        load_internal_asset!(
+            app,
+            SVG_2D_SHADER_HANDLE,
+            "svg_2d.wgsl",
+            Shader::from_wgsl
+        );
+
+        app.add_plugin(Material2dPlugin::<Svg>::default())
+            .register_asset_reflect::<Svg>();
+    }
+}
+
+impl Material2d for Svg {
+    fn fragment_shader() -> ShaderRef {
+        SVG_2D_SHADER_HANDLE.typed().into()
     }
 }

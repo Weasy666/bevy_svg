@@ -32,7 +32,6 @@ use bevy::{
 use crate::{
     loader::SvgAssetLoader,
     origin, render,
-    resources::{FillTessellator, StrokeTessellator},
     svg::Svg,
 };
 
@@ -54,12 +53,8 @@ pub struct SvgPlugin;
 
 impl Plugin for SvgPlugin {
     fn build(&self, app: &mut App) {
-        let fill_tess = FillTessellator::default();
-        let stroke_tess = StrokeTessellator::default();
         app.add_asset::<Svg>()
             .init_asset_loader::<SvgAssetLoader>()
-            .insert_resource(fill_tess)
-            .insert_resource(stroke_tess)
             .configure_set(
                 Stage::SVG.after(CoreSet::PostUpdate)
             )
