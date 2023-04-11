@@ -175,7 +175,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
                 color: Color::GOLD,
             }),
             TextSection::new(
-                "\n(max: ",
+                "\n(min: ",
                 TextStyle {
                     font: font_bold.clone(),
                     font_size: 20.0,
@@ -188,7 +188,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
                 color: Color::GOLD,
             }),
             TextSection::new(
-                " - min: ",
+                " - max: ",
                 TextStyle {
                     font: font_bold.clone(),
                     font_size: 20.0,
