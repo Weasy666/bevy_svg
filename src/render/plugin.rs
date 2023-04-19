@@ -1,4 +1,7 @@
-use crate::{resources::{FillTessellator, StrokeTessellator}, prelude::Svg};
+use crate::{
+    prelude::Svg,
+    resources::{FillTessellator, StrokeTessellator},
+};
 use bevy::{
     app::{App, Plugin},
     asset::{Assets, Handle},

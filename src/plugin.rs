@@ -29,11 +29,7 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 
-use crate::{
-    loader::SvgAssetLoader,
-    origin, render,
-    svg::Svg,
-};
+use crate::{loader::SvgAssetLoader, origin, render, svg::Svg};
 
 /// Stages for this plugin.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
@@ -50,18 +46,10 @@ impl Plugin for SvgPlugin {
     fn build(&self, app: &mut App) {
         app.add_asset::<Svg>()
             .init_asset_loader::<SvgAssetLoader>()
-            .configure_set(
-                Stage::SVG.after(CoreSet::PostUpdate)
-            )
-            .add_system(
-                svg_mesh_linker.in_base_set(Stage::SVG)
-            )
-            .add_system(
-                origin::add_origin_state.in_base_set(Stage::SVG)
-            )
-            .add_system(
-                origin::apply_origin.in_base_set(CoreSet::PostUpdate)
-            )
+            .configure_set(Stage::SVG.after(CoreSet::PostUpdate))
+            .add_system(svg_mesh_linker.in_base_set(Stage::SVG))
+            .add_system(origin::add_origin_state.in_base_set(Stage::SVG))
+            .add_system(origin::apply_origin.in_base_set(CoreSet::PostUpdate))
             .add_plugin(render::SvgPlugin);
     }
 }

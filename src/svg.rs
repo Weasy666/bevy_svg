@@ -1,17 +1,19 @@
+use std::path::Path;
+
 use bevy::{
     asset::Handle,
     math::{Mat4, Vec2},
-    reflect::{FromReflect, Reflect, TypeUuid, std_traits::ReflectDefault},
+    reflect::{std_traits::ReflectDefault, FromReflect, Reflect, TypeUuid},
     render::{color::Color, mesh::Mesh, render_resource::AsBindGroup},
     transform::components::Transform,
 };
 use copyless::VecHelper;
 use lyon_geom::euclid::default::Transform2D;
 use lyon_path::PathEvent;
-use lyon_tessellation::math::Point;
+use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
 
-use crate::Convert;
+use crate::{loader::FileSvgError, render::tessellation, Convert};
 
 /// A loaded and deserialized SVG file.
 #[derive(AsBindGroup, Reflect, FromReflect, Debug, Clone, TypeUuid)]
@@ -37,13 +39,44 @@ impl Default for Svg {
         Self {
             name: Default::default(),
             size: Default::default(),
-            view_box: ViewBox { x: 0., y: 0., w: 0., h: 0. },
+            view_box: ViewBox {
+                x: 0.,
+                y: 0.,
+                w: 0.,
+                h: 0.,
+            },
             paths: Default::default(),
-            mesh: Default::default() }
+            mesh: Default::default(),
+        }
     }
 }
 
 impl Svg {
+    /// Loads an SVG from bytes
+    pub fn from_bytes(bytes: &[u8], path: &Path) -> Result<Svg, FileSvgError> {
+        let mut opts = usvg::Options::default();
+        opts.fontdb.load_system_fonts();
+        opts.fontdb.load_fonts_dir("./assets");
+
+        let svg_tree =
+            usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| FileSvgError {
+                error: err.into(),
+                path: format!("{}", path.display()),
+            })?;
+
+        Ok(Svg::from_tree(svg_tree))
+    }
+
+    /// Creates a bevy mesh from the SVG data.
+    pub fn tessellate(&self) -> Mesh {
+        let buffer = tessellation::generate_buffer(
+            self,
+            &mut FillTessellator::new(),
+            &mut StrokeTessellator::new(),
+        );
+        buffer.convert()
+    }
+
     pub(crate) fn from_tree(tree: usvg::Tree) -> Svg {
         let view_box = tree.view_box;
         let size = tree.size;
