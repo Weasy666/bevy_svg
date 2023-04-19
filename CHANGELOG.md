@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Added a `from_bytes` function on the `Svg` struct that loads in an SVG from byte data
+- Added a `tesselate` function on the `Svg` struct that calculates the bevy mesh.
 
 ## [0.10.0] - 2023-04-10
 ### Changed

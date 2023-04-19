@@ -2,12 +2,10 @@ use anyhow;
 use bevy::{
     asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset},
     log::debug,
-    render::mesh::Mesh,
 };
-use lyon_tessellation::{FillTessellator, StrokeTessellator};
 use thiserror::Error;
 
-use crate::{render::tessellation, svg::Svg, Convert};
+use crate::svg::Svg;
 
 #[derive(Default)]
 pub struct SvgAssetLoader;
@@ -19,18 +17,8 @@ impl AssetLoader for SvgAssetLoader {
         load_context: &'a mut LoadContext,
     ) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
         Box::pin(async move {
-            let mut opts = usvg::Options::default();
-            opts.fontdb.load_system_fonts();
-            opts.fontdb.load_fonts_dir("./assets");
-
             debug!("Parsing SVG: {} ...", load_context.path().display());
-            let svg_tree =
-                usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| FileSvgError {
-                    error: err.into(),
-                    path: format!("{}", load_context.path().display()),
-                })?;
-
-            let mut svg = Svg::from_tree(svg_tree);
+            let mut svg = Svg::from_bytes(bytes, load_context.path())?;
             let name = &load_context
                 .path()
                 .file_name()
@@ -43,16 +31,11 @@ impl AssetLoader for SvgAssetLoader {
             debug!("Parsing SVG: {} ... Done", load_context.path().display());
 
             debug!("Tessellating SVG: {} ...", load_context.path().display());
-            let buffer = tessellation::generate_buffer(
-                &svg,
-                &mut FillTessellator::new(),
-                &mut StrokeTessellator::new(),
-            );
+            let mesh = svg.tessellate();
             debug!(
                 "Tessellating SVG: {} ... Done",
                 load_context.path().display()
             );
-            let mesh: Mesh = buffer.convert();
             let mesh_handle = load_context.set_labeled_asset("mesh", LoadedAsset::new(mesh));
             svg.mesh = mesh_handle;
 
@@ -79,8 +62,8 @@ pub enum SvgError {
 /// An error that occurs when loading a texture from a file.
 #[derive(Error, Debug)]
 pub struct FileSvgError {
-    error: SvgError,
-    path: String,
+    pub(crate) error: SvgError,
+    pub(crate) path: String,
 }
 impl std::fmt::Display for FileSvgError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {

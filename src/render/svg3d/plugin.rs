@@ -1,6 +1,6 @@
 use bevy::{
     app::{App, Plugin},
-    asset::{AddAsset, load_internal_asset},
+    asset::{load_internal_asset, AddAsset},
     pbr::{Material, MaterialPlugin},
     render::render_resource::{Shader, ShaderRef},
 };
@@ -14,12 +14,7 @@ pub struct RenderPlugin;
 
 impl Plugin for RenderPlugin {
     fn build(&self, app: &mut App) {
-        load_internal_asset!(
-            app,
-            SVG_3D_SHADER_HANDLE,
-            "svg_3d.wgsl",
-            Shader::from_wgsl
-        );
+        load_internal_asset!(app, SVG_3D_SHADER_HANDLE, "svg_3d.wgsl", Shader::from_wgsl);
 
         app.add_plugin(MaterialPlugin::<Svg>::default())
             .register_asset_reflect::<Svg>();
