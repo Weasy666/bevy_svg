@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::PathBuf;
 
 use bevy::{
     asset::Handle,
@@ -53,15 +53,20 @@ impl Default for Svg {
 
 impl Svg {
     /// Loads an SVG from bytes
-    pub fn from_bytes(bytes: &[u8], path: &Path) -> Result<Svg, FileSvgError> {
+    pub fn from_bytes(
+        bytes: &[u8],
+        path: impl Into<PathBuf>,
+        fonts: Option<impl Into<PathBuf>>,
+    ) -> Result<Svg, FileSvgError> {
         let mut opts = usvg::Options::default();
         opts.fontdb.load_system_fonts();
-        opts.fontdb.load_fonts_dir("./assets");
+        opts.fontdb
+            .load_fonts_dir(fonts.map(|p| p.into()).unwrap_or("./assets".into()));
 
         let svg_tree =
             usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| FileSvgError {
                 error: err.into(),
-                path: format!("{}", path.display()),
+                path: format!("{}", path.into().display()),
             })?;
 
         Ok(Svg::from_tree(svg_tree))
