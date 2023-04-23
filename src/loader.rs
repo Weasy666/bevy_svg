@@ -18,7 +18,7 @@ impl AssetLoader for SvgAssetLoader {
     ) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
         Box::pin(async move {
             debug!("Parsing SVG: {} ...", load_context.path().display());
-            let mut svg = Svg::from_bytes(bytes, load_context.path())?;
+            let mut svg = Svg::from_bytes(bytes, load_context.path(), None::<&std::path::Path>)?;
             let name = &load_context
                 .path()
                 .file_name()
