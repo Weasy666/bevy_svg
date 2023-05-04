@@ -7,10 +7,13 @@ use bevy::{
         system::{Commands, Query, Res},
     },
     math::{Vec2, Vec3, Vec3Swizzles},
-    render::mesh::Mesh,
-    sprite::Mesh2dHandle,
     transform::components::{GlobalTransform, Transform},
 };
+
+#[cfg(feature = "3d")]
+use bevy::render::mesh::Mesh;
+#[cfg(feature = "2d")]
+use bevy::sprite::Mesh2dHandle;
 
 use crate::svg::Svg;
 
@@ -50,18 +53,20 @@ pub(crate) struct OriginState {
     previous: Origin,
 }
 
+#[cfg(feature = "2d")]
+#[cfg(not(feature = "3d"))]
+type WithMesh = With<Mesh2dHandle>;
+#[cfg(not(feature = "2d"))]
+#[cfg(feature = "3d")]
+type WithMesh = With<Handle<Mesh>>;
+#[cfg(all(feature = "2d", feature = "3d"))]
+type WithMesh = Or<(With<Mesh2dHandle>, With<Handle<Mesh>>)>;
+
 /// Checkes if a "new" SVG bundle was added by looking for a missing OriginState
 /// and then adds it to the entity.
 pub(crate) fn add_origin_state(
     mut commands: Commands,
-    query: Query<
-        Entity,
-        (
-            With<Handle<Svg>>,
-            Or<(With<Mesh2dHandle>, With<Handle<Mesh>>)>,
-            Without<OriginState>,
-        ),
-    >,
+    query: Query<Entity, (With<Handle<Svg>>, WithMesh, Without<OriginState>)>,
 ) {
     for entity in &query {
         commands.entity(entity).insert(OriginState {
@@ -69,6 +74,15 @@ pub(crate) fn add_origin_state(
         });
     }
 }
+
+#[cfg(feature = "2d")]
+#[cfg(not(feature = "3d"))]
+type ChangedMesh = Changed<Mesh2dHandle>;
+#[cfg(not(feature = "2d"))]
+#[cfg(feature = "3d")]
+type ChangedMesh = Changed<Handle<Mesh>>;
+#[cfg(all(feature = "2d", feature = "3d"))]
+type ChangedMesh = Or<(Changed<Mesh2dHandle>, Changed<Handle<Mesh>>)>;
 
 /// Gets all SVGs with a changed origin or transform and checks if the origin offset
 /// needs to be applied.
@@ -84,12 +98,7 @@ pub(crate) fn apply_origin(
             Changed<Transform>,
             &mut GlobalTransform,
         ),
-        Or<(
-            Changed<Origin>,
-            Changed<Transform>,
-            Changed<Mesh2dHandle>,
-            Changed<Handle<Mesh>>,
-        )>,
+        Or<(Changed<Origin>, Changed<Transform>, ChangedMesh)>,
     >,
 ) {
     for (
