@@ -16,10 +16,9 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugin(common::CommonPlugin)
-        .add_plugin(bevy_svg::prelude::SvgPlugin)
-        .add_startup_system(setup)
-        .add_system(run)
+        .add_plugins((common::CommonPlugin, bevy_svg::prelude::SvgPlugin))
+        .add_systems(Startup, setup)
+        .add_systems(Update, run)
         .run();
 }
 

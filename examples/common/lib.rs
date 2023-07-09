@@ -1,5 +1,5 @@
 use bevy::{
-    diagnostic::{Diagnostics, FrameTimeDiagnosticsPlugin},
+    diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
 use bevy_svg::prelude::*;
@@ -10,13 +10,19 @@ pub struct CommonPlugin;
 
 impl Plugin for CommonPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-            .add_startup_system(setup_legend)
-            .add_startup_system(setup_fps_counter)
-            .add_startup_system(setup_origin_text)
-            .add_system(keyboard_input_system)
-            .add_system(fps_text_update_system)
-            .add_system(origin_text_update_system);
+        app.add_plugins(FrameTimeDiagnosticsPlugin::default())
+            .add_systems(
+                Startup,
+                (setup_legend, setup_fps_counter, setup_origin_text),
+            )
+            .add_systems(
+                Update,
+                (
+                    keyboard_input_system,
+                    fps_text_update_system,
+                    origin_text_update_system,
+                ),
+            );
     }
 }
 
@@ -84,11 +90,8 @@ fn setup_legend(mut commands: Commands, asset_server: Res<AssetServer>) {
     ])
     .with_style(Style {
         position_type: PositionType::Absolute,
-        position: UiRect {
-            top: Val::Px(5.0),
-            right: Val::Px(15.0),
-            ..default()
-        },
+        top: Val::Px(5.0),
+        right: Val::Px(15.0),
         ..default()
     }),));
 }
@@ -224,11 +227,8 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
         ])
         .with_style(Style {
             position_type: PositionType::Absolute,
-            position: UiRect {
-                top: Val::Px(5.0),
-                left: Val::Px(15.0),
-                ..default()
-            },
+            top: Val::Px(5.0),
+            left: Val::Px(15.0),
             ..default()
         }),
         FpsText,
@@ -236,7 +236,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn fps_text_update_system(
-    diagnostics: Res<Diagnostics>,
+    diagnostics: Res<DiagnosticsStore>,
     mut fps_values: Local<FpsValues>,
     mut query: Query<&mut Text, With<FpsText>>,
 ) {
@@ -284,11 +284,8 @@ fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
         ])
         .with_style(Style {
             position_type: PositionType::Absolute,
-            position: UiRect {
-                bottom: Val::Px(5.0),
-                left: Val::Px(15.0),
-                ..default()
-            },
+            bottom: Val::Px(5.0),
+            left: Val::Px(15.0),
             ..default()
         }),
         OriginText,

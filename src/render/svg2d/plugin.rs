@@ -14,7 +14,7 @@ impl Plugin for RenderPlugin {
     fn build(&self, app: &mut App) {
         load_internal_asset!(app, SVG_2D_SHADER_HANDLE, "svg_2d.wgsl", Shader::from_wgsl);
 
-        app.add_plugin(Material2dPlugin::<Svg>::default())
+        app.add_plugins(Material2dPlugin::<Svg>::default())
             .register_asset_reflect::<Svg>();
     }
 }

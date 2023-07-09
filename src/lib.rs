@@ -65,7 +65,7 @@ impl Plugin for SvgPlugin {
     fn build(&self, app: &mut App) {
         app.add_asset::<Svg>().init_asset_loader::<SvgAssetLoader>();
         #[cfg(any(feature = "2d", feature = "3d"))]
-        app.add_plugin(SvgRenderPlugin);
+        app.add_plugins(SvgRenderPlugin);
     }
 }
 

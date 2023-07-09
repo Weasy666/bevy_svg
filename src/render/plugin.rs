@@ -26,9 +26,9 @@ impl Plugin for SvgPlugin {
             .set_untracked(Handle::<Svg>::default(), Svg::default());
 
         #[cfg(feature = "2d")]
-        app.add_plugin(svg2d::RenderPlugin);
+        app.add_plugins(svg2d::RenderPlugin);
 
         #[cfg(feature = "3d")]
-        app.add_plugin(svg3d::RenderPlugin);
+        app.add_plugins(svg3d::RenderPlugin);
     }
 }
