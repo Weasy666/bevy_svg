@@ -6,26 +6,27 @@
 //! ## How it works
 //! The user creates/loades a [`Svg2dBundle`](crate::bundle::Svg2dBundle) in a system.
 //!
-//! Then, in the [`Stage::SVG`](Stage::SVG), a mesh is created for each loaded [`Svg`] bundle.
-//! Each mesh is then extracted in the [`RenderStage::Extract`](bevy::render::RenderStage) and added to the
+//! Then, in the [`Set::SVG`](Set::SVG), a mesh is created for each loaded [`Svg`] bundle.
+//! Each mesh is then extracted in the [`RenderSet::Extract`](bevy::render::RenderSet) and added to the
 //! [`RenderWorld`](bevy::render::RenderWorld).
-//! Afterwards it is queued in the [`RenderStage::Queue`](bevy::render::RenderStage) for actual drawing/rendering.
+//! Afterwards it is queued in the [`RenderSet::Queue`](bevy::render::RenderSet) for actual drawing/rendering.
 
 #[cfg(feature = "3d")]
 use std::ops::Deref;
 
 use bevy::{
-    app::{App, CoreSet, Plugin},
+    app::{App, Plugin},
     asset::{AssetEvent, Assets, Handle},
     ecs::{
         entity::Entity,
         event::EventReader,
         query::{Added, Changed, Or},
-        schedule::{IntoSystemConfig, IntoSystemSetConfig, SystemSet},
+        schedule::{IntoSystemConfigs, SystemSet},
         system::{Commands, Query, Res, ResMut},
     },
     hierarchy::DespawnRecursiveExt,
     log::debug,
+    prelude::{Last, PostUpdate},
     render::mesh::Mesh,
 };
 
@@ -34,11 +35,10 @@ use bevy::sprite::Mesh2dHandle;
 
 use crate::{origin, render, svg::Svg};
 
-/// Stages for this plugin.
+/// Sets for this plugin.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
-#[system_set(base)]
-pub enum Stage {
-    /// Stage in which [`Svg2dBundle`](crate::bundle::Svg2dBundle)s get drawn.
+pub enum Set {
+    /// Set in which [`Svg2dBundle`](crate::bundle::Svg2dBundle)s get drawn.
     SVG,
 }
 
@@ -47,11 +47,12 @@ pub struct SvgRenderPlugin;
 
 impl Plugin for SvgRenderPlugin {
     fn build(&self, app: &mut App) {
-        app.configure_set(Stage::SVG.after(CoreSet::PostUpdate))
-            .add_system(svg_mesh_linker.in_base_set(Stage::SVG))
-            .add_system(origin::add_origin_state.in_base_set(Stage::SVG))
-            .add_system(origin::apply_origin.in_base_set(CoreSet::PostUpdate))
-            .add_plugin(render::SvgPlugin);
+        app.add_systems(PostUpdate, (origin::add_origin_state.in_set(Set::SVG),))
+            .add_systems(
+                Last,
+                (origin::apply_origin, svg_mesh_linker.in_set(Set::SVG)),
+            )
+            .add_plugins(render::SvgPlugin);
     }
 }
 
