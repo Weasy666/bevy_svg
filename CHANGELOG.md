@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.11.0] - 2023-07-12
+### Changed
+- Update bevy to `0.11` ([#33](https://github.com/Weasy666/bevy_svg/pull/33) Thanks @NiseVoid)
+- Change `rust-version` to 1.70
+
 ## [0.10.1] - 2023-04-23
 ### Added
 - Added a `from_bytes` function on the `Svg` struct that loads in an SVG from byte data ([#30](https://github.com/Weasy666/bevy_svg/pull/30))
