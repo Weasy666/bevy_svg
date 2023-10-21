@@ -12,7 +12,11 @@ use lyon_geom::euclid::default::Transform2D;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
-use usvg::NodeExt;
+use usvg::{
+    NodeExt,
+    tiny_skia_path::{PathSegment, PathSegmentsIter},
+    TreeParsing, TreeTextToPath,
+};
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -59,16 +63,18 @@ impl Svg {
         path: impl Into<PathBuf>,
         fonts: Option<impl Into<PathBuf>>,
     ) -> Result<Svg, FileSvgError> {
-        let mut opts = usvg::Options::default();
-        opts.fontdb.load_system_fonts();
-        opts.fontdb
-            .load_fonts_dir(fonts.map(|p| p.into()).unwrap_or("./assets".into()));
-
-        let svg_tree =
-            usvg::Tree::from_data(&bytes, &opts.to_ref()).map_err(|err| FileSvgError {
-                error: err.into(),
-                path: format!("{}", path.into().display()),
+        let mut svg_tree =
+            usvg::Tree::from_data(&bytes, &usvg::Options::default()).map_err(|err| {
+                FileSvgError {
+                    error: err.into(),
+                    path: format!("{}", path.into().display()),
+                }
             })?;
+
+        let mut fontdb = usvg::fontdb::Database::default();
+        fontdb.load_system_fonts();
+        fontdb.load_fonts_dir(fonts.map(|p| p.into()).unwrap_or("./assets".into()));
+        svg_tree.convert_text(&fontdb);
 
         Ok(Svg::from_tree(svg_tree))
     }
@@ -93,10 +99,10 @@ impl Svg {
                 usvg::NodeKind::Path(path) => {
                     let t = node.abs_transform();
                     let abs_t = Transform::from_matrix(Mat4::from_cols(
-                        [t.a.abs() as f32, t.b as f32, 0.0, 0.0].into(),
-                        [t.c as f32, t.d.abs() as f32, 0.0, 0.0].into(),
+                        [t.sx.abs(), t.ky, 0.0, 0.0].into(),
+                        [t.kx, t.sy.abs(), 0.0, 0.0].into(),
                         [0.0, 0.0, 1.0, 0.0].into(),
-                        [t.e as f32, t.f as f32, 0.0, 1.0].into(),
+                        [t.tx, t.ty, 0.0, 1.0].into(),
                     ));
 
                     if let Some(fill) = &path.fill {
@@ -132,12 +138,12 @@ impl Svg {
 
         return Svg {
             name: Default::default(),
-            size: Vec2::new(size.width() as f32, size.height() as f32),
+            size: Vec2::new(size.width(), size.height()),
             view_box: ViewBox {
-                x: view_box.rect.x(),
-                y: view_box.rect.y(),
-                w: view_box.rect.width(),
-                h: view_box.rect.height(),
+                x: view_box.rect.x() as f64,
+                y: view_box.rect.y() as f64,
+                w: view_box.rect.width() as f64,
+                h: view_box.rect.height() as f64,
             },
             paths: descriptors,
             mesh: Default::default(),
@@ -161,7 +167,7 @@ pub enum DrawType {
 
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
 pub(crate) struct PathConvIter<'iter> {
-    iter: usvg::PathSegmentsIter<'iter>,
+    iter: PathSegmentsIter<'iter>,
     prev: Point,
     first: Point,
     needs_end: bool,
@@ -179,12 +185,12 @@ impl<'iter> Iterator for PathConvIter<'iter> {
         let mut return_event = None;
         let next = self.iter.next();
         match next {
-            Some(usvg::PathSegment::MoveTo { x, y }) => {
+            Some(PathSegment::MoveTo(point)) => {
                 if self.needs_end {
                     let last = self.prev;
                     let first = self.first;
                     self.needs_end = false;
-                    self.prev = (x, y).convert();
+                    self.prev = point.convert();
                     self.deferred = Some(PathEvent::Begin { at: self.prev });
                     self.first = self.prev;
                     return_event = Some(PathEvent::End {
@@ -193,38 +199,41 @@ impl<'iter> Iterator for PathConvIter<'iter> {
                         close: false,
                     });
                 } else {
-                    self.first = (x, y).convert();
+                    self.first = point.convert();
                     return_event = Some(PathEvent::Begin { at: self.first });
                 }
             }
-            Some(usvg::PathSegment::LineTo { x, y }) => {
+            Some(PathSegment::LineTo(point)) => {
                 self.needs_end = true;
                 let from = self.prev;
-                self.prev = (x, y).convert();
+                self.prev = point.convert();
                 return_event = Some(PathEvent::Line {
                     from,
                     to: self.prev,
                 });
             }
-            Some(usvg::PathSegment::CurveTo {
-                x1,
-                y1,
-                x2,
-                y2,
-                x,
-                y,
-            }) => {
+            Some(PathSegment::CubicTo(point1, point2, point3)) => {
                 self.needs_end = true;
                 let from = self.prev;
-                self.prev = (x, y).convert();
+                self.prev = point3.convert();
                 return_event = Some(PathEvent::Cubic {
                     from,
-                    ctrl1: (x1, y1).convert(),
-                    ctrl2: (x2, y2).convert(),
+                    ctrl1: point1.convert(),
+                    ctrl2: point2.convert(),
                     to: self.prev,
                 });
             }
-            Some(usvg::PathSegment::ClosePath) => {
+            Some(PathSegment::QuadTo(point1, point2)) => {
+                self.needs_end = true;
+                let from = self.prev;
+                self.prev = point2.convert();
+                return_event = Some(PathEvent::Quadratic {
+                    from,
+                    ctrl: point1.convert(),
+                    to: self.prev,
+                });
+            }
+            Some(PathSegment::Close) => {
                 self.needs_end = false;
                 self.prev = self.first;
                 return_event = Some(PathEvent::End {
@@ -251,17 +260,17 @@ impl<'iter> Iterator for PathConvIter<'iter> {
     }
 }
 
-impl Convert<Point> for (&f64, &f64) {
+impl Convert<Point> for &usvg::tiny_skia_path::Point {
     #[inline]
     fn convert(self) -> Point {
-        Point::new((*self.0) as f32, (*self.1) as f32)
+        Point::new(self.x, self.y)
     }
 }
 
-impl Convert<Point> for (f64, f64) {
+impl Convert<Point> for usvg::tiny_skia_path::Point {
     #[inline]
     fn convert(self) -> Point {
-        Point::new(self.0 as f32, self.1 as f32)
+        Point::new(self.x, self.y)
     }
 }
 
@@ -276,8 +285,8 @@ impl<'iter> Convert<PathConvIter<'iter>> for &'iter usvg::Path {
             // For some reason the local transform of some paths has negative scale values.
             // Here we correct to positive values.
             scale: lyon_geom::Transform::scale(
-                if self.transform.a < 0.0 { -1.0 } else { 1.0 },
-                if self.transform.d < 0.0 { -1.0 } else { 1.0 },
+                if self.transform.sx < 0.0 { -1.0 } else { 1.0 },
+                if self.transform.sy < 0.0 { -1.0 } else { 1.0 },
             ),
         };
     }
@@ -300,6 +309,7 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
         };
         let linejoin = match self.linejoin {
             usvg::LineJoin::Miter => lyon_tessellation::LineJoin::Miter,
+            usvg::LineJoin::MiterClip => lyon_tessellation::LineJoin::MiterClip,
             usvg::LineJoin::Bevel => lyon_tessellation::LineJoin::Bevel,
             usvg::LineJoin::Round => lyon_tessellation::LineJoin::Round,
         };
