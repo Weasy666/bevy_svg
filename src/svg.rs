@@ -13,9 +13,8 @@ use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
 use usvg::{
-    NodeExt,
     tiny_skia_path::{PathSegment, PathSegmentsIter},
-    TreeParsing, TreeTextToPath,
+    NodeExt, TreeParsing, TreeTextToPath,
 };
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
@@ -96,14 +95,8 @@ impl Svg {
 
         for node in tree.root.descendants() {
             match &*node.borrow() {
-                usvg::NodeKind::Path(path) => {
-                    let t = node.abs_transform();
-                    let abs_t = Transform::from_matrix(Mat4::from_cols(
-                        [t.sx.abs(), t.ky, 0.0, 0.0].into(),
-                        [t.kx, t.sy.abs(), 0.0, 0.0].into(),
-                        [0.0, 0.0, 1.0, 0.0].into(),
-                        [t.tx, t.ty, 0.0, 1.0].into(),
-                    ));
+                usvg::NodeKind::Path(ref path) => {
+                    let abs_transform = node.abs_transform().convert();
 
                     if let Some(fill) = &path.fill {
                         let color = match fill.paint {
@@ -115,7 +108,7 @@ impl Svg {
 
                         descriptors.alloc().init(PathDescriptor {
                             segments: path.convert().collect(),
-                            abs_transform: abs_t,
+                            abs_transform,
                             color,
                             draw_type: DrawType::Fill,
                         });
@@ -126,7 +119,7 @@ impl Svg {
 
                         descriptors.alloc().init(PathDescriptor {
                             segments: path.convert().collect(),
-                            abs_transform: abs_t,
+                            abs_transform,
                             color,
                             draw_type,
                         });
@@ -274,20 +267,28 @@ impl Convert<Point> for usvg::tiny_skia_path::Point {
     }
 }
 
+impl Convert<Transform> for usvg::tiny_skia_path::Transform {
+    #[inline]
+    fn convert(self) -> Transform {
+        Transform::from_matrix(Mat4::from_cols(
+            [self.sx, self.ky, 0.0, 0.0].into(),
+            [self.kx, self.sy, 0.0, 0.0].into(),
+            [0.0, 0.0, 1.0, 0.0].into(),
+            [self.tx, self.ty, 0.0, 1.0].into(),
+        ))
+    }
+}
+
 impl<'iter> Convert<PathConvIter<'iter>> for &'iter usvg::Path {
     fn convert(self) -> PathConvIter<'iter> {
+        let (scale_x, scale_y) = self.transform.get_scale();
         return PathConvIter {
             iter: self.data.segments(),
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
             deferred: None,
             needs_end: false,
-            // For some reason the local transform of some paths has negative scale values.
-            // Here we correct to positive values.
-            scale: lyon_geom::Transform::scale(
-                if self.transform.sx < 0.0 { -1.0 } else { 1.0 },
-                if self.transform.sy < 0.0 { -1.0 } else { 1.0 },
-            ),
+            scale: lyon_geom::Transform::scale(scale_x, scale_y),
         };
     }
 }
