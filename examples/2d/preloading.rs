@@ -42,16 +42,16 @@ fn run(mut commands: Commands, asset_server: Res<AssetServer>, mut fsm: Local<Tu
             *fsm = TutorialFsm::StartedLoad(handle);
         }
         TutorialFsm::StartedLoad(handle) => {
-            if asset_server.get_load_state(handle) == LoadState::Loaded {
+            if let Some(LoadState::Loaded) = asset_server.get_load_state(handle) {
                 *fsm = TutorialFsm::Wait(handle.clone(), 60);
             }
         }
         TutorialFsm::Wait(handle, frames) => {
             if *frames > 0 {
                 *fsm = TutorialFsm::Wait(handle.clone(), *frames - 1);
-            } else {
+            } else if let Some(svg) = asset_server.get_handle("neutron_star.svg") {
                 commands.spawn(Svg2dBundle {
-                    svg: asset_server.get_handle("neutron_star.svg"),
+                    svg,
                     origin: Origin::Center,
                     ..Default::default()
                 });

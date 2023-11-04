@@ -55,7 +55,7 @@ use crate::plugin::SvgRenderPlugin;
 use crate::{loader::SvgAssetLoader, svg::Svg};
 use bevy::{
     app::{App, Plugin},
-    asset::AddAsset,
+    asset::AssetApp,
 };
 
 /// A plugin that provides resources and a system to draw [`Svg`]s.
@@ -63,7 +63,8 @@ pub struct SvgPlugin;
 
 impl Plugin for SvgPlugin {
     fn build(&self, app: &mut App) {
-        app.add_asset::<Svg>().init_asset_loader::<SvgAssetLoader>();
+        app.init_asset::<Svg>()
+            .init_asset_loader::<SvgAssetLoader>();
         #[cfg(any(feature = "2d", feature = "3d"))]
         app.add_plugins(SvgRenderPlugin);
     }

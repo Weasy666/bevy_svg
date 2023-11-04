@@ -5,7 +5,7 @@ use bevy::{
     ecs::bundle::Bundle,
     render::{
         mesh::Mesh,
-        view::{ComputedVisibility, Visibility},
+        view::{InheritedVisibility, ViewVisibility, Visibility},
     },
     transform::components::{GlobalTransform, Transform},
 };
@@ -23,7 +23,8 @@ pub struct Svg3dBundle {
     pub transform: Transform,
     pub global_transform: GlobalTransform,
     pub visibility: Visibility,
-    pub computed_visibility: ComputedVisibility,
+    pub inherited_visibility: InheritedVisibility,
+    pub view_visibility: ViewVisibility,
 }
 
 impl Default for Svg3dBundle {
@@ -36,7 +37,8 @@ impl Default for Svg3dBundle {
             transform: Transform::default(),
             global_transform: GlobalTransform::default(),
             visibility: Visibility::default(),
-            computed_visibility: ComputedVisibility::default(),
+            inherited_visibility: InheritedVisibility::default(),
+            view_visibility: ViewVisibility::default(),
         }
     }
 }

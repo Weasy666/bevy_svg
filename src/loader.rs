@@ -1,6 +1,5 @@
-use anyhow;
 use bevy::{
-    asset::{AssetLoader, BoxedFuture, LoadContext, LoadedAsset},
+    asset::{io::Reader, AssetLoader, AsyncReadExt, BoxedFuture, LoadContext},
     log::debug,
 };
 use thiserror::Error;
@@ -11,20 +10,33 @@ use crate::svg::Svg;
 pub struct SvgAssetLoader;
 
 impl AssetLoader for SvgAssetLoader {
+    type Asset = Svg;
+    type Settings = ();
+    type Error = FileSvgError;
+
     fn load<'a>(
         &'a self,
-        bytes: &'a [u8],
+        reader: &'a mut Reader,
+        _settings: &'a (),
         load_context: &'a mut LoadContext,
-    ) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
+    ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             debug!("Parsing SVG: {} ...", load_context.path().display());
-            let mut svg = Svg::from_bytes(bytes, load_context.path(), None::<&std::path::Path>)?;
+            let mut bytes = Vec::new();
+            reader
+                .read_to_end(&mut bytes)
+                .await
+                .map_err(|e| FileSvgError {
+                    error: e.into(),
+                    path: load_context.path().display().to_string(),
+                })?;
+            let mut svg = Svg::from_bytes(&bytes, load_context.path(), None::<&std::path::Path>)?;
             let name = &load_context
                 .path()
                 .file_name()
                 .ok_or_else(|| FileSvgError {
                     error: SvgError::InvalidFileName(load_context.path().display().to_string()),
-                    path: format!("{}", load_context.path().display()),
+                    path: load_context.path().display().to_string(),
                 })?
                 .to_string_lossy();
             svg.name = name.to_string();
@@ -36,12 +48,12 @@ impl AssetLoader for SvgAssetLoader {
                 "Tessellating SVG: {} ... Done",
                 load_context.path().display()
             );
-            let mesh_handle = load_context.set_labeled_asset("mesh", LoadedAsset::new(mesh));
+            let mesh_handle = load_context.add_labeled_asset("mesh".to_string(), mesh);
             svg.mesh = mesh_handle;
 
-            load_context.set_default_asset(LoadedAsset::new(svg));
+            //load_context.set_default_asset(LoadedAsset::new(svg));
 
-            Ok(())
+            Ok(svg)
         })
     }
 
@@ -55,6 +67,8 @@ impl AssetLoader for SvgAssetLoader {
 pub enum SvgError {
     #[error("invalid file name")]
     InvalidFileName(String),
+    #[error("could not read file: {0}")]
+    IoError(#[from] std::io::Error),
     #[error("failed to load an SVG: {0}")]
     SvgError(#[from] usvg::Error),
 }

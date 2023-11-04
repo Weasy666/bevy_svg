@@ -3,7 +3,7 @@
 use bevy::{
     asset::Handle,
     ecs::bundle::Bundle,
-    render::view::{ComputedVisibility, Visibility},
+    render::view::{InheritedVisibility, ViewVisibility, Visibility},
     sprite::Mesh2dHandle,
     transform::components::{GlobalTransform, Transform},
 };
@@ -21,7 +21,8 @@ pub struct Svg2dBundle {
     pub transform: Transform,
     pub global_transform: GlobalTransform,
     pub visibility: Visibility,
-    pub computed_visibility: ComputedVisibility,
+    pub inherited_visibility: InheritedVisibility,
+    pub view_visibility: ViewVisibility,
 }
 
 impl Default for Svg2dBundle {
@@ -34,7 +35,8 @@ impl Default for Svg2dBundle {
             transform: Transform::default(),
             global_transform: GlobalTransform::default(),
             visibility: Visibility::default(),
-            computed_visibility: ComputedVisibility::default(),
+            inherited_visibility: InheritedVisibility::default(),
+            view_visibility: ViewVisibility::default(),
         }
     }
 }

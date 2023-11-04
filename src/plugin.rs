@@ -89,13 +89,15 @@ fn svg_mesh_linker(
     mut query: Query<SvgMeshComponents>,
     changed_handles: Query<Entity, Or<(Changed<Handle<Svg>>, Added<Handle<Svg>>)>>,
 ) {
-    for event in svg_events.iter() {
+    for event in svg_events.read() {
         match event {
-            AssetEvent::Created { handle } => {
-                for (.., _mesh_2d, _mesh_3d) in
-                    query.iter_mut().filter(|(_, svg, ..)| svg == &handle)
+            AssetEvent::Added { .. } => (),
+            AssetEvent::LoadedWithDependencies { id } => {
+                for (.., _mesh_2d, _mesh_3d) in query
+                    .iter_mut()
+                    .filter(|(_, handle, ..)| handle.id() == *id)
                 {
-                    let svg = svgs.get(handle).unwrap();
+                    let svg = svgs.get(*id).unwrap();
                     debug!(
                         "Svg `{}` created. Adding mesh component to entity.",
                         svg.name
@@ -106,11 +108,12 @@ fn svg_mesh_linker(
                     _mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
                 }
             }
-            AssetEvent::Modified { handle } => {
-                for (.., _mesh_2d, _mesh_3d) in
-                    query.iter_mut().filter(|(_, svg, ..)| svg == &handle)
+            AssetEvent::Modified { id } => {
+                for (.., _mesh_2d, _mesh_3d) in query
+                    .iter_mut()
+                    .filter(|(_, handle, ..)| handle.id() == *id)
                 {
-                    let svg = svgs.get(handle).unwrap();
+                    let svg = svgs.get(*id).unwrap();
                     debug!(
                         "Svg `{}` modified. Changing mesh component of entity.",
                         svg.name
@@ -131,8 +134,8 @@ fn svg_mesh_linker(
                         });
                 }
             }
-            AssetEvent::Removed { handle } => {
-                for (entity, ..) in query.iter_mut().filter(|(_, svg, ..)| svg == &handle) {
+            AssetEvent::Removed { id } => {
+                for (entity, ..) in query.iter_mut().filter(|(_, svg, ..)| svg.id() == *id) {
                     commands.entity(entity).despawn_recursive();
                 }
             }
@@ -141,9 +144,12 @@ fn svg_mesh_linker(
 
     // Ensure all correct meshes are set for entities which have had modified handles
     for entity in changed_handles.iter() {
-        let Ok((.., handle, _mesh_2d, _mesh_3d))
-            = query.get_mut(entity) else { continue };
-        let Some(svg) = svgs.get(handle) else { continue };
+        let Ok((.., handle, _mesh_2d, _mesh_3d)) = query.get_mut(entity) else {
+            continue;
+        };
+        let Some(svg) = svgs.get(handle) else {
+            continue;
+        };
         debug!(
             "Svg handle for entity `{:?}` modified. Changing mesh component of entity.",
             entity

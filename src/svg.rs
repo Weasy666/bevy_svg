@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use bevy::{
-    asset::Handle,
+    asset::{Asset, Handle},
     math::{Mat4, Vec2},
     reflect::{std_traits::ReflectDefault, Reflect, TypeUuid},
     render::{color::Color, mesh::Mesh, render_resource::AsBindGroup},
@@ -16,7 +16,7 @@ use svgtypes::ViewBox;
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
 /// A loaded and deserialized SVG file.
-#[derive(AsBindGroup, Reflect, Debug, Clone, TypeUuid)]
+#[derive(AsBindGroup, Reflect, Debug, Clone, TypeUuid, Asset)]
 #[reflect(Default, Debug)]
 #[uuid = "ad47a360-355d-4955-9fd8-678412a77f12"]
 pub struct Svg {
