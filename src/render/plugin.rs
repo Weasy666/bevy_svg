@@ -1,11 +1,5 @@
-use crate::{
-    prelude::Svg,
-    resources::{FillTessellator, StrokeTessellator},
-};
-use bevy::{
-    app::{App, Plugin},
-    asset::{Assets, Handle},
-};
+use crate::resources::{FillTessellator, StrokeTessellator};
+use bevy::app::{App, Plugin};
 
 #[cfg(feature = "2d")]
 use crate::render::svg2d;
@@ -20,10 +14,6 @@ impl Plugin for SvgPlugin {
         let fill_tess = FillTessellator::default();
         let stroke_tess = StrokeTessellator::default();
         app.insert_resource(fill_tess).insert_resource(stroke_tess);
-
-        app.world
-            .resource_mut::<Assets<Svg>>()
-            .set_untracked(Handle::<Svg>::default(), Svg::default());
 
         #[cfg(feature = "2d")]
         app.add_plugins(svg2d::RenderPlugin);

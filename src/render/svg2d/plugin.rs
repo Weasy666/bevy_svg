@@ -1,6 +1,6 @@
 use bevy::{
     app::{App, Plugin},
-    asset::{load_internal_asset, AddAsset},
+    asset::{load_internal_asset, AssetApp},
     render::render_resource::{Shader, ShaderRef},
     sprite::{Material2d, Material2dPlugin},
 };
@@ -21,6 +21,6 @@ impl Plugin for RenderPlugin {
 
 impl Material2d for Svg {
     fn fragment_shader() -> ShaderRef {
-        SVG_2D_SHADER_HANDLE.typed().into()
+        SVG_2D_SHADER_HANDLE.into()
     }
 }
