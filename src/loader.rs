@@ -14,12 +14,12 @@ impl AssetLoader for SvgAssetLoader {
     type Settings = ();
     type Error = FileSvgError;
 
-    fn load<'a>(
-        &'a self,
-        reader: &'a mut Reader,
-        _settings: &'a (),
-        load_context: &'a mut LoadContext,
-    ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
+    fn load<'load>(
+        &'load self,
+        reader: &'load mut Reader,
+        _settings: &'load (),
+        load_context: &'load mut LoadContext,
+    ) -> BoxedFuture<'load, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             debug!("Parsing SVG: {} ...", load_context.path().display());
             let mut bytes = Vec::new();
@@ -50,8 +50,6 @@ impl AssetLoader for SvgAssetLoader {
             );
             let mesh_handle = load_context.add_labeled_asset("mesh".to_string(), mesh);
             svg.mesh = mesh_handle;
-
-            //load_context.set_default_asset(LoadedAsset::new(svg));
 
             Ok(svg)
         })

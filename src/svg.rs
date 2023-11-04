@@ -89,8 +89,8 @@ impl Svg {
         let mut descriptors = Vec::new();
 
         for node in tree.root.descendants() {
-            match *node.borrow() {
-                usvg::NodeKind::Path(ref path) => {
+            match &*node.borrow() {
+                usvg::NodeKind::Path(path) => {
                     let t = node.abs_transform();
                     let abs_t = Transform::from_matrix(Mat4::from_cols(
                         [t.a.abs() as f32, t.b as f32, 0.0, 0.0].into(),
@@ -99,7 +99,7 @@ impl Svg {
                         [t.e as f32, t.f as f32, 0.0, 1.0].into(),
                     ));
 
-                    if let Some(ref fill) = path.fill {
+                    if let Some(fill) = &path.fill {
                         let color = match fill.paint {
                             usvg::Paint::Color(c) => {
                                 Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8())
@@ -115,7 +115,7 @@ impl Svg {
                         });
                     }
 
-                    if let Some(ref stroke) = path.stroke {
+                    if let Some(stroke) = &path.stroke {
                         let (color, draw_type) = stroke.convert();
 
                         descriptors.alloc().init(PathDescriptor {
@@ -160,8 +160,8 @@ pub enum DrawType {
 }
 
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
-pub(crate) struct PathConvIter<'a> {
-    iter: usvg::PathSegmentsIter<'a>,
+pub(crate) struct PathConvIter<'iter> {
+    iter: usvg::PathSegmentsIter<'iter>,
     prev: Point,
     first: Point,
     needs_end: bool,
@@ -169,7 +169,7 @@ pub(crate) struct PathConvIter<'a> {
     scale: Transform2D<f32>,
 }
 
-impl<'l> Iterator for PathConvIter<'l> {
+impl<'iter> Iterator for PathConvIter<'iter> {
     type Item = PathEvent;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -265,8 +265,8 @@ impl Convert<Point> for (f64, f64) {
     }
 }
 
-impl<'a> Convert<PathConvIter<'a>> for &'a usvg::Path {
-    fn convert(self) -> PathConvIter<'a> {
+impl<'iter> Convert<PathConvIter<'iter>> for &'iter usvg::Path {
+    fn convert(self) -> PathConvIter<'iter> {
         return PathConvIter {
             iter: self.data.segments(),
             first: Point::new(0.0, 0.0),
