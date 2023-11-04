@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
+### Changed
+- Update bevy to `0.12` ([#35](https://github.com/Weasy666/bevy_svg/pull/35))
+### Fixed
+- Fix SVG scaling issues (hopefully) (Fixes #18)
 
 ## [0.11.0] - 2023-07-12
 ### Changed
