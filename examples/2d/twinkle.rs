@@ -26,10 +26,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Svg2dBundle {
         svg,
         origin: Origin::Center,
-        transform: Transform {
-            scale: Vec3::new(0.75, 0.75, 1.0),
-            ..Default::default()
-        },
         ..Default::default()
     });
 }

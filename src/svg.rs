@@ -12,6 +12,7 @@ use lyon_geom::euclid::default::Transform2D;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
+use usvg::NodeExt;
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -90,7 +91,7 @@ impl Svg {
         for node in tree.root.descendants() {
             match *node.borrow() {
                 usvg::NodeKind::Path(ref path) => {
-                    let t = path.transform;
+                    let t = node.abs_transform();
                     let abs_t = Transform::from_matrix(Mat4::from_cols(
                         [t.a.abs() as f32, t.b as f32, 0.0, 0.0].into(),
                         [t.c as f32, t.d.abs() as f32, 0.0, 0.0].into(),
