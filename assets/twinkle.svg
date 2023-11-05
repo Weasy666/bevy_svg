@@ -1,4 +1,493 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg viewBox="0 0 526 507" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mei="http://www.music-encoding.org/ns/mei" overflow="visible"><desc>Engraved by Verovio 3.5.0-dev-c4ac6c1</desc><defs><symbol id="E052-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M382 117c-72 -2 -128 -47 -128 -120v-7c2 -46 43 -99 75 -115c-3 -2 -7 -5 -10 -10c-70 33 -116 88 -123 172v11c0 68 44 126 88 159c23 17 49 29 78 36l-29 170c-21 -13 -52 -37 -92 -73c-50 -44 -86 -84 -109 -119c-45 -69 -67 -130 -67 -182v-13 c5 -68 35 -127 93 -176s125 -73 203 -73c25 0 50 3 75 9c-19 111 -36 221 -54 331zM406 119l54 -326c73 25 110 78 110 161c0 7 0 15 -1 23c-7 95 -57 142 -151 142h-12zM461 939c-95 0 -135 -175 -135 -286c0 -24 2 -48 5 -71c50 39 92 82 127 128c40 53 60 100 60 140v8 c-4 53 -22 81 -55 81h-2zM441 -245c-23 -4 -48 -6 -76 -6c-59 0 -102 7 -130 20c-88 42 -150 93 -187 154c-26 44 -43 103 -48 176c0 6 -1 13 -1 19c0 54 15 111 45 170c29 57 65 106 110 148s96 85 153 127c-3 16 -8 46 -13 92c-4 43 -5 73 -5 89c0 117 16 172 69 257 c34 54 64 82 89 82c21 0 43 -30 69 -92s39 -115 41 -159v-15c0 -109 -21 -162 -67 -241c-13 -20 -63 -90 -98 -118c-13 -9 -25 -19 -37 -29l31 -181c8 1 18 2 28 2c58 0 102 -12 133 -35c59 -43 92 -104 98 -184c1 -7 1 -15 1 -22c0 -123 -87 -209 -181 -248 c8 -57 17 -110 25 -162c5 -31 6 -58 6 -80c0 -30 -5 -53 -14 -70c-25 -46 -59 -77 -102 -92c21 -1 85 -13 85 -60c0 -35 -22 -43 -31 -50c-6 -5 -8 -10 -8 -16s0 -11 4 -16c6 -11 9 -22 9 -34c0 -27 -18 -53 -46 -65c-11 -4 -27 -6 -41 -6c-34 0 -82 21 -90 58 c-1 5 -2 8 -2 12c0 28 25 57 51 66c4 1 6 2 6 5c0 2 -1 3 -2 3c-11 13 -16 27 -16 41c0 21 11 40 30 51h-5c-5 0 -11 -1 -16 -1c-37 0 -72 10 -108 27c-50 24 -77 59 -80 105v11c0 29 7 55 20 76c18 28 45 42 79 44h6c49 0 93 -42 97 -87v-9c0 -51 -34 -86 -105 -106 c17 -24 51 -36 102 -36c62 0 116 43 140 85c9 16 13 41 13 74c0 20 -1 42 -5 67c-8 53 -18 106 -26 159zM315 -781c-3 -2 -6 -5 -7 -8c-6 -8 -10 -19 -10 -30c0 -2 0 -4 1 -7c7 -32 34 -52 53 -52c20 0 37 20 37 36c0 5 -2 9 -4 14c-5 13 -14 24 -25 34c-6 5 -11 10 -17 14 c-4 2 -9 6 -14 6c-6 0 -11 -3 -14 -7zM349 -685c0 -14 10 -25 18 -34c8 -8 16 -18 26 -25c5 -2 10 -4 13 -4c17 0 22 30 23 48c0 9 -3 20 -9 26c-8 9 -23 14 -40 14c-15 -1 -29 -8 -31 -25z"/></symbol><symbol id="E084-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 -78c84 97 114 180 134 329h170c-13 -32 -82 -132 -99 -151l-84 -97c-33 -36 -59 -63 -80 -81h162v102l127 123v-225h57v-39h-57v-34c0 -43 19 -65 57 -65v-34h-244v36c48 0 60 26 60 70v27h-203v39z"/></symbol><symbol id="E0A2-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M198 133c102 0 207 -45 207 -133c0 -92 -98 -133 -207 -133c-101 0 -198 46 -198 133c0 88 93 133 198 133zM293 -21c0 14 -3 29 -8 44c-7 20 -18 38 -33 54c-20 21 -43 31 -68 31l-20 -2c-15 -5 -27 -14 -36 -28c-4 -9 -6 -17 -8 -24s-3 -16 -3 -27c0 -15 3 -34 9 -57 s18 -41 34 -55c15 -15 36 -23 62 -23c4 0 10 1 18 2c19 5 32 15 40 30s13 34 13 55z"/></symbol><symbol id="E0A3-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M278 64c0 22 -17 39 -43 39c-12 0 -26 -3 -41 -10c-85 -43 -165 -94 -165 -156c5 -25 15 -32 49 -32c67 11 200 95 200 159zM0 -36c0 68 73 174 200 174c66 0 114 -39 114 -97c0 -84 -106 -173 -218 -173c-64 0 -96 32 -96 96z"/></symbol><symbol id="E0A4-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 -39c0 68 73 172 200 172c66 0 114 -37 114 -95c0 -84 -106 -171 -218 -171c-64 0 -96 30 -96 94z"/></symbol><symbol id="E240-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M179 -646c15 29 29 55 46 102c18 49 30 108 30 138c0 105 -80 173 -168 200c-18 5 -47 9 -87 16v190h22c8 0 33 -61 71 -95c4 -3 -2 3 61 -56c62 -58 122 -137 122 -241c0 -38 -13 -106 -35 -163c-20 -51 -43 -99 -66 -132c-6 -5 -10 -7 -13 -7s-5 2 -5 5l4 10 c1 3 14 25 18 33z"/></symbol><symbol id="E260-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M20 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v644h20v-359zM90 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3z"/></symbol><symbol id="E4E3-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 -115v105c0 9 1 10 10 10h280c9 0 10 -1 10 -10v-105c0 -9 -1 -10 -10 -10h-280c-9 0 -10 1 -10 10z"/></symbol><symbol id="E4E5-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M107 292c-13 24 -30 49 -52 71c-1 1 0 2 0 3l-2 2c3 3 4 4 6 4c12 0 26 -7 40 -20s44 -40 89 -81c26 -24 28 -29 46 -47c4 -4 8 -9 10 -14c6 -8 8 -16 8 -27c0 -19 -12 -40 -36 -61c-28 -23 -49 -38 -61 -73c-4 -11 -7 -27 -10 -50c13 -43 34 -83 59 -121 c31 -47 59 -79 101 -129c-8 0 -26 7 -54 20l-62 29l-21 6l-23 1c-25 0 -45 -10 -60 -30l-4 -14l-1 -12c0 -33 20 -56 39 -78c8 -9 17 -18 26 -26c17 -15 27 -24 28 -30l-3 -3c-11 5 -19 10 -25 15c-9 3 -37 21 -45 26c-24 14 -45 32 -63 51c-19 21 -37 44 -37 71 c0 63 27 95 80 95c41 0 86 -18 136 -52c-19 26 -37 48 -55 66c-23 23 -48 44 -73 65c-28 23 -47 40 -58 53s-17 26 -18 39c75 64 113 125 113 183c0 27 -7 48 -18 68z"/></symbol></defs><style type="text/css">g.page-margin{font-family:Times;} g.ending, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, g.mNum{font-style:italic;} g.label{font-weight:normal;}</style><svg class="definition-scale" color="black" viewBox="0 0 5260 5070"><g class="page-margin" transform="translate(500, 0)"><g id="system-0000001990536186" class="system"><g id="bbox-system-0000001990536186" class="system bounding-box"><rect x="-1" y="233" height="4307" width="27" fill="none"/></g><path d="M13 247 L13 4527" stroke="currentColor" stroke-width="27"/><g id="section-0000001903683451" class="section boundaryStart"/><g id="pb-0000000547669794" class="pb"/><g id="measure-0000000472025428" class="measure"><g id="bbox-measure-0000000472025428" class="measure bounding-box"/><g id="staff-0000001511589172" class="staff"><g id="bbox-staff-0000001511589172" class="staff bounding-box"><rect x="-7" y="240" height="733" width="2759" fill="none"/></g><path d="M0 247 L2746 247" stroke="currentColor" stroke-width="13"/><path d="M0 427 L2746 427" stroke="currentColor" stroke-width="13"/><path d="M0 607 L2746 607" stroke="currentColor" stroke-width="13"/><path d="M0 787 L2746 787" stroke="currentColor" stroke-width="13"/><path d="M0 967 L2746 967" stroke="currentColor" stroke-width="13"/><g id="clef-0000001383121765" class="clef"><g id="bbox-clef-0000001383121765" class="clef bounding-box"><rect x="90" y="7" height="1420" width="465" fill="none"/></g><use xlink:href="#E052-0000000472135448" x="90" y="787" height="720px" width="720px"/></g><g id="keysig-0000001764509227" class="keySig"><g id="bbox-keysig-0000001764509227" class="keySig bounding-box"><rect x="735" y="0" height="733" width="322" fill="none"/></g><use xlink:href="#E260-0000000472135448" x="735" y="607" height="720px" width="720px"/><use xlink:href="#E260-0000000472135448" x="915" y="337" height="720px" width="720px"/></g><g id="msig-0000001504896766" class="meterSig"><g id="bbox-msig-0000001504896766" class="meterSig bounding-box"><rect x="1237" y="247" height="720" width="278" fill="none"/></g><use xlink:href="#E084-0000000472135448" x="1237" y="427" height="720px" width="720px"/><use xlink:href="#E084-0000000472135448" x="1237" y="787" height="720px" width="720px"/></g><g id="layer-0000000576788971" class="layer"><g id="bbox-layer-0000000576788971" class="layer bounding-box"/><g id="rest-0000000351053039" class="rest"><g id="bbox-rest-0000000351053039" class="rest bounding-box"><rect x="1785" y="339" height="547" width="219" fill="none"/></g><use xlink:href="#E4E5-0000000472135448" x="1785" y="607" height="720px" width="720px"/></g><g id="rest-0000001010848164" class="rest"><g id="bbox-rest-0000001010848164" class="rest bounding-box"><rect x="2094" y="339" height="547" width="219" fill="none"/></g><use xlink:href="#E4E5-0000000472135448" x="2094" y="607" height="720px" width="720px"/></g><g id="note-0000000581960931" class="note"><g id="bbox-note-0000000581960931" class="note bounding-box"><rect x="2403" y="778" height="194" width="226" fill="none"/></g><g class="notehead"><use xlink:href="#E0A3-0000000472135448" x="2403" y="877" height="720px" width="720px"/></g><g id="stem-0000001798556506" class="stem"><g id="bbox-stem-0000001798556506" class="stem bounding-box"><rect x="2611" y="247" height="601" width="18" fill="none"/></g><rect x="2611" y="247" height="601" width="18"/></g><g id="verse-0000001376838879" class="verse"><g id="bbox-verse-0000001376838879" class="verse bounding-box"/><g id="syl-0000001394742928" class="syl" xml:lang="en" font-style="normal" font-weight="normal"><rect x="2790" y="1206" height="9" width="426"/><g id="bbox-syl-0000001394742928" class="syl bounding-box" xml:lang="en" font-style="normal" font-weight="normal"/><text x="2363" y="1215" font-size="0px" font-style="normal"><tspan id="text-0000001660383891" class="text"><g id="bbox-text-0000001660383891" class="text bounding-box"/><tspan font-size="180px" font-style="normal" class="text">
-Star</tspan></tspan></text></g></g></g></g></g><g id="staff-0000002049433386" class="staff"><g id="bbox-staff-0000002049433386" class="staff bounding-box"><rect x="-7" y="2028" height="725" width="2759" fill="none"/></g><path d="M0 2035 L2746 2035" stroke="currentColor" stroke-width="13"/><path d="M0 2213 L2746 2213" stroke="currentColor" stroke-width="13"/><path d="M0 2391 L2746 2391" stroke="currentColor" stroke-width="13"/><path d="M0 2569 L2746 2569" stroke="currentColor" stroke-width="13"/><path d="M0 2747 L2746 2747" stroke="currentColor" stroke-width="13"/><g id="clef-0000001885035443" class="clef"><g id="bbox-clef-0000001885035443" class="clef bounding-box"><rect x="90" y="1798" height="1404" width="460" fill="none"/></g><use xlink:href="#E052-0000000472135448" x="90" y="2569" height="712px" width="712px"/></g><g id="keysig-0000002111929957" class="keySig"><g id="bbox-keysig-0000002111929957" class="keySig bounding-box"><rect x="735" y="1790" height="725" width="318" fill="none"/></g><use xlink:href="#E260-0000000472135448" x="735" y="2391" height="712px" width="712px"/><use xlink:href="#E260-0000000472135448" x="913" y="2124" height="712px" width="712px"/></g><g id="msig-0000001597069683" class="meterSig"><g id="bbox-msig-0000001597069683" class="meterSig bounding-box"><rect x="1237" y="2035" height="712" width="275" fill="none"/></g><use xlink:href="#E084-0000000472135448" x="1237" y="2213" height="712px" width="712px"/><use xlink:href="#E084-0000000472135448" x="1237" y="2569" height="712px" width="712px"/></g><g id="layer-0000001336704269" class="layer"><g id="bbox-layer-0000001336704269" class="layer bounding-box"/><g id="rest-0000001162217816" class="rest"><g id="bbox-rest-0000001162217816" class="rest bounding-box"><rect x="1785" y="2213" height="89" width="213" fill="none"/></g><use xlink:href="#E4E3-0000000472135448" x="1785" y="2213" height="712px" width="712px"/></g></g></g><g id="staff-0000001619103143" class="staff"><g id="bbox-staff-0000001619103143" class="staff bounding-box"><rect x="-7" y="3808" height="908" width="2759" fill="none"/></g><path d="M0 3815 L2746 3815" stroke="currentColor" stroke-width="13"/><path d="M0 3993 L2746 3993" stroke="currentColor" stroke-width="13"/><path d="M0 4171 L2746 4171" stroke="currentColor" stroke-width="13"/><path d="M0 4349 L2746 4349" stroke="currentColor" stroke-width="13"/><path d="M0 4527 L2746 4527" stroke="currentColor" stroke-width="13"/><g id="clef-0000000552058328" class="clef"><g id="bbox-clef-0000000552058328" class="clef bounding-box"><rect x="90" y="3578" height="1404" width="460" fill="none"/></g><use xlink:href="#E052-0000000472135448" x="90" y="4349" height="712px" width="712px"/></g><g id="keysig-0000001314963656" class="keySig"><g id="bbox-keysig-0000001314963656" class="keySig bounding-box"><rect x="735" y="3570" height="725" width="318" fill="none"/></g><use xlink:href="#E260-0000000472135448" x="735" y="4171" height="712px" width="712px"/><use xlink:href="#E260-0000000472135448" x="913" y="3904" height="712px" width="712px"/></g><g id="msig-0000000839955115" class="meterSig"><g id="bbox-msig-0000000839955115" class="meterSig bounding-box"><rect x="1237" y="3815" height="712" width="275" fill="none"/></g><use xlink:href="#E084-0000000472135448" x="1237" y="3993" height="712px" width="712px"/><use xlink:href="#E084-0000000472135448" x="1237" y="4349" height="712px" width="712px"/></g><g class="ledgerLines below"><path d="M1737 4705 L2121 4705" stroke="currentColor" stroke-width="22"/></g><g id="layer-0000001501233264" class="layer"><g id="bbox-layer-0000001501233264" class="layer bounding-box"/><g id="note-0000000442099445" class="note"><g id="bbox-note-0000000442099445" class="note bounding-box"><rect x="1785" y="4699" height="189" width="288" fill="none"/></g><g class="notehead"><use xlink:href="#E0A2-0000000472135448" x="1785" y="4794" height="712px" width="712px"/></g><g id="accid-0000000071953495" class="accid"><g id="bbox-accid-0000000071953495" class="accid bounding-box"><rect x="1785" y="4794" height="0" width="0" fill="none"/></g></g><g id="verse-0000000289097204" class="verse"><g id="bbox-verse-0000000289097204" class="verse bounding-box"/><g id="syl-0000001248698114" class="syl" xml:lang="en" font-style="normal" font-weight="normal"><rect x="2168" y="5030" height="9" width="1046"/><g id="bbox-syl-0000001248698114" class="syl bounding-box" xml:lang="en" font-style="normal" font-weight="normal"/><text x="1746" y="5039" font-size="0px" font-style="normal"><tspan id="text-0000001659003514" class="text"><g id="bbox-text-0000001659003514" class="text bounding-box"/><tspan font-size="178px" font-style="normal" class="text">
-Star</tspan></tspan></text></g></g></g></g></g><g id="tempo-0000000571316716" class="tempo"><g id="bbox-tempo-0000000571316716" class="tempo bounding-box"/><text x="1237" y="210" font-size="0px"><tspan id="rend-0000000720660075" class="rend" font-style="italic" font-weight="bold"><g id="bbox-rend-0000000720660075" class="rend bounding-box" font-style="italic" font-weight="bold"/><tspan id="text-0000000326111445" class="text"><g id="bbox-text-0000000326111445" class="text bounding-box"><rect x="1237" y="83" height="164" width="1177" fill="none"/></g><tspan font-size="180px" font-style="italic" class="text">Moderato, f= 90</tspan></tspan></tspan></text></g><g id="tie-0000001669546919" class="tie"><path d="M2674,1012 C2725,1079 2827,1079 2881,1012 C2827,1126 2725,1126 2674,1012" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/><g id="bbox-tie-0000001669546919" class="tie bounding-box"><rect x="2674" y="1012" height="85" width="207" fill="none"/></g></g><g id="tie-0000002091870797" class="tie"><path d="M2117,4838 C2308,4904 2690,4904 2882,4838 C2690,4950 2308,4950 2117,4838" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/><g id="bbox-tie-0000002091870797" class="tie bounding-box"><rect x="2117" y="4838" height="84" width="765" fill="none"/></g></g><g id="bline-0000001146470808" class="barLineAttr"><g id="bbox-bline-0000001146470808" class="barLineAttr bounding-box"><rect x="2719" y="233" height="4307" width="27" fill="none"/></g><path d="M2733 967 L2733 247" stroke="currentColor" stroke-width="27"/><path d="M2733 2747 L2733 2035" stroke="currentColor" stroke-width="27"/><path d="M2733 4527 L2733 3815" stroke="currentColor" stroke-width="27"/></g></g><g id="measure-0000001053735931" class="measure"><g id="bbox-measure-0000001053735931" class="measure bounding-box"/><g id="staff-0000001351188903" class="staff"><g id="bbox-staff-0000001351188903" class="staff bounding-box"><rect x="2739" y="240" height="733" width="1530" fill="none"/></g><path d="M2746 247 L4263 247" stroke="currentColor" stroke-width="13"/><path d="M2746 427 L4263 427" stroke="currentColor" stroke-width="13"/><path d="M2746 607 L4263 607" stroke="currentColor" stroke-width="13"/><path d="M2746 787 L4263 787" stroke="currentColor" stroke-width="13"/><path d="M2746 967 L4263 967" stroke="currentColor" stroke-width="13"/><g id="layer-0000001939809343" class="layer"><g id="bbox-layer-0000001939809343" class="layer bounding-box"/><g id="note-0000001426382694" class="note"><g id="bbox-note-0000001426382694" class="note bounding-box"><rect x="2926" y="781" height="191" width="291" fill="none"/></g><g class="notehead"><use xlink:href="#E0A2-0000000472135448" x="2926" y="877" height="720px" width="720px"/></g></g></g></g><g id="staff-0000000324407352" class="staff"><g id="bbox-staff-0000000324407352" class="staff bounding-box"><rect x="2739" y="2028" height="908" width="1530" fill="none"/></g><path d="M2746 2035 L4263 2035" stroke="currentColor" stroke-width="13"/><path d="M2746 2213 L4263 2213" stroke="currentColor" stroke-width="13"/><path d="M2746 2391 L4263 2391" stroke="currentColor" stroke-width="13"/><path d="M2746 2569 L4263 2569" stroke="currentColor" stroke-width="13"/><path d="M2746 2747 L4263 2747" stroke="currentColor" stroke-width="13"/><g class="ledgerLines below"><path d="M2878 2925 L3196 2925" stroke="currentColor" stroke-width="22"/></g><g id="layer-0000002000868978" class="layer"><g id="bbox-layer-0000002000868978" class="layer bounding-box"/><g id="note-0000001158484873" class="note"><g id="bbox-note-0000001158484873" class="note bounding-box"><rect x="2926" y="2830" height="189" width="223" fill="none"/></g><g class="notehead"><use xlink:href="#E0A4-0000000472135448" x="2926" y="2925" height="712px" width="712px"/></g><g id="dots-0000001607773782" class="dots"><g id="bbox-dots-0000001607773782" class="dots bounding-box"><rect x="3202" y="2801" height="70" width="70" fill="none"/></g><ellipse cx="3237" cy="2836" rx="35" ry="35"/></g><g id="stem-0000000434013342" class="stem"><g id="bbox-stem-0000000434013342" class="stem bounding-box"><rect x="3133" y="2316" height="582" width="16" fill="none"/></g><rect x="3133" y="2316" height="582" width="16"/></g><g id="verse-0000001568516809" class="verse"><g id="bbox-verse-0000001568516809" class="verse bounding-box"/><g id="syl-0000001700241938" class="syl" xml:lang="en" font-style="normal" font-weight="normal"><g id="bbox-syl-0000001700241938" class="syl bounding-box" xml:lang="en" font-style="normal" font-weight="normal"/><text x="2887" y="3138" font-size="0px" font-style="normal"><tspan id="text-0000001548844984" class="text"><g id="bbox-text-0000001548844984" class="text bounding-box"/><tspan font-size="178px" font-style="normal" class="text">
-Star</tspan></tspan></text></g></g></g><g id="note-0000001788360801" class="note"><g id="bbox-note-0000001788360801" class="note bounding-box"><rect x="3362" y="2474" height="189" width="223" fill="none"/></g><g class="notehead"><use xlink:href="#E0A4-0000000472135448" x="3362" y="2569" height="712px" width="712px"/></g><g id="stem-0000000067223873" class="stem"><g id="bbox-stem-0000000067223873" class="stem bounding-box"><rect x="3569" y="1960" height="582" width="16" fill="none"/></g><rect x="3569" y="1960" height="582" width="16"/><g id="flag-0000000255235189" class="flag"><g id="bbox-flag-0000000255235189" class="flag bounding-box"><rect x="3569" y="1960" height="494" width="196" fill="none"/></g><use xlink:href="#E240-0000000472135448" x="3569" y="1960" height="712px" width="712px"/></g></g><g id="verse-0000000798858995" class="verse"><g id="bbox-verse-0000000798858995" class="verse bounding-box"/><g id="syl-0000000355367921" class="syl" xml:lang="en" font-style="normal" font-weight="normal"><rect x="3627" y="3127" height="9" width="450"/><g id="bbox-syl-0000000355367921" class="syl bounding-box" xml:lang="en" font-style="normal" font-weight="normal"/><text x="3323" y="3136" font-size="0px" font-style="normal"><tspan id="text-0000000516625940" class="text"><g id="bbox-text-0000000516625940" class="text bounding-box"/><tspan font-size="178px" font-style="normal" class="text">star</tspan></tspan></text></g></g></g><g id="note-0000000955596109" class="note"><g id="bbox-note-0000000955596109" class="note bounding-box"><rect x="3855" y="2470" height="192" width="223" fill="none"/></g><g class="notehead"><use xlink:href="#E0A3-0000000472135448" x="3855" y="2569" height="712px" width="712px"/></g><g id="stem-0000001212978464" class="stem"><g id="bbox-stem-0000001212978464" class="stem bounding-box"><rect x="4062" y="1960" height="581" width="16" fill="none"/></g><rect x="4062" y="1960" height="581" width="16"/></g></g></g></g><g id="staff-0000000390792942" class="staff"><g id="bbox-staff-0000000390792942" class="staff bounding-box"><rect x="2739" y="3808" height="908" width="1530" fill="none"/></g><path d="M2746 3815 L4263 3815" stroke="currentColor" stroke-width="13"/><path d="M2746 3993 L4263 3993" stroke="currentColor" stroke-width="13"/><path d="M2746 4171 L4263 4171" stroke="currentColor" stroke-width="13"/><path d="M2746 4349 L4263 4349" stroke="currentColor" stroke-width="13"/><path d="M2746 4527 L4263 4527" stroke="currentColor" stroke-width="13"/><g class="ledgerLines below"><path d="M2878 4705 L3262 4705" stroke="currentColor" stroke-width="22"/></g><g id="layer-0000001051983668" class="layer"><g id="bbox-layer-0000001051983668" class="layer bounding-box"/><g id="note-0000000456642325" class="note"><g id="bbox-note-0000000456642325" class="note bounding-box"><rect x="2926" y="4699" height="189" width="288" fill="none"/></g><g class="notehead"><use xlink:href="#E0A2-0000000472135448" x="2926" y="4794" height="712px" width="712px"/></g><g id="accid-0000001828485544" class="accid"><g id="bbox-accid-0000001828485544" class="accid bounding-box"><rect x="2926" y="4794" height="0" width="0" fill="none"/></g></g></g></g></g><g id="tie-0000000853986597" class="tie"/><g id="tie-0000000655788759" class="tie"><path d="M3628,2702 C3673,2768 3763,2768 3811,2702 C3763,2814 3673,2814 3628,2702" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/><g id="bbox-tie-0000000655788759" class="tie bounding-box"><rect x="3628" y="2702" height="84" width="183" fill="none"/></g></g><g id="tie-0000001821091697" class="tie"/><g id="tie-0000000865549438" class="tie"/><g id="bline-0000000971284250" class="barLineAttr"><g id="bbox-bline-0000000971284250" class="barLineAttr bounding-box"><rect x="4236" y="233" height="4307" width="27" fill="none"/></g><path d="M4250 967 L4250 247" stroke="currentColor" stroke-width="27"/><path d="M4250 2747 L4250 2035" stroke="currentColor" stroke-width="27"/><path d="M4250 4527 L4250 3815" stroke="currentColor" stroke-width="27"/></g></g><g id="bdend-0000000350904386" class="boundaryEnd section-0000001903683451"/></g></g></svg></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg viewBox="0 0 526 507" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mei="http://www.music-encoding.org/ns/mei"
+    overflow="visible">
+    <desc>Engraved by Verovio 3.5.0-dev-c4ac6c1</desc>
+    <defs>
+        <symbol id="E052-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M382 117c-72 -2 -128 -47 -128 -120v-7c2 -46 43 -99 75 -115c-3 -2 -7 -5 -10 -10c-70 33 -116 88 -123 172v11c0 68 44 126 88 159c23 17 49 29 78 36l-29 170c-21 -13 -52 -37 -92 -73c-50 -44 -86 -84 -109 -119c-45 -69 -67 -130 -67 -182v-13 c5 -68 35 -127 93 -176s125 -73 203 -73c25 0 50 3 75 9c-19 111 -36 221 -54 331zM406 119l54 -326c73 25 110 78 110 161c0 7 0 15 -1 23c-7 95 -57 142 -151 142h-12zM461 939c-95 0 -135 -175 -135 -286c0 -24 2 -48 5 -71c50 39 92 82 127 128c40 53 60 100 60 140v8 c-4 53 -22 81 -55 81h-2zM441 -245c-23 -4 -48 -6 -76 -6c-59 0 -102 7 -130 20c-88 42 -150 93 -187 154c-26 44 -43 103 -48 176c0 6 -1 13 -1 19c0 54 15 111 45 170c29 57 65 106 110 148s96 85 153 127c-3 16 -8 46 -13 92c-4 43 -5 73 -5 89c0 117 16 172 69 257 c34 54 64 82 89 82c21 0 43 -30 69 -92s39 -115 41 -159v-15c0 -109 -21 -162 -67 -241c-13 -20 -63 -90 -98 -118c-13 -9 -25 -19 -37 -29l31 -181c8 1 18 2 28 2c58 0 102 -12 133 -35c59 -43 92 -104 98 -184c1 -7 1 -15 1 -22c0 -123 -87 -209 -181 -248 c8 -57 17 -110 25 -162c5 -31 6 -58 6 -80c0 -30 -5 -53 -14 -70c-25 -46 -59 -77 -102 -92c21 -1 85 -13 85 -60c0 -35 -22 -43 -31 -50c-6 -5 -8 -10 -8 -16s0 -11 4 -16c6 -11 9 -22 9 -34c0 -27 -18 -53 -46 -65c-11 -4 -27 -6 -41 -6c-34 0 -82 21 -90 58 c-1 5 -2 8 -2 12c0 28 25 57 51 66c4 1 6 2 6 5c0 2 -1 3 -2 3c-11 13 -16 27 -16 41c0 21 11 40 30 51h-5c-5 0 -11 -1 -16 -1c-37 0 -72 10 -108 27c-50 24 -77 59 -80 105v11c0 29 7 55 20 76c18 28 45 42 79 44h6c49 0 93 -42 97 -87v-9c0 -51 -34 -86 -105 -106 c17 -24 51 -36 102 -36c62 0 116 43 140 85c9 16 13 41 13 74c0 20 -1 42 -5 67c-8 53 -18 106 -26 159zM315 -781c-3 -2 -6 -5 -7 -8c-6 -8 -10 -19 -10 -30c0 -2 0 -4 1 -7c7 -32 34 -52 53 -52c20 0 37 20 37 36c0 5 -2 9 -4 14c-5 13 -14 24 -25 34c-6 5 -11 10 -17 14 c-4 2 -9 6 -14 6c-6 0 -11 -3 -14 -7zM349 -685c0 -14 10 -25 18 -34c8 -8 16 -18 26 -25c5 -2 10 -4 13 -4c17 0 22 30 23 48c0 9 -3 20 -9 26c-8 9 -23 14 -40 14c-15 -1 -29 -8 -31 -25z" />
+        </symbol>
+        <symbol id="E084-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M0 -78c84 97 114 180 134 329h170c-13 -32 -82 -132 -99 -151l-84 -97c-33 -36 -59 -63 -80 -81h162v102l127 123v-225h57v-39h-57v-34c0 -43 19 -65 57 -65v-34h-244v36c48 0 60 26 60 70v27h-203v39z" />
+        </symbol>
+        <symbol id="E0A2-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M198 133c102 0 207 -45 207 -133c0 -92 -98 -133 -207 -133c-101 0 -198 46 -198 133c0 88 93 133 198 133zM293 -21c0 14 -3 29 -8 44c-7 20 -18 38 -33 54c-20 21 -43 31 -68 31l-20 -2c-15 -5 -27 -14 -36 -28c-4 -9 -6 -17 -8 -24s-3 -16 -3 -27c0 -15 3 -34 9 -57 s18 -41 34 -55c15 -15 36 -23 62 -23c4 0 10 1 18 2c19 5 32 15 40 30s13 34 13 55z" />
+        </symbol>
+        <symbol id="E0A3-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M278 64c0 22 -17 39 -43 39c-12 0 -26 -3 -41 -10c-85 -43 -165 -94 -165 -156c5 -25 15 -32 49 -32c67 11 200 95 200 159zM0 -36c0 68 73 174 200 174c66 0 114 -39 114 -97c0 -84 -106 -173 -218 -173c-64 0 -96 32 -96 96z" />
+        </symbol>
+        <symbol id="E0A4-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M0 -39c0 68 73 172 200 172c66 0 114 -37 114 -95c0 -84 -106 -171 -218 -171c-64 0 -96 30 -96 94z" />
+        </symbol>
+        <symbol id="E240-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M179 -646c15 29 29 55 46 102c18 49 30 108 30 138c0 105 -80 173 -168 200c-18 5 -47 9 -87 16v190h22c8 0 33 -61 71 -95c4 -3 -2 3 61 -56c62 -58 122 -137 122 -241c0 -38 -13 -106 -35 -163c-20 -51 -43 -99 -66 -132c-6 -5 -10 -7 -13 -7s-5 2 -5 5l4 10 c1 3 14 25 18 33z" />
+        </symbol>
+        <symbol id="E260-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M20 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v644h20v-359zM90 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3z" />
+        </symbol>
+        <symbol id="E4E3-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M0 -115v105c0 9 1 10 10 10h280c9 0 10 -1 10 -10v-105c0 -9 -1 -10 -10 -10h-280c-9 0 -10 1 -10 10z" />
+        </symbol>
+        <symbol id="E4E5-0000000472135448" viewBox="0 0 1000 1000" overflow="inherit">
+            <path transform="scale(1,-1)"
+                d="M107 292c-13 24 -30 49 -52 71c-1 1 0 2 0 3l-2 2c3 3 4 4 6 4c12 0 26 -7 40 -20s44 -40 89 -81c26 -24 28 -29 46 -47c4 -4 8 -9 10 -14c6 -8 8 -16 8 -27c0 -19 -12 -40 -36 -61c-28 -23 -49 -38 -61 -73c-4 -11 -7 -27 -10 -50c13 -43 34 -83 59 -121 c31 -47 59 -79 101 -129c-8 0 -26 7 -54 20l-62 29l-21 6l-23 1c-25 0 -45 -10 -60 -30l-4 -14l-1 -12c0 -33 20 -56 39 -78c8 -9 17 -18 26 -26c17 -15 27 -24 28 -30l-3 -3c-11 5 -19 10 -25 15c-9 3 -37 21 -45 26c-24 14 -45 32 -63 51c-19 21 -37 44 -37 71 c0 63 27 95 80 95c41 0 86 -18 136 -52c-19 26 -37 48 -55 66c-23 23 -48 44 -73 65c-28 23 -47 40 -58 53s-17 26 -18 39c75 64 113 125 113 183c0 27 -7 48 -18 68z" />
+        </symbol>
+    </defs>
+    <style type="text/css">g.page-margin{font-family:Times;} g.ending, g.reh,
+        g.tempo{font-weight:bold;} g.dir, g.dynam, g.mNum{font-style:italic;}
+        g.label{font-weight:normal;}</style>
+    <svg class="definition-scale" color="black" viewBox="0 0 5260 5070">
+        <g class="page-margin" transform="translate(500, 0)">
+            <g id="system-0000001990536186" class="system">
+                <g id="bbox-system-0000001990536186" class="system bounding-box">
+                    <rect x="-1" y="233" height="4307" width="27" fill="none" />
+                </g>
+                <path d="M13 247 L13 4527" stroke="currentColor" stroke-width="27" />
+                <g id="section-0000001903683451" class="section boundaryStart" />
+                <g id="pb-0000000547669794" class="pb" />
+                <g id="measure-0000000472025428" class="measure">
+                    <g id="bbox-measure-0000000472025428" class="measure bounding-box" />
+                    <g id="staff-0000001511589172" class="staff">
+                        <g id="bbox-staff-0000001511589172" class="staff bounding-box">
+                            <rect x="-7" y="240" height="733" width="2759" fill="none" />
+                        </g>
+                        <path d="M0 247 L2746 247" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 427 L2746 427" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 607 L2746 607" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 787 L2746 787" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 967 L2746 967" stroke="currentColor" stroke-width="13" />
+                        <g id="clef-0000001383121765" class="clef">
+                            <g id="bbox-clef-0000001383121765" class="clef bounding-box">
+                                <rect x="90" y="7" height="1420" width="465" fill="none" />
+                            </g>
+                            <use xlink:href="#E052-0000000472135448" x="90" y="787" height="720px"
+                                width="720px" />
+                        </g>
+                        <g id="keysig-0000001764509227" class="keySig">
+                            <g id="bbox-keysig-0000001764509227" class="keySig bounding-box">
+                                <rect x="735" y="0" height="733" width="322" fill="none" />
+                            </g>
+                            <use xlink:href="#E260-0000000472135448" x="735" y="607" height="720px"
+                                width="720px" />
+                            <use xlink:href="#E260-0000000472135448" x="915" y="337" height="720px"
+                                width="720px" />
+                        </g>
+                        <g id="msig-0000001504896766" class="meterSig">
+                            <g id="bbox-msig-0000001504896766" class="meterSig bounding-box">
+                                <rect x="1237" y="247" height="720" width="278" fill="none" />
+                            </g>
+                            <use xlink:href="#E084-0000000472135448" x="1237" y="427" height="720px"
+                                width="720px" />
+                            <use xlink:href="#E084-0000000472135448" x="1237" y="787" height="720px"
+                                width="720px" />
+                        </g>
+                        <g id="layer-0000000576788971" class="layer">
+                            <g id="bbox-layer-0000000576788971" class="layer bounding-box" />
+                            <g id="rest-0000000351053039" class="rest">
+                                <g id="bbox-rest-0000000351053039" class="rest bounding-box">
+                                    <rect x="1785" y="339" height="547" width="219" fill="none" />
+                                </g>
+                                <use xlink:href="#E4E5-0000000472135448" x="1785" y="607"
+                                    height="720px" width="720px" />
+                            </g>
+                            <g id="rest-0000001010848164" class="rest">
+                                <g id="bbox-rest-0000001010848164" class="rest bounding-box">
+                                    <rect x="2094" y="339" height="547" width="219" fill="none" />
+                                </g>
+                                <use xlink:href="#E4E5-0000000472135448" x="2094" y="607"
+                                    height="720px" width="720px" />
+                            </g>
+                            <g id="note-0000000581960931" class="note">
+                                <g id="bbox-note-0000000581960931" class="note bounding-box">
+                                    <rect x="2403" y="778" height="194" width="226" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A3-0000000472135448" x="2403" y="877"
+                                        height="720px" width="720px" />
+                                </g>
+                                <g id="stem-0000001798556506" class="stem">
+                                    <g id="bbox-stem-0000001798556506" class="stem bounding-box">
+                                        <rect x="2611" y="247" height="601" width="18" fill="none" />
+                                    </g>
+                                    <rect x="2611" y="247" height="601" width="18" />
+                                </g>
+                                <g id="verse-0000001376838879" class="verse">
+                                    <g id="bbox-verse-0000001376838879" class="verse bounding-box" />
+                                    <g id="syl-0000001394742928" class="syl" xml:lang="en"
+                                        font-style="normal" font-weight="normal">
+                                        <rect x="2790" y="1206" height="9" width="426" />
+                                        <g id="bbox-syl-0000001394742928" class="syl bounding-box"
+                                            xml:lang="en" font-style="normal" font-weight="normal" />
+                                        <text x="2363" y="1215" font-size="0px" font-style="normal">
+                                            <tspan id="text-0000001660383891" class="text">
+                                                <g id="bbox-text-0000001660383891"
+                                                    class="text bounding-box" />
+                                                <tspan font-size="180px" font-style="normal"
+                                                    class="text">
+                                                    Star</tspan>
+                                            </tspan>
+                                        </text>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="staff-0000002049433386" class="staff">
+                        <g id="bbox-staff-0000002049433386" class="staff bounding-box">
+                            <rect x="-7" y="2028" height="725" width="2759" fill="none" />
+                        </g>
+                        <path d="M0 2035 L2746 2035" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 2213 L2746 2213" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 2391 L2746 2391" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 2569 L2746 2569" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 2747 L2746 2747" stroke="currentColor" stroke-width="13" />
+                        <g id="clef-0000001885035443" class="clef">
+                            <g id="bbox-clef-0000001885035443" class="clef bounding-box">
+                                <rect x="90" y="1798" height="1404" width="460" fill="none" />
+                            </g>
+                            <use xlink:href="#E052-0000000472135448" x="90" y="2569" height="712px"
+                                width="712px" />
+                        </g>
+                        <g id="keysig-0000002111929957" class="keySig">
+                            <g id="bbox-keysig-0000002111929957" class="keySig bounding-box">
+                                <rect x="735" y="1790" height="725" width="318" fill="none" />
+                            </g>
+                            <use xlink:href="#E260-0000000472135448" x="735" y="2391" height="712px"
+                                width="712px" />
+                            <use xlink:href="#E260-0000000472135448" x="913" y="2124" height="712px"
+                                width="712px" />
+                        </g>
+                        <g id="msig-0000001597069683" class="meterSig">
+                            <g id="bbox-msig-0000001597069683" class="meterSig bounding-box">
+                                <rect x="1237" y="2035" height="712" width="275" fill="none" />
+                            </g>
+                            <use xlink:href="#E084-0000000472135448" x="1237" y="2213"
+                                height="712px" width="712px" />
+                            <use xlink:href="#E084-0000000472135448" x="1237" y="2569"
+                                height="712px" width="712px" />
+                        </g>
+                        <g id="layer-0000001336704269" class="layer">
+                            <g id="bbox-layer-0000001336704269" class="layer bounding-box" />
+                            <g id="rest-0000001162217816" class="rest">
+                                <g id="bbox-rest-0000001162217816" class="rest bounding-box">
+                                    <rect x="1785" y="2213" height="89" width="213" fill="none" />
+                                </g>
+                                <use xlink:href="#E4E3-0000000472135448" x="1785" y="2213"
+                                    height="712px" width="712px" />
+                            </g>
+                        </g>
+                    </g>
+                    <g id="staff-0000001619103143" class="staff">
+                        <g id="bbox-staff-0000001619103143" class="staff bounding-box">
+                            <rect x="-7" y="3808" height="908" width="2759" fill="none" />
+                        </g>
+                        <path d="M0 3815 L2746 3815" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 3993 L2746 3993" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 4171 L2746 4171" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 4349 L2746 4349" stroke="currentColor" stroke-width="13" />
+                        <path d="M0 4527 L2746 4527" stroke="currentColor" stroke-width="13" />
+                        <g id="clef-0000000552058328" class="clef">
+                            <g id="bbox-clef-0000000552058328" class="clef bounding-box">
+                                <rect x="90" y="3578" height="1404" width="460" fill="none" />
+                            </g>
+                            <use xlink:href="#E052-0000000472135448" x="90" y="4349" height="712px"
+                                width="712px" />
+                        </g>
+                        <g id="keysig-0000001314963656" class="keySig">
+                            <g id="bbox-keysig-0000001314963656" class="keySig bounding-box">
+                                <rect x="735" y="3570" height="725" width="318" fill="none" />
+                            </g>
+                            <use xlink:href="#E260-0000000472135448" x="735" y="4171" height="712px"
+                                width="712px" />
+                            <use xlink:href="#E260-0000000472135448" x="913" y="3904" height="712px"
+                                width="712px" />
+                        </g>
+                        <g id="msig-0000000839955115" class="meterSig">
+                            <g id="bbox-msig-0000000839955115" class="meterSig bounding-box">
+                                <rect x="1237" y="3815" height="712" width="275" fill="none" />
+                            </g>
+                            <use xlink:href="#E084-0000000472135448" x="1237" y="3993"
+                                height="712px" width="712px" />
+                            <use xlink:href="#E084-0000000472135448" x="1237" y="4349"
+                                height="712px" width="712px" />
+                        </g>
+                        <g class="ledgerLines below">
+                            <path d="M1737 4705 L2121 4705" stroke="currentColor" stroke-width="22" />
+                        </g>
+                        <g id="layer-0000001501233264" class="layer">
+                            <g id="bbox-layer-0000001501233264" class="layer bounding-box" />
+                            <g id="note-0000000442099445" class="note">
+                                <g id="bbox-note-0000000442099445" class="note bounding-box">
+                                    <rect x="1785" y="4699" height="189" width="288" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A2-0000000472135448" x="1785" y="4794"
+                                        height="712px" width="712px" />
+                                </g>
+                                <g id="accid-0000000071953495" class="accid">
+                                    <g id="bbox-accid-0000000071953495" class="accid bounding-box">
+                                        <rect x="1785" y="4794" height="0" width="0" fill="none" />
+                                    </g>
+                                </g>
+                                <g id="verse-0000000289097204" class="verse">
+                                    <g id="bbox-verse-0000000289097204" class="verse bounding-box" />
+                                    <g id="syl-0000001248698114" class="syl" xml:lang="en"
+                                        font-style="normal" font-weight="normal">
+                                        <rect x="2168" y="5030" height="9" width="1046" />
+                                        <g id="bbox-syl-0000001248698114" class="syl bounding-box"
+                                            xml:lang="en" font-style="normal" font-weight="normal" />
+                                        <text x="1746" y="5039" font-size="0px" font-style="normal">
+                                            <tspan id="text-0000001659003514" class="text">
+                                                <g id="bbox-text-0000001659003514"
+                                                    class="text bounding-box" />
+                                                <tspan font-size="178px" font-style="normal"
+                                                    class="text">
+                                                    Star</tspan>
+                                            </tspan>
+                                        </text>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="tempo-0000000571316716" class="tempo">
+                        <g id="bbox-tempo-0000000571316716" class="tempo bounding-box" />
+                        <text x="1237" y="210" font-size="0px">
+                            <tspan id="rend-0000000720660075" class="rend" font-style="italic"
+                                font-weight="bold">
+                                <g id="bbox-rend-0000000720660075" class="rend bounding-box"
+                                    font-style="italic" font-weight="bold" />
+                                <tspan id="text-0000000326111445" class="text">
+                                    <g id="bbox-text-0000000326111445" class="text bounding-box">
+                                        <rect x="1237" y="83" height="164" width="1177" fill="none" />
+                                    </g>
+                                    <tspan font-size="180px" font-style="italic" class="text">Moderato,
+                                        f= 90</tspan>
+                                </tspan>
+                            </tspan>
+                        </text>
+                    </g>
+                    <g id="tie-0000001669546919" class="tie">
+                        <path
+                            d="M2674,1012 C2725,1079 2827,1079 2881,1012 C2827,1126 2725,1126 2674,1012"
+                            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="9" />
+                        <g id="bbox-tie-0000001669546919" class="tie bounding-box">
+                            <rect x="2674" y="1012" height="85" width="207" fill="none" />
+                        </g>
+                    </g>
+                    <g id="tie-0000002091870797" class="tie">
+                        <path
+                            d="M2117,4838 C2308,4904 2690,4904 2882,4838 C2690,4950 2308,4950 2117,4838"
+                            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="8" />
+                        <g id="bbox-tie-0000002091870797" class="tie bounding-box">
+                            <rect x="2117" y="4838" height="84" width="765" fill="none" />
+                        </g>
+                    </g>
+                    <g id="bline-0000001146470808" class="barLineAttr">
+                        <g id="bbox-bline-0000001146470808" class="barLineAttr bounding-box">
+                            <rect x="2719" y="233" height="4307" width="27" fill="none" />
+                        </g>
+                        <path d="M2733 967 L2733 247" stroke="currentColor" stroke-width="27" />
+                        <path d="M2733 2747 L2733 2035" stroke="currentColor" stroke-width="27" />
+                        <path d="M2733 4527 L2733 3815" stroke="currentColor" stroke-width="27" />
+                    </g>
+                </g>
+                <g id="measure-0000001053735931" class="measure">
+                    <g id="bbox-measure-0000001053735931" class="measure bounding-box" />
+                    <g id="staff-0000001351188903" class="staff">
+                        <g id="bbox-staff-0000001351188903" class="staff bounding-box">
+                            <rect x="2739" y="240" height="733" width="1530" fill="none" />
+                        </g>
+                        <path d="M2746 247 L4263 247" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 427 L4263 427" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 607 L4263 607" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 787 L4263 787" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 967 L4263 967" stroke="currentColor" stroke-width="13" />
+                        <g id="layer-0000001939809343" class="layer">
+                            <g id="bbox-layer-0000001939809343" class="layer bounding-box" />
+                            <g id="note-0000001426382694" class="note">
+                                <g id="bbox-note-0000001426382694" class="note bounding-box">
+                                    <rect x="2926" y="781" height="191" width="291" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A2-0000000472135448" x="2926" y="877"
+                                        height="720px" width="720px" />
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="staff-0000000324407352" class="staff">
+                        <g id="bbox-staff-0000000324407352" class="staff bounding-box">
+                            <rect x="2739" y="2028" height="908" width="1530" fill="none" />
+                        </g>
+                        <path d="M2746 2035 L4263 2035" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 2213 L4263 2213" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 2391 L4263 2391" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 2569 L4263 2569" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 2747 L4263 2747" stroke="currentColor" stroke-width="13" />
+                        <g class="ledgerLines below">
+                            <path d="M2878 2925 L3196 2925" stroke="currentColor" stroke-width="22" />
+                        </g>
+                        <g id="layer-0000002000868978" class="layer">
+                            <g id="bbox-layer-0000002000868978" class="layer bounding-box" />
+                            <g id="note-0000001158484873" class="note">
+                                <g id="bbox-note-0000001158484873" class="note bounding-box">
+                                    <rect x="2926" y="2830" height="189" width="223" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A4-0000000472135448" x="2926" y="2925"
+                                        height="712px" width="712px" />
+                                </g>
+                                <g id="dots-0000001607773782" class="dots">
+                                    <g id="bbox-dots-0000001607773782" class="dots bounding-box">
+                                        <rect x="3202" y="2801" height="70" width="70" fill="none" />
+                                    </g>
+                                    <ellipse cx="3237" cy="2836" rx="35" ry="35" />
+                                </g>
+                                <g id="stem-0000000434013342" class="stem">
+                                    <g id="bbox-stem-0000000434013342" class="stem bounding-box">
+                                        <rect x="3133" y="2316" height="582" width="16" fill="none" />
+                                    </g>
+                                    <rect x="3133" y="2316" height="582" width="16" />
+                                </g>
+                                <g id="verse-0000001568516809" class="verse">
+                                    <g id="bbox-verse-0000001568516809" class="verse bounding-box" />
+                                    <g id="syl-0000001700241938" class="syl" xml:lang="en"
+                                        font-style="normal" font-weight="normal">
+                                        <g id="bbox-syl-0000001700241938" class="syl bounding-box"
+                                            xml:lang="en" font-style="normal" font-weight="normal" />
+                                        <text x="2887" y="3138" font-size="0px" font-style="normal">
+                                            <tspan id="text-0000001548844984" class="text">
+                                                <g id="bbox-text-0000001548844984"
+                                                    class="text bounding-box" />
+                                                <tspan font-size="178px" font-style="normal"
+                                                    class="text">
+                                                    Star</tspan>
+                                            </tspan>
+                                        </text>
+                                    </g>
+                                </g>
+                            </g>
+                            <g id="note-0000001788360801" class="note">
+                                <g id="bbox-note-0000001788360801" class="note bounding-box">
+                                    <rect x="3362" y="2474" height="189" width="223" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A4-0000000472135448" x="3362" y="2569"
+                                        height="712px" width="712px" />
+                                </g>
+                                <g id="stem-0000000067223873" class="stem">
+                                    <g id="bbox-stem-0000000067223873" class="stem bounding-box">
+                                        <rect x="3569" y="1960" height="582" width="16" fill="none" />
+                                    </g>
+                                    <rect x="3569" y="1960" height="582" width="16" />
+                                    <g id="flag-0000000255235189" class="flag">
+                                        <g id="bbox-flag-0000000255235189" class="flag bounding-box">
+                                            <rect x="3569" y="1960" height="494" width="196"
+                                                fill="none" />
+                                        </g>
+                                        <use xlink:href="#E240-0000000472135448" x="3569" y="1960"
+                                            height="712px" width="712px" />
+                                    </g>
+                                </g>
+                                <g id="verse-0000000798858995" class="verse">
+                                    <g id="bbox-verse-0000000798858995" class="verse bounding-box" />
+                                    <g id="syl-0000000355367921" class="syl" xml:lang="en"
+                                        font-style="normal" font-weight="normal">
+                                        <rect x="3627" y="3127" height="9" width="450" />
+                                        <g id="bbox-syl-0000000355367921" class="syl bounding-box"
+                                            xml:lang="en" font-style="normal" font-weight="normal" />
+                                        <text x="3323" y="3136" font-size="0px" font-style="normal">
+                                            <tspan id="text-0000000516625940" class="text">
+                                                <g id="bbox-text-0000000516625940"
+                                                    class="text bounding-box" />
+                                                <tspan font-size="178px" font-style="normal"
+                                                    class="text">star</tspan>
+                                            </tspan>
+                                        </text>
+                                    </g>
+                                </g>
+                            </g>
+                            <g id="note-0000000955596109" class="note">
+                                <g id="bbox-note-0000000955596109" class="note bounding-box">
+                                    <rect x="3855" y="2470" height="192" width="223" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A3-0000000472135448" x="3855" y="2569"
+                                        height="712px" width="712px" />
+                                </g>
+                                <g id="stem-0000001212978464" class="stem">
+                                    <g id="bbox-stem-0000001212978464" class="stem bounding-box">
+                                        <rect x="4062" y="1960" height="581" width="16" fill="none" />
+                                    </g>
+                                    <rect x="4062" y="1960" height="581" width="16" />
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="staff-0000000390792942" class="staff">
+                        <g id="bbox-staff-0000000390792942" class="staff bounding-box">
+                            <rect x="2739" y="3808" height="908" width="1530" fill="none" />
+                        </g>
+                        <path d="M2746 3815 L4263 3815" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 3993 L4263 3993" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 4171 L4263 4171" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 4349 L4263 4349" stroke="currentColor" stroke-width="13" />
+                        <path d="M2746 4527 L4263 4527" stroke="currentColor" stroke-width="13" />
+                        <g class="ledgerLines below">
+                            <path d="M2878 4705 L3262 4705" stroke="currentColor" stroke-width="22" />
+                        </g>
+                        <g id="layer-0000001051983668" class="layer">
+                            <g id="bbox-layer-0000001051983668" class="layer bounding-box" />
+                            <g id="note-0000000456642325" class="note">
+                                <g id="bbox-note-0000000456642325" class="note bounding-box">
+                                    <rect x="2926" y="4699" height="189" width="288" fill="none" />
+                                </g>
+                                <g class="notehead">
+                                    <use xlink:href="#E0A2-0000000472135448" x="2926" y="4794"
+                                        height="712px" width="712px" />
+                                </g>
+                                <g id="accid-0000001828485544" class="accid">
+                                    <g id="bbox-accid-0000001828485544" class="accid bounding-box">
+                                        <rect x="2926" y="4794" height="0" width="0" fill="none" />
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="tie-0000000853986597" class="tie" />
+                    <g id="tie-0000000655788759" class="tie">
+                        <path
+                            d="M3628,2702 C3673,2768 3763,2768 3811,2702 C3763,2814 3673,2814 3628,2702"
+                            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="8" />
+                        <g id="bbox-tie-0000000655788759" class="tie bounding-box">
+                            <rect x="3628" y="2702" height="84" width="183" fill="none" />
+                        </g>
+                    </g>
+                    <g id="tie-0000001821091697" class="tie" />
+                    <g id="tie-0000000865549438" class="tie" />
+                    <g id="bline-0000000971284250" class="barLineAttr">
+                        <g id="bbox-bline-0000000971284250" class="barLineAttr bounding-box">
+                            <rect x="4236" y="233" height="4307" width="27" fill="none" />
+                        </g>
+                        <path d="M4250 967 L4250 247" stroke="currentColor" stroke-width="27" />
+                        <path d="M4250 2747 L4250 2035" stroke="currentColor" stroke-width="27" />
+                        <path d="M4250 4527 L4250 3815" stroke="currentColor" stroke-width="27" />
+                    </g>
+                </g>
+                <g id="bdend-0000000350904386" class="boundaryEnd section-0000001903683451" />
+            </g>
+        </g>
+    </svg>
+</svg>
