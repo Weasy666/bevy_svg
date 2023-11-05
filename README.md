@@ -15,14 +15,15 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.12.0-orange)](https://crates.io/crates/bevy/0.12.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.12.0-orange)](https://crates.io/crates/bevy-svg/0.12.0) | [`bevy-0.12`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.12) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.11.0-orange)](https://crates.io/crates/bevy/0.11.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.11.0-orange)](https://crates.io/crates/bevy-svg/0.11.0) | [`bevy-0.11`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.11) |
-| [![Crates.io](https://img.shields.io/badge/crates.io-v0.10.0-orange)](https://crates.io/crates/bevy/0.10.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.10.1-orange)](https://crates.io/crates/bevy-svg/0.10.1) | [`bevy-0.10`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.10) |
 | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
 
 <details><summary>Old versions</summary>
 
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.10.0-orange)](https://crates.io/crates/bevy/0.10.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.10.1-orange)](https://crates.io/crates/bevy-svg/0.10.1) | [`bevy-0.10`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.10) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy/0.9.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.9.0-orange)](https://crates.io/crates/bevy-svg/0.9.0) | [`bevy-0.9`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.9) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy/0.8.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.8.0-orange)](https://crates.io/crates/bevy-svg/0.8.0) | [`bevy-0.8`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.8) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy/0.7.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.7.0-orange)](https://crates.io/crates/bevy-svg/0.7.0) | [`bevy-0.7`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.7) |
@@ -38,9 +39,9 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 |----------------------|-----------------|------------|
 | ![complex_one_color] | ![two_colors]   | ![twinkle] |
 
-[complex_one_color]: assets/complex_one_color.png
-[two_colors]: assets/two_colors.png
-[twinkle]: assets/twinkle.png
+[complex_one_color]: assets/readme/complex_one_color.png
+[two_colors]: assets/readme/two_colors.png
+[twinkle]: assets/readme/twinkle.png
 
 ## Usage
 
@@ -48,12 +49,12 @@ Copy this to your `Cargo.toml`
 
 ```toml
 # Stable
-bevy_svg = "0.11.0"
+bevy_svg = "0.12.0"
 
 # 2D and 3D are available on default, if you only want/need one, use the following
-bevy_svg = { version = "0.11.0", default-features = false, features = ["2d"] }
+bevy_svg = { version = "0.12.0", default-features = false, features = ["2d"] }
 # or
-bevy_svg = { version = "0.11.0", default-features = false, features = ["3d"] }
+bevy_svg = { version = "0.12.0", default-features = false, features = ["3d"] }
 
 # Living on the edge (at your own risk 😅)
 bevy_svg = { git = "https://github.com/Weasy666/bevy_svg", branch = "main" }
@@ -124,8 +125,7 @@ fn setup(
         origin: Origin::Center, // Origin::TopLeft is the default
         transform: Transform {
             translation: Vec3::new(0.0, 0.0, -600.0),
-            // The scale you need depends a lot on your SVG and camera distance it
-            // is currently rather unpredictable, so you need to try it out a bit
+            // The scale you need depends a lot on your SVG and camera distance
             scale: Vec3::new(1.0, 1.0, 1.0),
             rotation: Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
         },
@@ -145,4 +145,4 @@ bevy_svg is licensed under either of the following, at your option:
 [`bevy_prototype_lyon`]: https://github.com/Nilirad/bevy_prototype_lyon
 [`Lyon`]: https://github.com/nical/lyon
 [`usvg`]: https://github.com/RazrFalcon/resvg
-[`AssetLoader`]: https://docs.rs/bevy/0.11/bevy/asset/trait.AssetLoader.html
+[`AssetLoader`]: https://docs.rs/bevy/0.12/bevy/asset/trait.AssetLoader.html
