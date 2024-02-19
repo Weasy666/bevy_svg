@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use bevy::{
     asset::{Asset, Handle},
     math::{Mat4, Vec2},
-    reflect::{std_traits::ReflectDefault, Reflect, TypeUuid},
+    reflect::{std_traits::ReflectDefault, Reflect},
     render::{color::Color, mesh::Mesh, render_resource::AsBindGroup},
     transform::components::Transform,
 };
@@ -17,9 +17,8 @@ use usvg::NodeExt;
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
 /// A loaded and deserialized SVG file.
-#[derive(AsBindGroup, Reflect, Debug, Clone, TypeUuid, Asset)]
+#[derive(AsBindGroup, Reflect, Debug, Clone, Asset)]
 #[reflect(Default, Debug)]
-#[uuid = "ad47a360-355d-4955-9fd8-678412a77f12"]
 pub struct Svg {
     /// The name of the file.
     pub name: String,
