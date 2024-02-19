@@ -50,7 +50,10 @@ impl Plugin for SvgRenderPlugin {
         app.add_systems(PostUpdate, (origin::add_origin_state.in_set(Set::SVG),))
             .add_systems(
                 Last,
-                (origin::apply_origin, svg_mesh_linker.in_set(Set::SVG)),
+                (
+                    origin::apply_origin,
+                    svg_mesh_linker.in_set(Set::SVG),
+                ),
             )
             .add_plugins(render::SvgPlugin);
     }
@@ -134,7 +137,7 @@ fn svg_mesh_linker(
                         });
                 }
             }
-            AssetEvent::Removed { id } => {
+            AssetEvent::Removed { id } | AssetEvent::Unused { id } => {
                 for (entity, ..) in query.iter_mut().filter(|(_, svg, ..)| svg.id() == *id) {
                     commands.entity(entity).despawn_recursive();
                 }

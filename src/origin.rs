@@ -95,22 +95,12 @@ pub(crate) fn apply_origin(
             &Origin,
             &mut OriginState,
             &Transform,
-            Changed<Transform>,
             &mut GlobalTransform,
         ),
         Or<(Changed<Origin>, Changed<Transform>, ChangedMesh)>,
     >,
 ) {
-    for (
-        _,
-        svg_handle,
-        origin,
-        mut origin_state,
-        transform,
-        transform_changed,
-        mut global_transform,
-    ) in &mut query
-    {
+    for (_, svg_handle, origin, mut origin_state, transform, mut global_transform) in &mut query {
         if let Some(svg) = svgs.get(svg_handle) {
             if origin_state.previous != *origin {
                 let scaled_size = svg.size * transform.scale.xy();
@@ -125,7 +115,7 @@ pub(crate) fn apply_origin(
                 *global_transform = GlobalTransform::from(gtransf);
 
                 origin_state.previous = origin.clone();
-            } else if transform_changed {
+            } else {
                 let scaled_size = svg.size * transform.scale.xy();
                 let origin_translation = origin.compute_translation(scaled_size);
 
