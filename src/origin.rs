@@ -31,6 +31,8 @@ pub enum Origin {
     TopLeft,
     /// Top right of the image or viewbox.
     TopRight,
+    /// Custom origin, top left is (0, 0), bottom right is (1, 1)
+    Custom((f32, f32)),
 }
 
 impl Origin {
@@ -44,6 +46,9 @@ impl Origin {
             // Standard SVG origin is top left, so we don't need to do anything
             Origin::TopLeft => Vec3::ZERO,
             Origin::TopRight => Vec3::new(-scaled_size.x, 0.0, 0.0),
+            Origin::Custom(coord) => {
+                Vec3::new(-scaled_size.x * coord.0, scaled_size.y * coord.1, 0.0)
+            }
         }
     }
 }
