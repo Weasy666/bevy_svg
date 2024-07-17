@@ -2,6 +2,7 @@ use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
+use bevy::color::palettes::css::{GOLD, GREEN};
 use bevy_svg::prelude::*;
 
 /// Provides some common functionallity for all examples.
@@ -102,7 +103,7 @@ pub struct DontChange;
 /// This system toggles SVG visibility when 'V' is pressed and toggles through
 /// origin when 'O' is pressed.
 fn keyboard_input_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut svg_query: Query<(&mut Origin, &mut Visibility), (With<Handle<Svg>>, Without<DontChange>)>,
     mut ui_query: Query<
         &mut Visibility,
@@ -113,14 +114,14 @@ fn keyboard_input_system(
         ),
     >,
 ) {
-    if keyboard_input.just_pressed(KeyCode::V) {
+    if keyboard_input.just_pressed(KeyCode::KeyV) {
         for (_, mut visible) in svg_query.iter_mut() {
             *visible = match *visible {
                 Visibility::Hidden => Visibility::Inherited,
                 Visibility::Visible | Visibility::Inherited => Visibility::Hidden,
             };
         }
-    } else if keyboard_input.just_pressed(KeyCode::O) {
+    } else if keyboard_input.just_pressed(KeyCode::KeyO) {
         for (mut origin, _) in svg_query.iter_mut() {
             *origin = match origin.as_ref() {
                 Origin::BottomLeft => Origin::BottomRight,
@@ -130,7 +131,7 @@ fn keyboard_input_system(
                 Origin::TopRight => Origin::TopLeft,
             }
         }
-    } else if keyboard_input.just_pressed(KeyCode::F) {
+    } else if keyboard_input.just_pressed(KeyCode::KeyF) {
         for mut visible in &mut ui_query {
             *visible = match *visible {
                 Visibility::Hidden => Visibility::Inherited,
@@ -175,7 +176,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
             TextSection::from_style(TextStyle {
                 font: font_medium.clone(),
                 font_size: 30.0,
-                color: Color::GOLD,
+                color: Color::from(GOLD),
             }),
             TextSection::new(
                 "\n(min: ",
@@ -188,7 +189,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
             TextSection::from_style(TextStyle {
                 font: font_medium.clone(),
                 font_size: 20.0,
-                color: Color::GOLD,
+                color: Color::from(GOLD),
             }),
             TextSection::new(
                 " - max: ",
@@ -201,7 +202,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
             TextSection::from_style(TextStyle {
                 font: font_medium.clone(),
                 font_size: 20.0,
-                color: Color::GOLD,
+                color: Color::from(GOLD),
             }),
             TextSection::new(
                 ")",
@@ -222,7 +223,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
             TextSection::from_style(TextStyle {
                 font: font_medium.clone(),
                 font_size: 30.0,
-                color: Color::GREEN,
+                color: Color::from(GREEN),
             }),
         ])
         .with_style(Style {
@@ -241,7 +242,7 @@ fn fps_text_update_system(
     mut query: Query<&mut Text, With<FpsText>>,
 ) {
     for mut text in &mut query {
-        if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+        if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
             if let Some(fps_smoothed) = fps.smoothed() {
                 // Update the value of the second section
                 text.sections[1].value = format!("{fps_smoothed:.2}");
@@ -251,7 +252,7 @@ fn fps_text_update_system(
                 text.sections[5].value = format!("{:.2}", fps_values.max);
             }
         }
-        if let Some(frame_time) = diagnostics.get(FrameTimeDiagnosticsPlugin::FRAME_TIME) {
+        if let Some(frame_time) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_TIME) {
             if let Some(frame_time_smoothed) = frame_time.smoothed() {
                 text.sections[8].value = format!("{frame_time_smoothed:.2}");
             }
@@ -279,7 +280,7 @@ fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
             TextSection::from_style(TextStyle {
                 font: font_medium.clone(),
                 font_size: 20.0,
-                color: Color::GOLD,
+                color: Color::from(GOLD),
             }),
         ])
         .with_style(Style {

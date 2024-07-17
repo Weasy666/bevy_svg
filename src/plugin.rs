@@ -122,7 +122,7 @@ fn svg_mesh_linker(
                     _mesh_2d.filter(|mesh| mesh.0 != svg.mesh).map(|mut mesh| {
                         let old_mesh = mesh.0.clone();
                         mesh.0 = svg.mesh.clone();
-                        meshes.remove(old_mesh);
+                        meshes.remove(&old_mesh);
                     });
                     #[cfg(feature = "3d")]
                     _mesh_3d
@@ -130,7 +130,7 @@ fn svg_mesh_linker(
                         .map(|mut mesh| {
                             let old_mesh = mesh.clone();
                             *mesh = svg.mesh.clone();
-                            meshes.remove(old_mesh);
+                            meshes.remove(&old_mesh);
                         });
                 }
             }
@@ -138,6 +138,9 @@ fn svg_mesh_linker(
                 for (entity, ..) in query.iter_mut().filter(|(_, svg, ..)| svg.id() == *id) {
                     commands.entity(entity).despawn_recursive();
                 }
+            }
+            AssetEvent::Unused { .. } => {
+                // TODO: does anything need done here?
             }
         }
     }

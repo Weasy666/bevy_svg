@@ -2,9 +2,10 @@ use std::path::PathBuf;
 
 use bevy::{
     asset::{Asset, Handle},
+    color::Color,
     math::{Mat4, Vec2},
-    reflect::{std_traits::ReflectDefault, Reflect, TypeUuid},
-    render::{color::Color, mesh::Mesh, render_resource::AsBindGroup},
+    reflect::{std_traits::ReflectDefault, Reflect},
+    render::{mesh::Mesh, render_resource::AsBindGroup},
     transform::components::Transform,
 };
 use copyless::VecHelper;
@@ -20,9 +21,8 @@ use usvg::{
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
 /// A loaded and deserialized SVG file.
-#[derive(AsBindGroup, Reflect, Debug, Clone, TypeUuid, Asset)]
+#[derive(AsBindGroup, Reflect, Debug, Clone, Asset)]
 #[reflect(Default, Debug)]
-#[uuid = "ad47a360-355d-4955-9fd8-678412a77f12"]
 pub struct Svg {
     /// The name of the file.
     pub name: String,
@@ -101,7 +101,7 @@ impl Svg {
                     if let Some(fill) = &path.fill {
                         let color = match fill.paint {
                             usvg::Paint::Color(c) => {
-                                Color::rgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8())
+                                Color::srgba_u8(c.red, c.green, c.blue, fill.opacity.to_u8())
                             }
                             _ => Color::default(),
                         };
@@ -297,7 +297,7 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
     #[inline]
     fn convert(self) -> (Color, DrawType) {
         let color = match self.paint {
-            usvg::Paint::Color(c) => Color::rgba_u8(c.red, c.green, c.blue, self.opacity.to_u8()),
+            usvg::Paint::Color(c) => Color::srgba_u8(c.red, c.green, c.blue, self.opacity.to_u8()),
             usvg::Paint::LinearGradient(_)
             | usvg::Paint::RadialGradient(_)
             | usvg::Paint::Pattern(_) => Color::default(),
