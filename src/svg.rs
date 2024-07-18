@@ -170,6 +170,8 @@ impl Svg {
                     trace!("path: {}", path.id());
                     let abs_transform = path.abs_transform();
                     let transform = transform;
+                    // TODO: remove after confirming that abs_transform is in fact the expected value for all cases
+                    debug_assert!(transform == abs_transform);
 
                     if let Some(fill) = &path.fill() {
                         // from resvg render logic
@@ -196,7 +198,6 @@ impl Svg {
                             descriptors.alloc().init(PathDescriptor {
                                 segments: path.convert().collect(),
                                 abs_transform,
-                                transform,
                                 color,
                                 draw_type: DrawType::Fill,
                             });
@@ -209,7 +210,6 @@ impl Svg {
                         descriptors.alloc().init(PathDescriptor {
                             segments: path.convert().collect(),
                             abs_transform,
-                            transform,
                             color,
                             draw_type,
                         });
@@ -241,7 +241,6 @@ impl Svg {
 pub struct PathDescriptor {
     pub segments: Vec<PathEvent>,
     pub abs_transform: usvg::Transform,
-    pub transform: usvg::Transform,
     pub color: Color,
     pub draw_type: DrawType,
 }
