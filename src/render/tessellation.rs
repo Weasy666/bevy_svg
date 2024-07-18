@@ -17,7 +17,6 @@ pub(crate) fn generate_buffer(
 ) -> VertexBuffers {
     debug!("Tessellating SVG: {}", svg.name);
 
-    let flip_y = Transform::from_scale(Vec3::new(1.0, -1.0, 1.0));
     let mut buffers = VertexBuffers::new();
 
     let mut color = None;
@@ -28,8 +27,7 @@ pub(crate) fn generate_buffer(
             color = Some(path.color);
         }
 
-        // Bevy has a different y-axis origin, so we need to flip that axis
-        let transform = flip_y * path.abs_transform;
+        let transform = path.abs_transform;
         match path.draw_type {
             DrawType::Fill => {
                 if let Err(e) = fill_tess.tessellate(
