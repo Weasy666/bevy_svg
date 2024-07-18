@@ -5,10 +5,7 @@ use bevy::{
 };
 use lyon_tessellation::{BuffersBuilder, FillOptions, FillTessellator, StrokeTessellator};
 
-use crate::{
-    render::vertex_buffer::{BufferExt, VertexBuffers, VertexConstructor},
-    svg::{DrawType, Svg},
-};
+use crate::{Convert, render::vertex_buffer::{BufferExt, VertexBuffers, VertexConstructor}, svg::{DrawType, Svg}};
 
 pub(crate) fn generate_buffer(
     svg: &Svg,
@@ -27,11 +24,12 @@ pub(crate) fn generate_buffer(
             color = Some(path.color);
         }
 
-        let transform = path.abs_transform;
+        let transform = path.abs_transform.convert();
+        let segments = path.segments.clone();
         match path.draw_type {
             DrawType::Fill => {
                 if let Err(e) = fill_tess.tessellate(
-                    path.segments.clone(),
+                    segments,
                     &FillOptions::tolerance(0.001),
                     &mut BuffersBuilder::new(
                         &mut buffer,
@@ -46,7 +44,7 @@ pub(crate) fn generate_buffer(
             }
             DrawType::Stroke(opts) => {
                 if let Err(e) = stroke_tess.tessellate(
-                    path.segments.clone(),
+                    segments,
                     &opts,
                     &mut BuffersBuilder::new(
                         &mut buffer,

@@ -5,7 +5,7 @@ use bevy::{
         ColorToComponents
     },
     render::{
-        mesh::{Indices, Mesh},
+        mesh::{Indices, Mesh, VertexAttributeValues},
         render_resource::PrimitiveTopology,
         render_asset::RenderAssetUsages,
     },

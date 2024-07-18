@@ -1,21 +1,21 @@
+use std::collections::VecDeque;
+use std::ops::Deref;
 use std::path::PathBuf;
 
 use bevy::{
     asset::{Asset, Handle},
     color::Color,
     math::{Mat4, Vec2},
+    log::{debug, error, trace, warn},
     reflect::{std_traits::ReflectDefault, Reflect},
     render::{mesh::Mesh, render_resource::AsBindGroup},
     transform::components::Transform,
 };
 use copyless::VecHelper;
-use lyon_geom::euclid::default::Transform2D;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
-use usvg::{
-    tiny_skia_path::{PathSegment, PathSegmentsIter},
-};
+use usvg::{Node, tiny_skia_path::{PathSegment, PathSegmentsIter}};
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -58,7 +58,7 @@ impl Svg {
     /// Loads an SVG from bytes
     pub fn from_bytes(
         bytes: &[u8],
-        path: impl Into<PathBuf>,
+        path: impl Into<PathBuf> + Copy,
         fonts: Option<impl Into<PathBuf>>,
     ) -> Result<Svg, FileSvgError> {
         let svg_tree =
@@ -71,7 +71,9 @@ impl Svg {
 
         let mut fontdb = usvg::fontdb::Database::default();
         fontdb.load_system_fonts();
-        fontdb.load_fonts_dir(fonts.map(|p| p.into()).unwrap_or("./assets".into()));
+        let font_dir = fonts.map(|p| p.into()).unwrap_or("./assets".into());
+        debug!("loading fonts in {:?}", font_dir);
+        fontdb.load_fonts_dir(font_dir);
 
         Ok(Svg::from_tree(svg_tree))
     }
@@ -90,26 +92,108 @@ impl Svg {
         let view_box = tree.root().layer_bounding_box();
         let size = tree.size();
         let mut descriptors = Vec::new();
+        let transform = tree.root().transform();
 
-        for node in tree.root().children() {
+        struct NodeContext<'a> {
+            node: &'a Node,
+            transform: usvg::Transform,
+        }
+
+        let mut node_stack = tree
+            .root()
+            .children()
+            .into_iter()
+            .map(|node| NodeContext {
+                node,
+                transform,
+            })
+            .collect::<VecDeque<_>>();
+
+        let mut counter = node_stack.len();
+        while let Some(NodeContext { node, transform }) = node_stack.pop_front() {
+            trace!("---");
+            trace!("node: {}", node.id());
             match node {
+                usvg::Node::Group(ref group) => {
+                    trace!("group: {}", group.id());
+                    let transform = transform.pre_concat(group.transform());
+                    if !group.should_isolate() {
+                        for node in group.children() {
+                            // this fixes the draw order
+                            if node.id().is_empty() {
+                                // TODO: doesnt work with knight
+                                let Node::Group(group) = node else {
+                                    error!("bad state - {node:?}");
+                                    unreachable!("assumption about invisible groups is wrong");
+                                };
+                                let transform = transform.pre_concat(group.transform());
+                                for node in group.children() {
+                                    node_stack.push_front(NodeContext {
+                                        node,
+                                        transform,
+                                    });
+                                }
+                            } else {
+                                node_stack.push_back(NodeContext {
+                                    node,
+                                    transform,
+                                });
+                            }
+                        }
+                    } else {
+                        todo!("group isolate not implemented")
+                    }
+                }
+                usvg::Node::Text(ref text) => {
+                    trace!("text: {}", text.id());
+                    let group = text.flattened();
+                    let transform = transform.pre_concat(group.transform());
+                    for node in group.children() {
+                        node_stack.push_back(NodeContext {
+                            node,
+                            transform,
+                        });
+                    }
+                }
                 usvg::Node::Path(ref path) => {
-                    let abs_transform = node.abs_transform().convert();
+                    if !path.is_visible() {
+                        trace!("path: {} - invisible", path.id());
+                        continue
+                    }
+                    trace!("path: {}", path.id());
+                    let abs_transform = path.abs_transform();
+                    let transform = transform;
 
                     if let Some(fill) = &path.fill() {
-                        let color = match fill.paint() {
-                            usvg::Paint::Color(c) => {
-                                Color::srgba_u8(c.red, c.green, c.blue, fill.opacity().to_u8())
-                            }
-                            _ => Color::default(),
-                        };
+                        // from resvg render logic
+                        if path.data().bounds().width() == 0.0 || path.data().bounds().height() == 0.0 {
+                            // Horizontal and vertical lines cannot be filled. Skip.
+                        } else {
+                            let color = match fill.paint() {
+                                usvg::Paint::Color(c) => {
+                                    Color::srgba_u8(c.red, c.green, c.blue, fill.opacity().to_u8())
+                                }
+                                usvg::Paint::LinearGradient(g) => {
+                                    // TODO: implement
+                                    // just taking the average between the first and last stop so we get something to render
+                                    crate::util::paint::avg_gradient(g.deref().deref())
+                                }
+                                usvg::Paint::RadialGradient(g) => {
+                                    // TODO: implement
+                                    // just taking the average between the first and last stop so we get something to render
+                                    crate::util::paint::avg_gradient(g.deref().deref())
+                                }
+                                _ => Color::NONE,
+                            };
 
-                        descriptors.alloc().init(PathDescriptor {
-                            segments: path.convert().collect(),
-                            abs_transform,
-                            color,
-                            draw_type: DrawType::Fill,
-                        });
+                            descriptors.alloc().init(PathDescriptor {
+                                segments: path.convert().collect(),
+                                abs_transform,
+                                transform,
+                                color,
+                                draw_type: DrawType::Fill,
+                            });
+                        }
                     }
 
                     if let Some(stroke) = &path.stroke() {
@@ -118,16 +202,19 @@ impl Svg {
                         descriptors.alloc().init(PathDescriptor {
                             segments: path.convert().collect(),
                             abs_transform,
+                            transform,
                             color,
                             draw_type,
                         });
                     }
                 }
-                _ => {}
+                usvg::Node::Image(image) => {
+                    warn!("image: {} - not implemented", image.id());
+                }
             }
         }
 
-        return Svg {
+        Svg {
             name: Default::default(),
             size: Vec2::new(size.width(), size.height()),
             view_box: ViewBox {
@@ -138,14 +225,16 @@ impl Svg {
             },
             paths: descriptors,
             mesh: Default::default(),
-        };
+        }
     }
 }
+
 
 #[derive(Debug, Clone)]
 pub struct PathDescriptor {
     pub segments: Vec<PathEvent>,
-    pub abs_transform: Transform,
+    pub abs_transform: usvg::Transform,
+    pub transform: usvg::Transform,
     pub color: Color,
     pub draw_type: DrawType,
 }
@@ -163,7 +252,6 @@ pub(crate) struct PathConvIter<'iter> {
     first: Point,
     needs_end: bool,
     deferred: Option<PathEvent>,
-    scale: Transform2D<f32>,
 }
 
 impl<'iter> Iterator for PathConvIter<'iter> {
@@ -175,6 +263,7 @@ impl<'iter> Iterator for PathConvIter<'iter> {
         }
         let mut return_event = None;
         let next = self.iter.next();
+
         match next {
             Some(PathSegment::MoveTo(point)) => {
                 if self.needs_end {
@@ -247,7 +336,7 @@ impl<'iter> Iterator for PathConvIter<'iter> {
             }
         }
 
-        return return_event.map(|event| event.transformed(&self.scale));
+        return_event
     }
 }
 
@@ -280,15 +369,12 @@ impl Convert<Transform> for usvg::tiny_skia_path::Transform {
 
 impl<'iter> Convert<PathConvIter<'iter>> for &'iter usvg::Path {
     fn convert(self) -> PathConvIter<'iter> {
-        // TODO: verify abs_transform is expected
-        let (scale_x, scale_y) = self.abs_transform().get_scale();
         return PathConvIter {
             iter: self.data().segments(),
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
             deferred: None,
             needs_end: false,
-            scale: lyon_geom::Transform::scale(scale_x, scale_y),
         };
     }
 }
@@ -298,9 +384,10 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
     fn convert(self) -> (Color, DrawType) {
         let color = match self.paint() {
             usvg::Paint::Color(c) => Color::srgba_u8(c.red, c.green, c.blue, self.opacity().to_u8()),
-            usvg::Paint::LinearGradient(_)
-            | usvg::Paint::RadialGradient(_)
-            | usvg::Paint::Pattern(_) => Color::default(),
+            // TODO: implement, take average for now
+            usvg::Paint::LinearGradient(g) => crate::util::paint::avg_gradient(g.deref().deref()),
+            usvg::Paint::RadialGradient(g) => crate::util::paint::avg_gradient(g.deref().deref()),
+            usvg::Paint::Pattern(_) => Color::NONE,
         };
 
         let linecap = match self.linecap() {
@@ -316,7 +403,7 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
         };
 
         let opt = lyon_tessellation::StrokeOptions::tolerance(0.01)
-            .with_line_width(self.width().get() as f32)
+            .with_line_width(self.width().get())
             .with_line_cap(linecap)
             .with_line_join(linejoin);
 
