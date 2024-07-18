@@ -119,21 +119,28 @@ impl Svg {
                     let transform = transform.pre_concat(group.transform());
                     if !group.should_isolate() {
                         for node in group.children() {
-                            // this fixes the draw order
-                            if node.id().is_empty() {
-                                // TODO: doesnt work with knight
-                                let Node::Group(group) = node else {
-                                    error!("bad state - {node:?}");
-                                    unreachable!("assumption about invisible groups is wrong");
-                                };
-                                let transform = transform.pre_concat(group.transform());
-                                for node in group.children() {
-                                    node_stack.push_front(NodeContext {
-                                        node,
-                                        transform,
-                                    });
+                            let should_add = if node.id().is_empty() {
+                                // TODO: this fixes the draw order - not sure why anymore..
+                                // originally was push_front that had "fixed it" which would make
+                                // the most sense, since push_back is no different than what we are
+                                // already doing now..
+                                if let Node::Group(group) = node {
+                                    let transform = transform.pre_concat(group.transform());
+                                    for node in group.children() {
+                                        node_stack.push_back(NodeContext {
+                                            node,
+                                            transform,
+                                        });
+                                    }
+                                    false
+                                } else {
+                                    // certain svgs might have empty ids and not be groups
+                                    true
                                 }
                             } else {
+                                true
+                            };
+                            if should_add {
                                 node_stack.push_back(NodeContext {
                                     node,
                                     transform,
