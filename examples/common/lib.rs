@@ -3,6 +3,8 @@ use bevy::{
     prelude::*,
 };
 use bevy::color::palettes::css::{GOLD, GREEN};
+use bevy::ecs::schedule::SystemConfigs;
+use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
 use bevy_svg::prelude::*;
 
 /// Provides some common functionallity for all examples.
@@ -22,6 +24,8 @@ impl Plugin for CommonPlugin {
                     keyboard_input_system,
                     fps_text_update_system,
                     origin_text_update_system,
+                    camera_zoom_system,
+                    camera_pan_system,
                 ),
             );
     }
@@ -300,6 +304,44 @@ fn origin_text_update_system(
     for mut text in &mut text_query {
         if let Some(origin) = query.iter().next() {
             text.sections[1].value = format!("{origin:?}");
+        }
+    }
+}
+
+pub fn camera_zoom_system(mut evr_scroll: EventReader<MouseWheel>, mut camera: Query<(Option<Mut<OrthographicProjection>>, Mut<Transform>), With<Camera>>) {
+    for ev in evr_scroll.read() {
+        for (mut projection, mut transform) in camera.iter_mut() {
+            let amount = match ev.unit {
+                MouseScrollUnit::Line => ev.y,
+                MouseScrollUnit::Pixel => ev.y,
+            };
+            if let Some(mut projection) = projection {
+                projection.scale -= if projection.scale <= 1.0 {
+                    amount * 0.05
+                } else {
+                    amount
+                };
+                projection.scale = projection.scale.clamp(0.01, 10.0);
+            } else {
+                transform.translation.z -= amount;
+            }
+        }
+    }
+}
+
+pub fn camera_pan_system(input: Res<ButtonInput<KeyCode>>, mut camera: Query<Mut<Transform>, With<Camera>>) {
+    for mut transform in camera.iter_mut() {
+        if input.pressed(KeyCode::KeyW) {
+            transform.translation.y += 1.0;
+        }
+        if input.pressed(KeyCode::KeyS) {
+            transform.translation.y -= 1.0;
+        }
+        if input.pressed(KeyCode::KeyA) {
+            transform.translation.x -= 1.0;
+        }
+        if input.pressed(KeyCode::KeyD) {
+            transform.translation.x += 1.0;
         }
     }
 }
