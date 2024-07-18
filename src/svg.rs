@@ -109,7 +109,6 @@ impl Svg {
             })
             .collect::<VecDeque<_>>();
 
-        let mut counter = node_stack.len();
         while let Some(NodeContext { node, transform }) = node_stack.pop_front() {
             trace!("---");
             trace!("node: {}", node.id());
