@@ -384,19 +384,6 @@ impl Convert<Point> for usvg::tiny_skia_path::Point {
     }
 }
 
-impl Convert<Transform> for usvg::tiny_skia_path::Transform {
-    #[inline]
-    fn convert(self) -> Transform {
-        let flip_y = Mat4::from_scale(bevy::math::Vec3::new(1.0, -1.0, 1.0));
-        Transform::from_matrix(flip_y * Mat4::from_cols(
-            [self.sx, self.ky, 0.0, 0.0].into(),
-            [self.kx, self.sy, 0.0, 0.0].into(),
-            [0.0, 0.0, 1.0, 0.0].into(),
-            [self.tx, self.ty, 0.0, 1.0].into(),
-        ))
-    }
-}
-
 impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
     fn convert(self) -> PathConvIter<'iter> {
         return PathConvIter {

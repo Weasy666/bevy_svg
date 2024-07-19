@@ -9,7 +9,6 @@ use bevy::{
         render_resource::PrimitiveTopology,
         render_asset::RenderAssetUsages,
     },
-    transform::components::Transform,
 };
 use copyless::VecHelper;
 use lyon_tessellation::{
@@ -32,6 +31,15 @@ pub(crate) type IndexType = u32;
 /// Lyon's [`VertexBuffers`] generic data type defined for [`Vertex`].
 pub(crate) type VertexBuffers = lyon_tessellation::VertexBuffers<Vertex, IndexType>;
 
+fn flip_mesh_vertically(mesh: &mut Mesh) {
+    if let Some(VertexAttributeValues::Float32x3(positions)) = mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION) {
+        for position in positions.iter_mut() {
+            // Invert the y-coordinate to flip the mesh vertically
+            position[1] = -position[1];
+        }
+    }
+}
+
 impl Convert<Mesh> for VertexBuffers {
     fn convert(self) -> Mesh {
         let mut positions = Vec::with_capacity(self.vertices.len());
@@ -46,6 +54,9 @@ impl Convert<Mesh> for VertexBuffers {
         mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
         mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
         mesh.insert_indices(Indices::U32(self.indices));
+
+        // Bevy has a different y-axis origin, so we need to flip that axis
+        flip_mesh_vertically(&mut mesh);
 
         mesh
     }
