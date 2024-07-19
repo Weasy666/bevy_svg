@@ -167,16 +167,13 @@ impl Svg {
                         continue
                     }
                     trace!("path: {}", path.id());
-                    let abs_transform = path.abs_transform();
-                    let transform = transform;
-                    // TODO: remove after confirming that abs_transform is in fact the expected value for all cases
-                    debug_assert!(transform == abs_transform);
+                    let transform = path.abs_transform();
 
                     let path_with_transform = PathWithTransform {
                         path,
                         transform,
                     };
-                    
+
                     match path.paint_order() {
                         PaintOrder::FillAndStroke => {
                             Self::process_fill(&mut descriptors, path_with_transform);
@@ -207,7 +204,7 @@ impl Svg {
             mesh: Default::default(),
         }
     }
-    
+
     fn process_fill(descriptors: &mut Vec<PathDescriptor>, path_with_transform: PathWithTransform) {
         let path = path_with_transform.path;
         // from resvg render logic
@@ -241,12 +238,12 @@ impl Svg {
             draw_type: DrawType::Fill,
         });
     }
-    
+
     fn process_stroke(descriptors: &mut Vec<PathDescriptor>, path_with_transform: PathWithTransform) {
         let path = path_with_transform.path;
         let Some(stroke) = &path.stroke() else {
             return
-        };        
+        };
         let (color, draw_type) = stroke.convert();
 
         descriptors.alloc().init(PathDescriptor {
