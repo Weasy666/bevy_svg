@@ -94,7 +94,13 @@ impl Svg {
         let size = tree.size();
         let mut descriptors = Vec::new();
 
-        let mut node_stack = tree.root().children().into_iter().collect::<VecDeque<_>>();
+        let mut node_stack = tree.root()
+            .children()
+            .into_iter()
+            // to make sure we are processing the svg with sibling > descendant priority we reverse it
+            // and reverse the resulting descriptors before returning the final constructed svg
+            .rev()
+            .collect::<VecDeque<_>>();
 
         while let Some(node) = node_stack.pop_front() {
             trace!("---");
@@ -104,26 +110,7 @@ impl Svg {
                     trace!("group: {}", group.id());
                     if !group.should_isolate() {
                         for node in group.children() {
-                            let should_add = if node.id().is_empty() {
-                                // TODO: this might cause svgs without id attributes to have regressions
-                                // this was likely a virtual group created by usvg 
-                                // we need to process the real one to prevent rendering paths out of order
-                                // since its sibling > descendant priority
-                                if let Node::Group(group) = node {
-                                    for node in group.children() {
-                                        node_stack.push_back(node);
-                                    }
-                                    false
-                                } else {
-                                    // certain svgs might have empty ids and not be groups
-                                    true
-                                }
-                            } else {
-                                true
-                            };
-                            if should_add {
-                                node_stack.push_back(node);
-                            }
+                            node_stack.push_front(node);
                         }
                     } else {
                         todo!("group isolate not implemented")
@@ -133,7 +120,7 @@ impl Svg {
                     trace!("text: {}", text.id());
                     let group = text.flattened();
                     for node in group.children() {
-                        node_stack.push_back(node);
+                        node_stack.push_front(node);
                     }
                 }
                 usvg::Node::Path(ref path) => {
@@ -162,6 +149,8 @@ impl Svg {
                 }
             }
         }
+        
+        descriptors.reverse();
 
         Svg {
             name: Default::default(),
