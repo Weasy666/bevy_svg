@@ -92,30 +92,19 @@ impl Svg {
         let view_box = tree.root().layer_bounding_box();
         let size = tree.size();
         let mut descriptors = Vec::new();
-        let transform = tree.root().transform();
-
-        struct NodeContext<'a> {
-            node: &'a Node,
-            transform: usvg::Transform,
-        }
 
         let mut node_stack = tree
             .root()
             .children()
             .into_iter()
-            .map(|node| NodeContext {
-                node,
-                transform,
-            })
             .collect::<VecDeque<_>>();
 
-        while let Some(NodeContext { node, transform }) = node_stack.pop_front() {
+        while let Some(node) = node_stack.pop_front() {
             trace!("---");
             trace!("node: {}", node.id());
             match node {
                 usvg::Node::Group(ref group) => {
                     trace!("group: {}", group.id());
-                    let transform = transform.pre_concat(group.transform());
                     if !group.should_isolate() {
                         for node in group.children() {
                             let should_add = if node.id().is_empty() {
@@ -124,12 +113,8 @@ impl Svg {
                                 // the most sense, since push_back is no different than what we are
                                 // already doing now..
                                 if let Node::Group(group) = node {
-                                    let transform = transform.pre_concat(group.transform());
                                     for node in group.children() {
-                                        node_stack.push_back(NodeContext {
-                                            node,
-                                            transform,
-                                        });
+                                        node_stack.push_back(node);
                                     }
                                     false
                                 } else {
@@ -140,10 +125,7 @@ impl Svg {
                                 true
                             };
                             if should_add {
-                                node_stack.push_back(NodeContext {
-                                    node,
-                                    transform,
-                                });
+                                node_stack.push_back(node);
                             }
                         }
                     } else {
@@ -153,12 +135,8 @@ impl Svg {
                 usvg::Node::Text(ref text) => {
                     trace!("text: {}", text.id());
                     let group = text.flattened();
-                    let transform = transform.pre_concat(group.transform());
                     for node in group.children() {
-                        node_stack.push_back(NodeContext {
-                            node,
-                            transform,
-                        });
+                        node_stack.push_back(node);
                     }
                 }
                 usvg::Node::Path(ref path) => {
