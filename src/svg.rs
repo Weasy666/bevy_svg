@@ -172,6 +172,11 @@ impl Svg {
                     // TODO: remove after confirming that abs_transform is in fact the expected value for all cases
                     debug_assert!(transform == abs_transform);
 
+                    let path_with_transform = PathWithTransform {
+                        path,
+                        transform,
+                    };
+
                     if let Some(fill) = &path.fill() {
                         // from resvg render logic
                         if path.data().bounds().width() == 0.0 || path.data().bounds().height() == 0.0 {
@@ -195,8 +200,7 @@ impl Svg {
                             };
 
                             descriptors.alloc().init(PathDescriptor {
-                                segments: path.convert().collect(),
-                                abs_transform,
+                                segments: path_with_transform.convert().collect(),
                                 color,
                                 draw_type: DrawType::Fill,
                             });
@@ -207,8 +211,7 @@ impl Svg {
                         let (color, draw_type) = stroke.convert();
 
                         descriptors.alloc().init(PathDescriptor {
-                            segments: path.convert().collect(),
-                            abs_transform,
+                            segments: path_with_transform.convert().collect(),
                             color,
                             draw_type,
                         });
@@ -239,7 +242,6 @@ impl Svg {
 #[derive(Debug, Clone)]
 pub struct PathDescriptor {
     pub segments: Vec<PathEvent>,
-    pub abs_transform: usvg::Transform,
     pub color: Color,
     pub draw_type: DrawType,
 }
@@ -250,9 +252,16 @@ pub enum DrawType {
     Stroke(lyon_tessellation::StrokeOptions),
 }
 
+#[derive(Debug, Copy, Clone)]
+struct PathWithTransform<'a> {
+    path: &'a usvg::Path,
+    transform: usvg::Transform,
+}
+
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
 pub(crate) struct PathConvIter<'iter> {
     iter: PathSegmentsIter<'iter>,
+    transform: usvg::Transform,
     prev: Point,
     first: Point,
     needs_end: bool,
@@ -341,7 +350,23 @@ impl<'iter> Iterator for PathConvIter<'iter> {
             }
         }
 
-        return_event
+        return_event.map(|event| {
+            // Mapping for converting usvg::Transform to lyon_geom::Transform
+            //
+            // | sx  kx  tx | -> | m11 m21 m31 |
+            // | ky  sy  ty | -> | m12 m22 m32 |
+            // |  0   0   1 | -> |   0   0   1 |
+            //
+            // m11, m12,
+            // m21, m22,
+            // m31, m32,
+            event
+                .transformed(&lyon_geom::Transform::new(
+                    self.transform.sx, self.transform.ky,
+                    self.transform.kx, self.transform.sy,
+                    self.transform.tx, self.transform.ty,
+                ))
+        })
     }
 }
 
@@ -372,10 +397,11 @@ impl Convert<Transform> for usvg::tiny_skia_path::Transform {
     }
 }
 
-impl<'iter> Convert<PathConvIter<'iter>> for &'iter usvg::Path {
+impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
     fn convert(self) -> PathConvIter<'iter> {
         return PathConvIter {
-            iter: self.data().segments(),
+            iter: self.path.data().segments(),
+            transform: self.transform,
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
             deferred: None,

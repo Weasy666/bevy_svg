@@ -54,14 +54,13 @@ impl Convert<Mesh> for VertexBuffers {
 /// Zero-sized type used to implement various vertex construction traits from Lyon.
 pub(crate) struct VertexConstructor {
     pub(crate) color: Color,
-    pub(crate) transform: Transform,
 }
 
 /// Enables the construction of a [`Vertex`] when using a `FillTessellator`.
 impl FillVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: FillVertex) -> Vertex {
         let vertex = vertex.position();
-        let pos = self.transform * Vec3::new(vertex.x, vertex.y, 0.0);
+        let pos = Vec3::new(vertex.x, vertex.y, 0.0);
 
         Vertex {
             position: [pos.x, pos.y, pos.z],
@@ -74,7 +73,7 @@ impl FillVertexConstructor<Vertex> for VertexConstructor {
 impl StrokeVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: StrokeVertex) -> Vertex {
         let vertex = vertex.position();
-        let pos = self.transform * Vec3::new(vertex.x, vertex.y, 0.0);
+        let pos = Vec3::new(vertex.x, vertex.y, 0.0);
 
         Vertex {
             position: [pos.x, pos.y, pos.z],

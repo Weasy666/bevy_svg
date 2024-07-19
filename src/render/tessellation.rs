@@ -1,11 +1,9 @@
 use bevy::{
     log::{debug, error},
-    math::Vec3,
-    transform::components::Transform,
 };
 use lyon_tessellation::{BuffersBuilder, FillOptions, FillTessellator, StrokeTessellator};
 
-use crate::{Convert, render::vertex_buffer::{BufferExt, VertexBuffers, VertexConstructor}, svg::{DrawType, Svg}};
+use crate::{render::vertex_buffer::{BufferExt, VertexBuffers, VertexConstructor}, svg::{DrawType, Svg}};
 
 pub(crate) fn generate_buffer(
     svg: &Svg,
@@ -24,7 +22,6 @@ pub(crate) fn generate_buffer(
             color = Some(path.color);
         }
 
-        let transform = path.abs_transform.convert();
         let segments = path.segments.clone();
         match path.draw_type {
             DrawType::Fill => {
@@ -35,7 +32,6 @@ pub(crate) fn generate_buffer(
                         &mut buffer,
                         VertexConstructor {
                             color: path.color,
-                            transform,
                         },
                     ),
                 ) {
@@ -50,7 +46,6 @@ pub(crate) fn generate_buffer(
                         &mut buffer,
                         VertexConstructor {
                             color: path.color,
-                            transform,
                         },
                     ),
                 ) {
