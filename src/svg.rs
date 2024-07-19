@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::ops::Deref;
 use std::path::PathBuf;
-
+use std::sync::Arc;
 use bevy::{
     asset::{Asset, Handle},
     color::Color,
@@ -63,18 +63,23 @@ impl Svg {
         path: impl Into<PathBuf> + Copy,
         fonts: Option<impl Into<PathBuf>>,
     ) -> Result<Svg, FileSvgError> {
-        let svg_tree = usvg::Tree::from_data(&bytes, &usvg::Options::default()).map_err(|err| {
-            FileSvgError {
-                error: err.into(),
-                path: format!("{}", path.into().display()),
-            }
-        })?;
-
         let mut fontdb = usvg::fontdb::Database::default();
         fontdb.load_system_fonts();
         let font_dir = fonts.map(|p| p.into()).unwrap_or("./assets".into());
         debug!("loading fonts in {:?}", font_dir);
         fontdb.load_fonts_dir(font_dir);
+        
+        let fontdb = Arc::new(fontdb);
+        
+        let svg_tree = usvg::Tree::from_data(&bytes, &usvg::Options {
+            fontdb,
+            ..Default::default()
+        }).map_err(|err| {
+            FileSvgError {
+                error: err.into(),
+                path: format!("{}", path.into().display()),
+            }
+        })?;
 
         Ok(Svg::from_tree(svg_tree))
     }
