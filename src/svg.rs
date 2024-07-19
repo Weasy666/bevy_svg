@@ -105,10 +105,10 @@ impl Svg {
                     if !group.should_isolate() {
                         for node in group.children() {
                             let should_add = if node.id().is_empty() {
-                                // TODO: this fixes the draw order - not sure why anymore..
-                                // originally was push_front that had "fixed it" which would make
-                                // the most sense, since push_back is no different than what we are
-                                // already doing now..
+                                // TODO: this might cause svgs without id attributes to have regressions
+                                // this was likely a virtual group created by usvg 
+                                // we need to process the real one to prevent rendering paths out of order
+                                // since its sibling > descendant priority
                                 if let Node::Group(group) = node {
                                     for node in group.children() {
                                         node_stack.push_back(node);
