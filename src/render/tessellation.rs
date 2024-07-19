@@ -1,9 +1,10 @@
-use bevy::{
-    log::{debug, error},
-};
+use bevy::log::{debug, error};
 use lyon_tessellation::{BuffersBuilder, FillOptions, FillTessellator, StrokeTessellator};
 
-use crate::{render::vertex_buffer::{BufferExt, VertexBuffers, VertexConstructor}, svg::{DrawType, Svg}};
+use crate::{
+    render::vertex_buffer::{BufferExt, VertexBuffers, VertexConstructor},
+    svg::{DrawType, Svg},
+};
 
 pub(crate) fn generate_buffer(
     svg: &Svg,
@@ -28,12 +29,7 @@ pub(crate) fn generate_buffer(
                 if let Err(e) = fill_tess.tessellate(
                     segments,
                     &FillOptions::tolerance(0.001),
-                    &mut BuffersBuilder::new(
-                        &mut buffer,
-                        VertexConstructor {
-                            color: path.color,
-                        },
-                    ),
+                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color }),
                 ) {
                     error!("FillTessellator error: {:?}", e)
                 }
@@ -42,12 +38,7 @@ pub(crate) fn generate_buffer(
                 if let Err(e) = stroke_tess.tessellate(
                     segments,
                     &opts,
-                    &mut BuffersBuilder::new(
-                        &mut buffer,
-                        VertexConstructor {
-                            color: path.color,
-                        },
-                    ),
+                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color }),
                 ) {
                     error!("StrokeTessellator error: {:?}", e)
                 }

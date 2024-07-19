@@ -1,13 +1,10 @@
 use bevy::{
+    color::{Color, ColorToComponents},
     math::Vec3,
-    color::{
-        Color,
-        ColorToComponents
-    },
     render::{
         mesh::{Indices, Mesh, VertexAttributeValues},
-        render_resource::PrimitiveTopology,
         render_asset::RenderAssetUsages,
+        render_resource::PrimitiveTopology,
     },
 };
 use copyless::VecHelper;
@@ -32,7 +29,9 @@ pub(crate) type IndexType = u32;
 pub(crate) type VertexBuffers = lyon_tessellation::VertexBuffers<Vertex, IndexType>;
 
 fn flip_mesh_vertically(mesh: &mut Mesh) {
-    if let Some(VertexAttributeValues::Float32x3(positions)) = mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION) {
+    if let Some(VertexAttributeValues::Float32x3(positions)) =
+        mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION)
+    {
         for position in positions.iter_mut() {
             // Invert the y-coordinate to flip the mesh vertically
             position[1] = -position[1];
@@ -50,7 +49,10 @@ impl Convert<Mesh> for VertexBuffers {
             colors.alloc().init(vert.color);
         }
 
-        let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::default());
+        let mut mesh = Mesh::new(
+            PrimitiveTopology::TriangleList,
+            RenderAssetUsages::default(),
+        );
         mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
         mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
         mesh.insert_indices(Indices::U32(self.indices));

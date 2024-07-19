@@ -5,17 +5,19 @@ use std::path::PathBuf;
 use bevy::{
     asset::{Asset, Handle},
     color::Color,
-    math::{Mat4, Vec2},
-    log::{debug, error, trace, warn},
+    log::{debug, trace, warn},
+    math::Vec2,
     reflect::{std_traits::ReflectDefault, Reflect},
     render::{mesh::Mesh, render_resource::AsBindGroup},
-    transform::components::Transform,
 };
 use copyless::VecHelper;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
-use usvg::{Node, PaintOrder, tiny_skia_path::{PathSegment, PathSegmentsIter}};
+use usvg::{
+    tiny_skia_path::{PathSegment, PathSegmentsIter},
+    Node, PaintOrder,
+};
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -61,13 +63,12 @@ impl Svg {
         path: impl Into<PathBuf> + Copy,
         fonts: Option<impl Into<PathBuf>>,
     ) -> Result<Svg, FileSvgError> {
-        let svg_tree =
-            usvg::Tree::from_data(&bytes, &usvg::Options::default()).map_err(|err| {
-                FileSvgError {
-                    error: err.into(),
-                    path: format!("{}", path.into().display()),
-                }
-            })?;
+        let svg_tree = usvg::Tree::from_data(&bytes, &usvg::Options::default()).map_err(|err| {
+            FileSvgError {
+                error: err.into(),
+                path: format!("{}", path.into().display()),
+            }
+        })?;
 
         let mut fontdb = usvg::fontdb::Database::default();
         fontdb.load_system_fonts();
@@ -93,11 +94,7 @@ impl Svg {
         let size = tree.size();
         let mut descriptors = Vec::new();
 
-        let mut node_stack = tree
-            .root()
-            .children()
-            .into_iter()
-            .collect::<VecDeque<_>>();
+        let mut node_stack = tree.root().children().into_iter().collect::<VecDeque<_>>();
 
         while let Some(node) = node_stack.pop_front() {
             trace!("---");
@@ -142,15 +139,12 @@ impl Svg {
                 usvg::Node::Path(ref path) => {
                     if !path.is_visible() {
                         trace!("path: {} - invisible", path.id());
-                        continue
+                        continue;
                     }
                     trace!("path: {}", path.id());
                     let transform = path.abs_transform();
 
-                    let path_with_transform = PathWithTransform {
-                        path,
-                        transform,
-                    };
+                    let path_with_transform = PathWithTransform { path, transform };
 
                     match path.paint_order() {
                         PaintOrder::FillAndStroke => {
@@ -188,7 +182,7 @@ impl Svg {
         // from resvg render logic
         if path.data().bounds().width() == 0.0 || path.data().bounds().height() == 0.0 {
             // Horizontal and vertical lines cannot be filled. Skip.
-            return
+            return;
         }
         let Some(fill) = &path.fill() else {
             return;
@@ -217,11 +211,12 @@ impl Svg {
         });
     }
 
-    fn process_stroke(descriptors: &mut Vec<PathDescriptor>, path_with_transform: PathWithTransform) {
+    fn process_stroke(
+        descriptors: &mut Vec<PathDescriptor>,
+        path_with_transform: PathWithTransform,
+    ) {
         let path = path_with_transform.path;
-        let Some(stroke) = &path.stroke() else {
-            return
-        };
+        let Some(stroke) = &path.stroke() else { return };
         let (color, draw_type) = stroke.convert();
 
         descriptors.alloc().init(PathDescriptor {
@@ -231,7 +226,6 @@ impl Svg {
         });
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct PathDescriptor {
@@ -354,12 +348,14 @@ impl<'iter> Iterator for PathConvIter<'iter> {
             // m11, m12,
             // m21, m22,
             // m31, m32,
-            event
-                .transformed(&lyon_geom::Transform::new(
-                    self.transform.sx, self.transform.ky,
-                    self.transform.kx, self.transform.sy,
-                    self.transform.tx, self.transform.ty,
-                ))
+            event.transformed(&lyon_geom::Transform::new(
+                self.transform.sx,
+                self.transform.ky,
+                self.transform.kx,
+                self.transform.sy,
+                self.transform.tx,
+                self.transform.ty,
+            ))
         })
     }
 }
@@ -395,7 +391,9 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
     #[inline]
     fn convert(self) -> (Color, DrawType) {
         let color = match self.paint() {
-            usvg::Paint::Color(c) => Color::srgba_u8(c.red, c.green, c.blue, self.opacity().to_u8()),
+            usvg::Paint::Color(c) => {
+                Color::srgba_u8(c.red, c.green, c.blue, self.opacity().to_u8())
+            }
             // TODO: implement, take average for now
             usvg::Paint::LinearGradient(g) => crate::util::paint::avg_gradient(g.deref().deref()),
             usvg::Paint::RadialGradient(g) => crate::util::paint::avg_gradient(g.deref().deref()),
