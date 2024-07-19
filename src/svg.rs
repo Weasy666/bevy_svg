@@ -15,7 +15,7 @@ use copyless::VecHelper;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
-use usvg::{Node, tiny_skia_path::{PathSegment, PathSegmentsIter}};
+use usvg::{Node, PaintOrder, tiny_skia_path::{PathSegment, PathSegmentsIter}};
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -176,45 +176,16 @@ impl Svg {
                         path,
                         transform,
                     };
-
-                    if let Some(fill) = &path.fill() {
-                        // from resvg render logic
-                        if path.data().bounds().width() == 0.0 || path.data().bounds().height() == 0.0 {
-                            // Horizontal and vertical lines cannot be filled. Skip.
-                        } else {
-                            let color = match fill.paint() {
-                                usvg::Paint::Color(c) => {
-                                    Color::srgba_u8(c.red, c.green, c.blue, fill.opacity().to_u8())
-                                }
-                                usvg::Paint::LinearGradient(g) => {
-                                    // TODO: implement
-                                    // just taking the average between the first and last stop so we get something to render
-                                    crate::util::paint::avg_gradient(g.deref().deref())
-                                }
-                                usvg::Paint::RadialGradient(g) => {
-                                    // TODO: implement
-                                    // just taking the average between the first and last stop so we get something to render
-                                    crate::util::paint::avg_gradient(g.deref().deref())
-                                }
-                                _ => Color::NONE,
-                            };
-
-                            descriptors.alloc().init(PathDescriptor {
-                                segments: path_with_transform.convert().collect(),
-                                color,
-                                draw_type: DrawType::Fill,
-                            });
+                    
+                    match path.paint_order() {
+                        PaintOrder::FillAndStroke => {
+                            Self::process_fill(&mut descriptors, path_with_transform);
+                            Self::process_stroke(&mut descriptors, path_with_transform);
                         }
-                    }
-
-                    if let Some(stroke) = &path.stroke() {
-                        let (color, draw_type) = stroke.convert();
-
-                        descriptors.alloc().init(PathDescriptor {
-                            segments: path_with_transform.convert().collect(),
-                            color,
-                            draw_type,
-                        });
+                        PaintOrder::StrokeAndFill => {
+                            Self::process_stroke(&mut descriptors, path_with_transform);
+                            Self::process_fill(&mut descriptors, path_with_transform);
+                        }
                     }
                 }
                 usvg::Node::Image(image) => {
@@ -235,6 +206,54 @@ impl Svg {
             paths: descriptors,
             mesh: Default::default(),
         }
+    }
+    
+    fn process_fill(descriptors: &mut Vec<PathDescriptor>, path_with_transform: PathWithTransform) {
+        let path = path_with_transform.path;
+        // from resvg render logic
+        if path.data().bounds().width() == 0.0 || path.data().bounds().height() == 0.0 {
+            // Horizontal and vertical lines cannot be filled. Skip.
+            return
+        }
+        let Some(fill) = &path.fill() else {
+            return;
+        };
+        let color = match fill.paint() {
+            usvg::Paint::Color(c) => {
+                Color::srgba_u8(c.red, c.green, c.blue, fill.opacity().to_u8())
+            }
+            usvg::Paint::LinearGradient(g) => {
+                // TODO: implement
+                // just taking the average between the first and last stop so we get something to render
+                crate::util::paint::avg_gradient(g.deref().deref())
+            }
+            usvg::Paint::RadialGradient(g) => {
+                // TODO: implement
+                // just taking the average between the first and last stop so we get something to render
+                crate::util::paint::avg_gradient(g.deref().deref())
+            }
+            _ => Color::NONE,
+        };
+
+        descriptors.alloc().init(PathDescriptor {
+            segments: path_with_transform.convert().collect(),
+            color,
+            draw_type: DrawType::Fill,
+        });
+    }
+    
+    fn process_stroke(descriptors: &mut Vec<PathDescriptor>, path_with_transform: PathWithTransform) {
+        let path = path_with_transform.path;
+        let Some(stroke) = &path.stroke() else {
+            return
+        };        
+        let (color, draw_type) = stroke.convert();
+
+        descriptors.alloc().init(PathDescriptor {
+            segments: path_with_transform.convert().collect(),
+            color,
+            draw_type,
+        });
     }
 }
 
