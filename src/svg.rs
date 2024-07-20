@@ -139,7 +139,6 @@ impl Svg {
                     trace!("text: {}", text.id());
                     let bounding_box = text.abs_stroke_bounding_box();
                     let bounding_box = Rect::new(bounding_box.x(), bounding_box.y(), bounding_box.width(), bounding_box.height());
-
                     // TODO: Not sure why text with a bounding box in negative space of the canvas requires nudged back over
                     // maybe we are missing a transform but as noted below we can't rely on the transforms below this point as they
                     // are all identity and requires us to build them up ourself traversing the tree.
@@ -172,8 +171,9 @@ impl Svg {
                     } else {
                         path.abs_transform()
                     };
+                    trace!("{transform:?}");
 
-                    let path_with_transform = PathWithTransform { path, transform };
+                    let path_with_transform = PathWithTransform { path, transform, is_stroke: false };
 
                     // inverted because we are reversing the list at the end
                     match path.paint_order() {
@@ -237,9 +237,11 @@ impl Svg {
         };
 
         descriptors.alloc().init(PathDescriptor {
+            abs_transform: path_with_transform.transform,
             segments: path_with_transform.convert().collect(),
             color,
             draw_type: DrawType::Fill,
+            is_stroke: false,
         });
     }
 
@@ -247,14 +249,19 @@ impl Svg {
         descriptors: &mut Vec<PathDescriptor>,
         path_with_transform: PathWithTransform,
     ) {
+        let mut path_with_transform = path_with_transform;
         let path = path_with_transform.path;
         let Some(stroke) = &path.stroke() else { return };
         let (color, draw_type) = stroke.convert();
 
+        path_with_transform.is_stroke = true;
+
         descriptors.alloc().init(PathDescriptor {
             segments: path_with_transform.convert().collect(),
+            abs_transform: path_with_transform.transform,
             color,
             draw_type,
+            is_stroke: true,
         });
     }
 }
@@ -264,6 +271,8 @@ pub struct PathDescriptor {
     pub segments: Vec<PathEvent>,
     pub color: Color,
     pub draw_type: DrawType,
+    pub abs_transform: usvg::Transform,
+    pub is_stroke: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -275,6 +284,7 @@ pub enum DrawType {
 #[derive(Debug, Copy, Clone)]
 struct PathWithTransform<'a> {
     path: &'a usvg::Path,
+    is_stroke: bool,
     transform: usvg::Transform,
 }
 
@@ -286,6 +296,7 @@ pub(crate) struct PathConvIter<'iter> {
     first: Point,
     needs_end: bool,
     deferred: Option<PathEvent>,
+    is_stroke: bool,
 }
 
 impl<'iter> Iterator for PathConvIter<'iter> {
@@ -370,25 +381,7 @@ impl<'iter> Iterator for PathConvIter<'iter> {
             }
         }
 
-        return_event.map(|event| {
-            // Mapping for converting usvg::Transform to lyon_geom::Transform
-            //
-            // | sx  kx  tx | -> | m11 m21 m31 |
-            // | ky  sy  ty | -> | m12 m22 m32 |
-            // |  0   0   1 | -> |   0   0   1 |
-            //
-            // m11, m12,
-            // m21, m22,
-            // m31, m32,
-            event.transformed(&lyon_geom::Transform::new(
-                self.transform.sx,
-                self.transform.ky,
-                self.transform.kx,
-                self.transform.sy,
-                self.transform.tx,
-                self.transform.ty,
-            ))
-        })
+        return_event
     }
 }
 
@@ -415,6 +408,7 @@ impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
             prev: Point::new(0.0, 0.0),
             deferred: None,
             needs_end: false,
+            is_stroke: self.is_stroke,
         };
     }
 }

@@ -29,7 +29,7 @@ pub(crate) fn generate_buffer(
                 if let Err(e) = fill_tess.tessellate(
                     segments,
                     &FillOptions::tolerance(0.001),
-                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color }),
+                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color, transform: path.abs_transform  }),
                 ) {
                     error!("FillTessellator error: {:?}", e)
                 }
@@ -38,7 +38,7 @@ pub(crate) fn generate_buffer(
                 if let Err(e) = stroke_tess.tessellate(
                     segments,
                     &opts,
-                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color }),
+                    &mut BuffersBuilder::new(&mut buffer, VertexConstructor { color: path.color, transform: path.abs_transform }),
                 ) {
                     error!("StrokeTessellator error: {:?}", e)
                 }

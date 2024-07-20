@@ -1,6 +1,5 @@
 use bevy::{
     color::{Color, ColorToComponents},
-    math::Vec3,
     render::{
         mesh::{Indices, Mesh, VertexAttributeValues},
         render_asset::RenderAssetUsages,
@@ -8,6 +7,7 @@ use bevy::{
     },
 };
 use copyless::VecHelper;
+use lyon_path::math::Point;
 use lyon_tessellation::{
     self, FillVertex, FillVertexConstructor, StrokeVertex, StrokeVertexConstructor,
 };
@@ -67,31 +67,35 @@ impl Convert<Mesh> for VertexBuffers {
 /// Zero-sized type used to implement various vertex construction traits from Lyon.
 pub(crate) struct VertexConstructor {
     pub(crate) color: Color,
+    pub(crate) transform: usvg::Transform,
+}
+
+impl VertexConstructor {
+    fn process_vertex(&self, point: Point) -> Vertex {
+        let pos = {
+            let (scale_x, scale_y) = self.transform.get_scale();
+            let mut point = usvg::tiny_skia_path::Point::from_xy(point.x, point.y);
+            self.transform.map_point(&mut point);
+            Point::new(point.x, point.y)
+        };
+        Vertex {
+            position: [pos.x, pos.y, 0.0],
+            color: self.color.to_linear().to_f32_array(),
+        }
+    }
 }
 
 /// Enables the construction of a [`Vertex`] when using a `FillTessellator`.
 impl FillVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: FillVertex) -> Vertex {
-        let vertex = vertex.position();
-        let pos = Vec3::new(vertex.x, vertex.y, 0.0);
-
-        Vertex {
-            position: [pos.x, pos.y, pos.z],
-            color: self.color.to_linear().to_f32_array(),
-        }
+        self.process_vertex(vertex.position())
     }
 }
 
 /// Enables the construction of a [`Vertex`] when using a `StrokeTessellator`.
 impl StrokeVertexConstructor<Vertex> for VertexConstructor {
     fn new_vertex(&mut self, vertex: StrokeVertex) -> Vertex {
-        let vertex = vertex.position();
-        let pos = Vec3::new(vertex.x, vertex.y, 0.0);
-
-        Vertex {
-            position: [pos.x, pos.y, pos.z],
-            color: self.color.to_linear().to_f32_array(),
-        }
+        self.process_vertex(vertex.position())
     }
 }
 
