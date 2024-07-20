@@ -150,10 +150,10 @@ impl Svg {
                     trace!("text: {}", text.id());
                     let bounding_box = text.abs_stroke_bounding_box();
                     let bounding_box = Rect::new(
-                        bounding_box.x(),
-                        bounding_box.y(),
-                        bounding_box.width(),
-                        bounding_box.height(),
+                        bounding_box.left(),
+                        bounding_box.top(),
+                        bounding_box.right(),
+                        bounding_box.bottom(),
                     );
                     // TODO: Not sure why text with a bounding box in negative space of the canvas requires nudged back over
                     // maybe we are missing a transform but as noted below we can't rely on the transforms below this point as they
