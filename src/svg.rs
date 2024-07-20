@@ -10,6 +10,7 @@ use copyless::VecHelper;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use std::collections::VecDeque;
+use std::iter::Peekable;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -311,7 +312,7 @@ struct PathWithTransform<'a> {
 
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
 pub(crate) struct PathConvIter<'iter> {
-    iter: PathSegmentsIter<'iter>,
+    iter: Peekable<PathSegmentsIter<'iter>>,
     transform: usvg::Transform,
     prev: Point,
     first: Point,
@@ -324,6 +325,11 @@ impl<'iter> Iterator for PathConvIter<'iter> {
     type Item = PathEvent;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // if we have nothing left return early
+        // don't send deferred as it won't be completed and cause panic on some svgs
+        if self.iter.peek().is_none() {
+            return None;
+        }
         if self.deferred.is_some() {
             return self.deferred.take();
         }
@@ -343,9 +349,12 @@ impl<'iter> Iterator for PathConvIter<'iter> {
                         first,
                         close: false,
                     })
-                } else {
+                } else if self.iter.peek().is_some() {
+                    // only bother sending begin if we have more items to process
                     self.first = point.convert();
                     Some(PathEvent::Begin { at: self.first })
+                } else {
+                    None
                 }
             }
             Some(PathSegment::LineTo(point)) => {
@@ -422,7 +431,7 @@ impl Convert<Point> for usvg::tiny_skia_path::Point {
 impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
     fn convert(self) -> PathConvIter<'iter> {
         return PathConvIter {
-            iter: self.path.data().segments(),
+            iter: self.path.data().segments().peekable(),
             transform: self.transform,
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
