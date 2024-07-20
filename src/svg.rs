@@ -156,16 +156,7 @@ impl Svg {
                         bounding_box.right(),
                         bounding_box.bottom(),
                     );
-                    // TODO: Not sure why text with a bounding box in negative space of the canvas requires nudged back over
-                    // maybe we are missing a transform but as noted below we can't rely on the transforms below this point as they
-                    // are all identity and requires us to build them up ourself traversing the tree.
-                    let transform = if /* !transform.is_identity() && */ (bounding_box.min.x < 0.0 || bounding_box.min.y < 0.0)  {
-                        let offset_x = if bounding_box.min.x < 0.0 { bounding_box.min.x } else { 0.0 };
-                        let offset_y = if bounding_box.min.y < 0.0 { bounding_box.min.y } else { 0.0 };
-                        text.abs_transform().pre_concat(usvg::Transform::from_translate(-offset_x, -offset_y))
-                    } else {
-                        text.abs_transform()
-                    };
+                    let transform = text.abs_transform();
 
                     // all transforms from here on down are identity
                     // https://github.com/RazrFalcon/resvg/blob/1a6922d5bfcee9e69e04dc47cb0b586f1ca64a1c/crates/usvg/src/text/flatten.rs#L83-L83
