@@ -315,15 +315,28 @@ pub(crate) struct PathConvIter<'iter> {
 impl<'iter> Iterator for PathConvIter<'iter> {
     type Item = PathEvent;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        // if we have nothing left return early
-        // don't send deferred as it won't be completed and cause panic on some svgs
-        if self.iter.peek().is_none() {
-            return None;
-        }
-        if self.deferred.is_some() {
+    fn next(&mut self) -> Option<Self::Item> {        
+        if let Some(defered) = self.deferred {
+            match defered { 
+                PathEvent::Begin { .. } => {
+                    // if we have nothing left return early
+                    // don't send deferred as it won't be completed and cause panic on some svgs
+                    if self.iter.peek().is_none() {
+                        return None;
+                    }
+                }
+                _ => {}
+            }
+            self.needs_end = match defered {
+                PathEvent::Begin { .. } => true,
+                PathEvent::Line { .. } => true,
+                PathEvent::Quadratic { .. } => true,
+                PathEvent::Cubic { .. } => true,
+                PathEvent::End { .. } => false,
+            };
             return self.deferred.take();
         }
+
         let next = self.iter.next();
 
         match next {
@@ -343,6 +356,7 @@ impl<'iter> Iterator for PathConvIter<'iter> {
                 } else if self.iter.peek().is_some() {
                     // only bother sending begin if we have more items to process
                     self.first = point.convert();
+                    self.needs_end = true;
                     Some(PathEvent::Begin { at: self.first })
                 } else {
                     None
