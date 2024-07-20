@@ -1,20 +1,23 @@
-use std::collections::VecDeque;
-use std::ops::Deref;
-use std::path::PathBuf;
-use std::sync::Arc;
 use bevy::{
     asset::{Asset, Handle},
     color::Color,
     log::{debug, error, trace, warn},
-    math::{Vec2, Rect},
+    math::{Rect, Vec2},
     reflect::{std_traits::ReflectDefault, Reflect},
     render::{mesh::Mesh, render_resource::AsBindGroup},
 };
 use copyless::VecHelper;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
+use std::collections::VecDeque;
+use std::ops::Deref;
+use std::path::PathBuf;
+use std::sync::Arc;
 use svgtypes::ViewBox;
-use usvg::{tiny_skia_path::{PathSegment, PathSegmentsIter}, PaintOrder};
+use usvg::{
+    tiny_skia_path::{PathSegment, PathSegmentsIter},
+    PaintOrder,
+};
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -68,14 +71,16 @@ impl Svg {
 
         let fontdb = Arc::new(fontdb);
 
-        let svg_tree = usvg::Tree::from_data(&bytes, &usvg::Options {
-            fontdb,
-            ..Default::default()
-        }).map_err(|err| {
-            FileSvgError {
-                error: err.into(),
-                path: format!("{}", path.into().display()),
-            }
+        let svg_tree = usvg::Tree::from_data(
+            &bytes,
+            &usvg::Options {
+                fontdb,
+                ..Default::default()
+            },
+        )
+        .map_err(|err| FileSvgError {
+            error: err.into(),
+            path: format!("{}", path.into().display()),
         })?;
 
         Ok(Svg::from_tree(svg_tree))
@@ -103,7 +108,8 @@ impl Svg {
             is_text: bool,
         }
 
-        let mut node_stack = tree.root()
+        let mut node_stack = tree
+            .root()
             .children()
             .into_iter()
             // to make sure we are processing the svg with sibling > descendant priority we reverse it
@@ -173,7 +179,11 @@ impl Svg {
                     };
                     trace!("{transform:?}");
 
-                    let path_with_transform = PathWithTransform { path, transform, is_stroke: false };
+                    let path_with_transform = PathWithTransform {
+                        path,
+                        transform,
+                        is_stroke: false,
+                    };
 
                     // inverted because we are reversing the list at the end
                     match path.paint_order() {
@@ -306,7 +316,6 @@ impl<'iter> Iterator for PathConvIter<'iter> {
         if self.deferred.is_some() {
             return self.deferred.take();
         }
-        let mut return_event = None;
         let next = self.iter.next();
 
         match next {
@@ -318,70 +327,70 @@ impl<'iter> Iterator for PathConvIter<'iter> {
                     self.prev = point.convert();
                     self.deferred = Some(PathEvent::Begin { at: self.prev });
                     self.first = self.prev;
-                    return_event = Some(PathEvent::End {
+                    Some(PathEvent::End {
                         last,
                         first,
                         close: false,
-                    });
+                    })
                 } else {
                     self.first = point.convert();
-                    return_event = Some(PathEvent::Begin { at: self.first });
+                    Some(PathEvent::Begin { at: self.first })
                 }
             }
             Some(PathSegment::LineTo(point)) => {
                 self.needs_end = true;
                 let from = self.prev;
                 self.prev = point.convert();
-                return_event = Some(PathEvent::Line {
+                Some(PathEvent::Line {
                     from,
                     to: self.prev,
-                });
+                })
             }
             Some(PathSegment::CubicTo(point1, point2, point3)) => {
                 self.needs_end = true;
                 let from = self.prev;
                 self.prev = point3.convert();
-                return_event = Some(PathEvent::Cubic {
+                Some(PathEvent::Cubic {
                     from,
                     ctrl1: point1.convert(),
                     ctrl2: point2.convert(),
                     to: self.prev,
-                });
+                })
             }
             Some(PathSegment::QuadTo(point1, point2)) => {
                 self.needs_end = true;
                 let from = self.prev;
                 self.prev = point2.convert();
-                return_event = Some(PathEvent::Quadratic {
+                Some(PathEvent::Quadratic {
                     from,
                     ctrl: point1.convert(),
                     to: self.prev,
-                });
+                })
             }
             Some(PathSegment::Close) => {
                 self.needs_end = false;
                 self.prev = self.first;
-                return_event = Some(PathEvent::End {
+                Some(PathEvent::End {
                     last: self.prev,
                     first: self.first,
                     close: true,
-                });
+                })
             }
             None => {
                 if self.needs_end {
                     self.needs_end = false;
                     let last = self.prev;
                     let first = self.first;
-                    return_event = Some(PathEvent::End {
+                    Some(PathEvent::End {
                         last,
                         first,
                         close: false,
-                    });
+                    })
+                } else {
+                    None
                 }
             }
         }
-
-        return_event
     }
 }
 
