@@ -167,6 +167,7 @@ impl Svg {
                     };
 
                     // all transforms from here on down are identity
+                    // https://github.com/RazrFalcon/resvg/blob/1a6922d5bfcee9e69e04dc47cb0b586f1ca64a1c/crates/usvg/src/text/flatten.rs#L83-L83
                     let group = text.flattened();
                     for node in group.children() {
                         node_stack.push_front(NodeContext {
