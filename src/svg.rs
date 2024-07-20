@@ -129,11 +129,11 @@ impl Svg {
         }) = node_stack.pop_front()
         {
             trace!("---");
-            trace!("node: {}", node.id());
+            trace!("node: {:?}", node.id());
             match node {
                 usvg::Node::Group(ref group) => {
                     let transform = transform.pre_concat(group.transform());
-                    trace!("group: {}", group.id());
+                    trace!("group: {:?}", group.id());
                     if !group.should_isolate() {
                         for node in group.children() {
                             node_stack.push_front(NodeContext {
@@ -147,7 +147,7 @@ impl Svg {
                     }
                 }
                 usvg::Node::Text(ref text) => {
-                    trace!("text: {}", text.id());
+                    trace!("text: {:?}", text.id());
                     let bounding_box = text.abs_stroke_bounding_box();
                     let bounding_box = Rect::new(
                         bounding_box.left(),
@@ -179,10 +179,10 @@ impl Svg {
                 }
                 usvg::Node::Path(ref path) => {
                     if !path.is_visible() {
-                        trace!("path: {} - invisible", path.id());
+                        trace!("path: {:?} - invisible", path.id());
                         continue;
                     }
-                    trace!("path: {}", path.id());
+                    trace!("path: {:?}", path.id());
                     let transform = if is_text {
                         transform
                     } else {
@@ -209,7 +209,7 @@ impl Svg {
                     }
                 }
                 usvg::Node::Image(image) => {
-                    warn!("image: {} - not implemented", image.id());
+                    warn!("image: {:?} - not implemented", image.id());
                 }
             }
         }
