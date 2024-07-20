@@ -128,8 +128,6 @@
                                             xml:lang="en" font-style="normal" font-weight="normal" />
                                         <text x="2363" y="1215" font-size="0px" font-style="normal">
                                             <tspan id="text-0000001660383891" class="text">
-                                                <g id="bbox-text-0000001660383891"
-                                                    class="text bounding-box" />
                                                 <tspan font-size="180px" font-style="normal"
                                                     class="text">
                                                     Star</tspan>
@@ -246,8 +244,6 @@
                                             xml:lang="en" font-style="normal" font-weight="normal" />
                                         <text x="1746" y="5039" font-size="0px" font-style="normal">
                                             <tspan id="text-0000001659003514" class="text">
-                                                <g id="bbox-text-0000001659003514"
-                                                    class="text bounding-box" />
                                                 <tspan font-size="178px" font-style="normal"
                                                     class="text">
                                                     Star</tspan>
@@ -260,15 +256,13 @@
                     </g>
                     <g id="tempo-0000000571316716" class="tempo">
                         <g id="bbox-tempo-0000000571316716" class="tempo bounding-box" />
+                        <g id="bbox-text-0000000326111445" class="text bounding-box">
+                            <rect x="1237" y="83" height="164" width="1177" fill="none" />
+                        </g>
                         <text x="1237" y="210" font-size="0px">
                             <tspan id="rend-0000000720660075" class="rend" font-style="italic"
                                 font-weight="bold">
-                                <g id="bbox-rend-0000000720660075" class="rend bounding-box"
-                                    font-style="italic" font-weight="bold" />
                                 <tspan id="text-0000000326111445" class="text">
-                                    <g id="bbox-text-0000000326111445" class="text bounding-box">
-                                        <rect x="1237" y="83" height="164" width="1177" fill="none" />
-                                    </g>
                                     <tspan font-size="180px" font-style="italic" class="text">Moderato,
                                         f= 90</tspan>
                                 </tspan>
@@ -368,8 +362,6 @@
                                             xml:lang="en" font-style="normal" font-weight="normal" />
                                         <text x="2887" y="3138" font-size="0px" font-style="normal">
                                             <tspan id="text-0000001548844984" class="text">
-                                                <g id="bbox-text-0000001548844984"
-                                                    class="text bounding-box" />
                                                 <tspan font-size="178px" font-style="normal"
                                                     class="text">
                                                     Star</tspan>
@@ -409,8 +401,6 @@
                                             xml:lang="en" font-style="normal" font-weight="normal" />
                                         <text x="3323" y="3136" font-size="0px" font-style="normal">
                                             <tspan id="text-0000000516625940" class="text">
-                                                <g id="bbox-text-0000000516625940"
-                                                    class="text bounding-box" />
                                                 <tspan font-size="178px" font-style="normal"
                                                     class="text">star</tspan>
                                             </tspan>
