@@ -5,8 +5,8 @@ use std::sync::Arc;
 use bevy::{
     asset::{Asset, Handle},
     color::Color,
-    log::{debug, trace, warn},
-    math::Vec2,
+    log::{debug, error, trace, warn},
+    math::{Vec2, Rect},
     reflect::{std_traits::ReflectDefault, Reflect},
     render::{mesh::Mesh, render_resource::AsBindGroup},
 };
@@ -14,10 +14,7 @@ use copyless::VecHelper;
 use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use svgtypes::ViewBox;
-use usvg::{
-    tiny_skia_path::{PathSegment, PathSegmentsIter},
-    Node, PaintOrder,
-};
+use usvg::{tiny_skia_path::{PathSegment, PathSegmentsIter}, PaintOrder};
 
 use crate::{loader::FileSvgError, render::tessellation, Convert};
 
@@ -68,9 +65,9 @@ impl Svg {
         let font_dir = fonts.map(|p| p.into()).unwrap_or("./assets".into());
         debug!("loading fonts in {:?}", font_dir);
         fontdb.load_fonts_dir(font_dir);
-        
+
         let fontdb = Arc::new(fontdb);
-        
+
         let svg_tree = usvg::Tree::from_data(&bytes, &usvg::Options {
             fontdb,
             ..Default::default()
@@ -99,23 +96,40 @@ impl Svg {
         let size = tree.size();
         let mut descriptors = Vec::new();
 
+        #[derive(Copy, Clone)]
+        struct NodeContext<'a> {
+            node: &'a usvg::Node,
+            transform: usvg::Transform,
+            is_text: bool,
+        }
+
         let mut node_stack = tree.root()
             .children()
             .into_iter()
             // to make sure we are processing the svg with sibling > descendant priority we reverse it
             // and reverse the resulting descriptors before returning the final constructed svg
             .rev()
+            .map(|node| NodeContext {
+                node,
+                transform: node.abs_transform(),
+                is_text: false,
+            })
             .collect::<VecDeque<_>>();
 
-        while let Some(node) = node_stack.pop_front() {
+        while let Some(NodeContext { node, transform, is_text }) = node_stack.pop_front() {
             trace!("---");
             trace!("node: {}", node.id());
             match node {
                 usvg::Node::Group(ref group) => {
+                    let transform = transform.pre_concat(group.transform());
                     trace!("group: {}", group.id());
                     if !group.should_isolate() {
                         for node in group.children() {
-                            node_stack.push_front(node);
+                            node_stack.push_front(NodeContext {
+                                node,
+                                transform,
+                                is_text: false,
+                            });
                         }
                     } else {
                         todo!("group isolate not implemented")
@@ -123,9 +137,28 @@ impl Svg {
                 }
                 usvg::Node::Text(ref text) => {
                     trace!("text: {}", text.id());
+                    let bounding_box = text.abs_stroke_bounding_box();
+                    let bounding_box = Rect::new(bounding_box.x(), bounding_box.y(), bounding_box.width(), bounding_box.height());
+
+                    // TODO: Not sure why text with a bounding box in negative space of the canvas requires nudged back over
+                    // maybe we are missing a transform but as noted below we can't rely on the transforms below this point as they
+                    // are all identity and requires us to build them up ourself traversing the tree.
+                    let transform = if /* !transform.is_identity() && */ (bounding_box.min.x < 0.0 || bounding_box.min.y < 0.0)  {
+                        let offset_x = if bounding_box.min.x < 0.0 { bounding_box.min.x } else { 0.0 };
+                        let offset_y = if bounding_box.min.y < 0.0 { bounding_box.min.y } else { 0.0 };
+                        text.abs_transform().pre_concat(usvg::Transform::from_translate(-offset_x, -offset_y))
+                    } else {
+                        text.abs_transform()
+                    };
+
+                    // all transforms from here on down are identity
                     let group = text.flattened();
                     for node in group.children() {
-                        node_stack.push_front(node);
+                        node_stack.push_front(NodeContext {
+                            node,
+                            transform,
+                            is_text: true,
+                        });
                     }
                 }
                 usvg::Node::Path(ref path) => {
@@ -134,18 +167,23 @@ impl Svg {
                         continue;
                     }
                     trace!("path: {}", path.id());
-                    let transform = path.abs_transform();
+                    let transform = if is_text {
+                        transform
+                    } else {
+                        path.abs_transform()
+                    };
 
                     let path_with_transform = PathWithTransform { path, transform };
 
+                    // inverted because we are reversing the list at the end
                     match path.paint_order() {
                         PaintOrder::FillAndStroke => {
-                            Self::process_fill(&mut descriptors, path_with_transform);
                             Self::process_stroke(&mut descriptors, path_with_transform);
+                            Self::process_fill(&mut descriptors, path_with_transform);
                         }
                         PaintOrder::StrokeAndFill => {
-                            Self::process_stroke(&mut descriptors, path_with_transform);
                             Self::process_fill(&mut descriptors, path_with_transform);
+                            Self::process_stroke(&mut descriptors, path_with_transform);
                         }
                     }
                 }
@@ -154,7 +192,7 @@ impl Svg {
                 }
             }
         }
-        
+
         descriptors.reverse();
 
         Svg {
