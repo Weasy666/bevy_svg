@@ -149,13 +149,6 @@ impl Svg {
                 }
                 usvg::Node::Text(ref text) => {
                     trace!("text: {:?}", text.id());
-                    let bounding_box = text.abs_stroke_bounding_box();
-                    let bounding_box = Rect::new(
-                        bounding_box.left(),
-                        bounding_box.top(),
-                        bounding_box.right(),
-                        bounding_box.bottom(),
-                    );
                     let transform = text.abs_transform();
 
                     // all transforms from here on down are identity
@@ -315,9 +308,9 @@ pub(crate) struct PathConvIter<'iter> {
 impl<'iter> Iterator for PathConvIter<'iter> {
     type Item = PathEvent;
 
-    fn next(&mut self) -> Option<Self::Item> {        
+    fn next(&mut self) -> Option<Self::Item> {
         if let Some(defered) = self.deferred {
-            match defered { 
+            match defered {
                 PathEvent::Begin { .. } => {
                     // if we have nothing left return early
                     // don't send deferred as it won't be completed and cause panic on some svgs
