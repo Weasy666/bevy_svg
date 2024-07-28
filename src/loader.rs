@@ -1,6 +1,7 @@
 use bevy::{
-    asset::{io::Reader, AssetLoader, AsyncReadExt, BoxedFuture, LoadContext},
+    asset::{io::Reader, AssetLoader, AsyncReadExt, LoadContext},
     log::debug,
+    utils::ConditionalSendFuture,
 };
 use thiserror::Error;
 
@@ -19,7 +20,7 @@ impl AssetLoader for SvgAssetLoader {
         reader: &'load mut Reader,
         _settings: &'load (),
         load_context: &'load mut LoadContext,
-    ) -> BoxedFuture<'load, Result<Self::Asset, Self::Error>> {
+    ) -> impl ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             debug!("Parsing SVG: {} ...", load_context.path().display());
             let mut bytes = Vec::new();

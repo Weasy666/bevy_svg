@@ -34,6 +34,7 @@ mod plugin;
 mod render;
 mod resources;
 mod svg;
+mod util;
 
 /// Import this module as `use bevy_svg::prelude::*` to get convenient imports.
 pub mod prelude {

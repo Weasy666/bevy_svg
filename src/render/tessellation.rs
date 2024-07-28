@@ -1,8 +1,4 @@
-use bevy::{
-    log::{debug, error},
-    math::Vec3,
-    transform::components::Transform,
-};
+use bevy::log::{debug, error};
 use lyon_tessellation::{BuffersBuilder, FillOptions, FillTessellator, StrokeTessellator};
 
 use crate::{
@@ -10,14 +6,13 @@ use crate::{
     svg::{DrawType, Svg},
 };
 
-pub(crate) fn generate_buffer(
+pub fn generate_buffer(
     svg: &Svg,
     fill_tess: &mut FillTessellator,
     stroke_tess: &mut StrokeTessellator,
 ) -> VertexBuffers {
     debug!("Tessellating SVG: {}", svg.name);
 
-    let flip_y = Transform::from_scale(Vec3::new(1.0, -1.0, 1.0));
     let mut buffers = VertexBuffers::new();
 
     let mut color = None;
@@ -28,37 +23,36 @@ pub(crate) fn generate_buffer(
             color = Some(path.color);
         }
 
-        // Bevy has a different y-axis origin, so we need to flip that axis
-        let transform = flip_y * path.abs_transform;
+        let segments = path.segments.clone();
         match path.draw_type {
             DrawType::Fill => {
                 if let Err(e) = fill_tess.tessellate(
-                    path.segments.clone(),
+                    segments,
                     &FillOptions::tolerance(0.001),
                     &mut BuffersBuilder::new(
                         &mut buffer,
                         VertexConstructor {
                             color: path.color,
-                            transform,
+                            transform: path.abs_transform,
                         },
                     ),
                 ) {
-                    error!("FillTessellator error: {:?}", e)
+                    error!("FillTessellator error: {:?}", e);
                 }
             }
             DrawType::Stroke(opts) => {
                 if let Err(e) = stroke_tess.tessellate(
-                    path.segments.clone(),
+                    segments,
                     &opts,
                     &mut BuffersBuilder::new(
                         &mut buffer,
                         VertexConstructor {
                             color: path.color,
-                            transform,
+                            transform: path.abs_transform,
                         },
                     ),
                 ) {
-                    error!("StrokeTessellator error: {:?}", e)
+                    error!("StrokeTessellator error: {:?}", e);
                 }
             }
         }

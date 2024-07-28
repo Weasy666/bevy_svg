@@ -11,9 +11,6 @@
 //! [`RenderWorld`](bevy::render::RenderWorld).
 //! Afterwards it is queued in the [`RenderSet::Queue`](bevy::render::RenderSet) for actual drawing/rendering.
 
-#[cfg(feature = "3d")]
-use std::ops::Deref;
-
 use bevy::{
     app::{App, Plugin},
     asset::{AssetEvent, Assets, Handle},
@@ -93,7 +90,7 @@ fn svg_mesh_linker(
         match event {
             AssetEvent::Added { .. } => (),
             AssetEvent::LoadedWithDependencies { id } => {
-                for (.., _mesh_2d, _mesh_3d) in query
+                for (.., mesh_2d, mesh_3d) in query
                     .iter_mut()
                     .filter(|(_, handle, ..)| handle.id() == *id)
                 {
@@ -103,13 +100,17 @@ fn svg_mesh_linker(
                         svg.name
                     );
                     #[cfg(feature = "2d")]
-                    _mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
+                    if let Some(mut mesh) = mesh_2d {
+                        mesh.0 = svg.mesh.clone();
+                    }
                     #[cfg(feature = "3d")]
-                    _mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
+                    if let Some(mut mesh) = mesh_3d {
+                        *mesh = svg.mesh.clone();
+                    }
                 }
             }
             AssetEvent::Modified { id } => {
-                for (.., _mesh_2d, _mesh_3d) in query
+                for (.., mesh_2d, mesh_3d) in query
                     .iter_mut()
                     .filter(|(_, handle, ..)| handle.id() == *id)
                 {
@@ -119,19 +120,17 @@ fn svg_mesh_linker(
                         svg.name
                     );
                     #[cfg(feature = "2d")]
-                    _mesh_2d.filter(|mesh| mesh.0 != svg.mesh).map(|mut mesh| {
+                    if let Some(mut mesh) = mesh_2d.filter(|mesh| mesh.0 != svg.mesh) {
                         let old_mesh = mesh.0.clone();
                         mesh.0 = svg.mesh.clone();
-                        meshes.remove(old_mesh);
-                    });
+                        meshes.remove(&old_mesh);
+                    }
                     #[cfg(feature = "3d")]
-                    _mesh_3d
-                        .filter(|mesh| mesh.deref() != &svg.mesh)
-                        .map(|mut mesh| {
-                            let old_mesh = mesh.clone();
-                            *mesh = svg.mesh.clone();
-                            meshes.remove(old_mesh);
-                        });
+                    if let Some(mut mesh) = mesh_3d.filter(|mesh| **mesh != svg.mesh) {
+                        let old_mesh = mesh.clone();
+                        *mesh = svg.mesh.clone();
+                        meshes.remove(&old_mesh);
+                    }
                 }
             }
             AssetEvent::Removed { id } => {
@@ -139,12 +138,15 @@ fn svg_mesh_linker(
                     commands.entity(entity).despawn_recursive();
                 }
             }
+            AssetEvent::Unused { .. } => {
+                // TODO: does anything need done here?
+            }
         }
     }
 
     // Ensure all correct meshes are set for entities which have had modified handles
     for entity in changed_handles.iter() {
-        let Ok((.., handle, _mesh_2d, _mesh_3d)) = query.get_mut(entity) else {
+        let Ok((.., handle, mesh_2d, mesh_3d)) = query.get_mut(entity) else {
             continue;
         };
         let Some(svg) = svgs.get(handle) else {
@@ -155,8 +157,12 @@ fn svg_mesh_linker(
             entity
         );
         #[cfg(feature = "2d")]
-        _mesh_2d.map(|mut mesh| mesh.0 = svg.mesh.clone());
+        if let Some(mut mesh) = mesh_2d {
+            mesh.0 = svg.mesh.clone();
+        }
         #[cfg(feature = "3d")]
-        _mesh_3d.map(|mut mesh| *mesh = svg.mesh.clone());
+        if let Some(mut mesh) = mesh_3d {
+            *mesh = svg.mesh.clone();
+        }
     }
 }
