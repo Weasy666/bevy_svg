@@ -132,6 +132,7 @@ fn keyboard_input_system(
                 Origin::Center => Origin::BottomLeft,
                 Origin::TopLeft => Origin::Center,
                 Origin::TopRight => Origin::TopLeft,
+                Origin::Custom(coord) => Origin::Custom(*coord)
             }
         }
     } else if keyboard_input.just_pressed(KeyCode::KeyF) {
