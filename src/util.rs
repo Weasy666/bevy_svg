@@ -1,10 +1,8 @@
-pub(crate) mod paint {
+pub mod paint {
     use bevy::color::{Color, ColorToComponents, Srgba};
     use usvg::BaseGradient;
-    fn stop_to_color(stop: &usvg::Stop) -> Color {
-        let color = stop.color();
-        Color::srgba_u8(color.red, color.green, color.blue, stop.opacity().to_u8())
-    }
+
+    use crate::Convert;
 
     trait ToF32Array {
         fn to_f32_array(&self) -> [f32; 4];
@@ -12,7 +10,7 @@ pub(crate) mod paint {
 
     impl ToF32Array for Option<&usvg::Stop> {
         fn to_f32_array(&self) -> [f32; 4] {
-            self.map(stop_to_color)
+            self.map(Convert::convert)
                 .unwrap_or(Color::NONE)
                 .to_srgba()
                 .to_f32_array()

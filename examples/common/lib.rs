@@ -1,10 +1,9 @@
+use bevy::color::palettes::css::{GOLD, GREEN};
+use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
-use bevy::color::palettes::css::{GOLD, GREEN};
-use bevy::ecs::schedule::SystemConfigs;
-use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
 use bevy_svg::prelude::*;
 
 /// Provides some common functionallity for all examples.
@@ -308,9 +307,12 @@ fn origin_text_update_system(
     }
 }
 
-pub fn camera_zoom_system(mut evr_scroll: EventReader<MouseWheel>, mut camera: Query<(Option<Mut<OrthographicProjection>>, Mut<Transform>), With<Camera>>) {
+pub fn camera_zoom_system(
+    mut evr_scroll: EventReader<MouseWheel>,
+    mut camera: Query<(Option<Mut<OrthographicProjection>>, Mut<Transform>), With<Camera>>,
+) {
     for ev in evr_scroll.read() {
-        for (mut projection, mut transform) in camera.iter_mut() {
+        for (projection, mut transform) in camera.iter_mut() {
             let amount = match ev.unit {
                 MouseScrollUnit::Line => ev.y,
                 MouseScrollUnit::Pixel => ev.y,
@@ -329,7 +331,10 @@ pub fn camera_zoom_system(mut evr_scroll: EventReader<MouseWheel>, mut camera: Q
     }
 }
 
-pub fn camera_pan_system(input: Res<ButtonInput<KeyCode>>, mut camera: Query<Mut<Transform>, With<Camera>>) {
+pub fn camera_pan_system(
+    input: Res<ButtonInput<KeyCode>>,
+    mut camera: Query<Mut<Transform>, With<Camera>>,
+) {
     for mut transform in camera.iter_mut() {
         if input.pressed(KeyCode::KeyW) {
             transform.translation.y += 1.0;

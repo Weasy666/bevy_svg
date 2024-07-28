@@ -2,7 +2,7 @@ use bevy::{
     asset::{Asset, Handle},
     color::Color,
     log::{debug, trace, warn},
-    math::{Rect, Vec2},
+    math::Vec2,
     reflect::{std_traits::ReflectDefault, Reflect},
     render::{mesh::Mesh, render_resource::AsBindGroup},
 };
@@ -11,7 +11,6 @@ use lyon_path::PathEvent;
 use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
 use std::collections::VecDeque;
 use std::iter::Peekable;
-use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;
 use svgtypes::ViewBox;
@@ -66,14 +65,14 @@ impl Svg {
     ) -> Result<Svg, FileSvgError> {
         let mut fontdb = usvg::fontdb::Database::default();
         fontdb.load_system_fonts();
-        let font_dir = fonts.map(|p| p.into()).unwrap_or("./assets".into());
+        let font_dir = fonts.map_or("./assets".into(), Into::into);
         debug!("loading fonts in {:?}", font_dir);
         fontdb.load_fonts_dir(font_dir);
 
         let fontdb = Arc::new(fontdb);
 
         let svg_tree = usvg::Tree::from_data(
-            &bytes,
+            bytes,
             &usvg::Options {
                 fontdb,
                 ..Default::default()
@@ -112,7 +111,7 @@ impl Svg {
         let mut node_stack = tree
             .root()
             .children()
-            .into_iter()
+            .iter()
             // to make sure we are processing the svg with sibling > descendant priority we reverse it
             // and reverse the resulting descriptors before returning the final constructed svg
             .rev()
@@ -232,14 +231,14 @@ impl Svg {
             usvg::Paint::LinearGradient(g) => {
                 // TODO: implement
                 // just taking the average between the first and last stop so we get something to render
-                crate::util::paint::avg_gradient(g.deref().deref())
+                crate::util::paint::avg_gradient(g)
             }
             usvg::Paint::RadialGradient(g) => {
                 // TODO: implement
                 // just taking the average between the first and last stop so we get something to render
-                crate::util::paint::avg_gradient(g.deref().deref())
+                crate::util::paint::avg_gradient(g)
             }
-            _ => Color::NONE,
+            usvg::Paint::Pattern(_) => Color::NONE,
         };
 
         descriptors.alloc().init(PathDescriptor {
@@ -295,36 +294,29 @@ struct PathWithTransform<'a> {
 }
 
 // Taken from https://github.com/nical/lyon/blob/74e6b137fea70d71d3b537babae22c6652f8843e/examples/wgpu_svg/src/main.rs
-pub(crate) struct PathConvIter<'iter> {
+pub struct PathConvIter<'iter> {
     iter: Peekable<PathSegmentsIter<'iter>>,
-    transform: usvg::Transform,
     prev: Point,
     first: Point,
     needs_end: bool,
     deferred: Option<PathEvent>,
-    is_stroke: bool,
 }
 
 impl<'iter> Iterator for PathConvIter<'iter> {
     type Item = PathEvent;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(defered) = self.deferred {
-            match defered {
-                PathEvent::Begin { .. } => {
-                    // if we have nothing left return early
-                    // don't send deferred as it won't be completed and cause panic on some svgs
-                    if self.iter.peek().is_none() {
-                        return None;
-                    }
-                }
-                _ => {}
+        if let Some(deferred) = self.deferred {
+            if let PathEvent::Begin { .. } = deferred {
+                // if we have nothing left return early
+                // don't send deferred as it won't be completed and cause panic on some svgs
+                self.iter.peek()?;
             }
-            self.needs_end = match defered {
-                PathEvent::Begin { .. } => true,
-                PathEvent::Line { .. } => true,
-                PathEvent::Quadratic { .. } => true,
-                PathEvent::Cubic { .. } => true,
+            self.needs_end = match deferred {
+                PathEvent::Begin { .. }
+                | PathEvent::Line { .. }
+                | PathEvent::Quadratic { .. }
+                | PathEvent::Cubic { .. } => true,
                 PathEvent::End { .. } => false,
             };
             return self.deferred.take();
@@ -426,16 +418,22 @@ impl Convert<Point> for usvg::tiny_skia_path::Point {
     }
 }
 
+impl Convert<Color> for &usvg::Stop {
+    #[inline]
+    fn convert(self) -> Color {
+        let color = self.color();
+        Color::srgba_u8(color.red, color.green, color.blue, self.opacity().to_u8())
+    }
+}
+
 impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
     fn convert(self) -> PathConvIter<'iter> {
         return PathConvIter {
             iter: self.path.data().segments().peekable(),
-            transform: self.transform,
             first: Point::new(0.0, 0.0),
             prev: Point::new(0.0, 0.0),
             deferred: None,
             needs_end: false,
-            is_stroke: self.is_stroke,
         };
     }
 }
@@ -448,8 +446,8 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
                 Color::srgba_u8(c.red, c.green, c.blue, self.opacity().to_u8())
             }
             // TODO: implement, take average for now
-            usvg::Paint::LinearGradient(g) => crate::util::paint::avg_gradient(g.deref().deref()),
-            usvg::Paint::RadialGradient(g) => crate::util::paint::avg_gradient(g.deref().deref()),
+            usvg::Paint::LinearGradient(g) => crate::util::paint::avg_gradient(g),
+            usvg::Paint::RadialGradient(g) => crate::util::paint::avg_gradient(g),
             usvg::Paint::Pattern(_) => Color::NONE,
         };
 
@@ -470,6 +468,6 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
             .with_line_cap(linecap)
             .with_line_join(linejoin);
 
-        return (color, DrawType::Stroke(opt));
+        (color, DrawType::Stroke(opt))
     }
 }

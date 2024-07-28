@@ -1,5 +1,5 @@
 mod plugin;
-pub(crate) mod tessellation;
+pub mod tessellation;
 mod vertex_buffer;
 
 #[cfg(feature = "2d")]
