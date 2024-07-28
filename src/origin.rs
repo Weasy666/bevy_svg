@@ -17,7 +17,7 @@ use bevy::{
 
 use crate::svg::Svg;
 
-#[derive(Clone, Component, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Component, Copy, Debug, Default, PartialEq)]
 /// Origin of the coordinate system.
 pub enum Origin {
     /// Bottom left of the image or viewbox.
@@ -53,7 +53,7 @@ impl Origin {
     }
 }
 
-#[derive(Clone, Component, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Component, Copy, Debug, PartialEq)]
 pub struct OriginState {
     previous: Origin,
 }
