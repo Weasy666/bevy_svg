@@ -1,9 +1,9 @@
-#[cfg(feature = "3d")]
-use bevy::render::mesh::Mesh;
 #[cfg(feature = "2d")]
-use bevy::sprite::Mesh2dHandle;
+use bevy::render::mesh::Mesh2d;
+#[cfg(feature = "3d")]
+use bevy::render::mesh::Mesh3d;
 use bevy::{
-    asset::{Assets, Handle},
+    asset::Assets,
     ecs::{
         change_detection::{DetectChanges, Ref},
         component::Component,
@@ -15,7 +15,10 @@ use bevy::{
     transform::components::{GlobalTransform, Transform},
 };
 
-use crate::svg::Svg;
+use crate::{
+    render::{Svg2d, Svg3d},
+    svg::Svg,
+};
 
 #[derive(Clone, Component, Copy, Debug, Default, PartialEq)]
 /// Origin of the coordinate system.
@@ -60,18 +63,27 @@ pub struct OriginState {
 
 #[cfg(feature = "2d")]
 #[cfg(not(feature = "3d"))]
-type WithMesh = With<Mesh2dHandle>;
+type WithSvg = With<Svg2d>;
 #[cfg(not(feature = "2d"))]
 #[cfg(feature = "3d")]
-type WithMesh = With<Handle<Mesh>>;
+type WithSvg = With<Svg3d>;
 #[cfg(all(feature = "2d", feature = "3d"))]
-type WithMesh = Or<(With<Mesh2dHandle>, With<Handle<Mesh>>)>;
+type WithSvg = Or<(With<Svg2d>, With<Svg3d>)>;
+
+#[cfg(feature = "2d")]
+#[cfg(not(feature = "3d"))]
+type WithMesh = With<Mesh2d>;
+#[cfg(not(feature = "2d"))]
+#[cfg(feature = "3d")]
+type WithMesh = With<Mesh3d>;
+#[cfg(all(feature = "2d", feature = "3d"))]
+type WithMesh = Or<(With<Mesh2d>, With<Mesh3d>)>;
 
 /// Checkes if a "new" SVG bundle was added by looking for a missing `OriginState`
 /// and then adds it to the entity.
 pub fn add_origin_state(
     mut commands: Commands,
-    query: Query<Entity, (With<Handle<Svg>>, WithMesh, Without<OriginState>)>,
+    query: Query<Entity, (WithSvg, WithMesh, Without<OriginState>)>,
 ) {
     for entity in &query {
         commands.entity(entity).insert(OriginState {
@@ -82,12 +94,12 @@ pub fn add_origin_state(
 
 #[cfg(feature = "2d")]
 #[cfg(not(feature = "3d"))]
-type ChangedMesh = Changed<Mesh2dHandle>;
+type ChangedMesh = Changed<Mesh2d>;
 #[cfg(not(feature = "2d"))]
 #[cfg(feature = "3d")]
-type ChangedMesh = Changed<Handle<Mesh>>;
+type ChangedMesh = Changed<Mesh3d>;
 #[cfg(all(feature = "2d", feature = "3d"))]
-type ChangedMesh = Or<(Changed<Mesh2dHandle>, Changed<Handle<Mesh>>)>;
+type ChangedMesh = Or<(Changed<Mesh2d>, Changed<Mesh3d>)>;
 
 /// Gets all SVGs with a changed origin or transform and checks if the origin offset
 /// needs to be applied.
@@ -96,7 +108,8 @@ pub fn apply_origin(
     mut query: Query<
         (
             Entity,
-            &Handle<Svg>,
+            Option<&Svg2d>,
+            Option<&Svg3d>,
             &Origin,
             &mut OriginState,
             Ref<Transform>,
@@ -105,7 +118,21 @@ pub fn apply_origin(
         Or<(Changed<Origin>, Changed<Transform>, ChangedMesh)>,
     >,
 ) {
-    for (_, svg_handle, origin, mut origin_state, transform, mut global_transform) in &mut query {
+    for (
+        _,
+        svg2d_handle,
+        svg3d_handle,
+        origin,
+        mut origin_state,
+        transform,
+        mut global_transform,
+    ) in &mut query
+    {
+        let Some(svg_handle) =
+            svg2d_handle.map_or_else(|| svg3d_handle.map(|x| &x.0), |x| Some(&x.0))
+        else {
+            continue;
+        };
         if let Some(svg) = svgs.get(svg_handle) {
             if origin_state.previous != *origin {
                 let scaled_size = svg.size * transform.scale.xy();

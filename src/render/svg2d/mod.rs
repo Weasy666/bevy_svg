@@ -1,4 +1,7 @@
-use bevy::{asset::Handle, render::render_resource::Shader};
+use crate::{origin::Origin, svg::Svg};
+use bevy::{
+    asset::Handle, ecs::component::Component, render::mesh::Mesh2d, render::render_resource::Shader,
+};
 
 mod bundle;
 mod plugin;
@@ -8,3 +11,7 @@ pub const SVG_2D_SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(8_514_82
 
 pub use bundle::Svg2dBundle;
 pub use plugin::RenderPlugin;
+
+#[derive(Component, Default)]
+#[require(Mesh2d, Origin)]
+pub struct Svg2d(pub Handle<Svg>);

@@ -6,7 +6,6 @@ mod common;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "2d_complex_one_color".to_string(),
@@ -22,14 +21,13 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("asteroid_field.svg");
-    commands.spawn(Camera2dBundle::default());
-    commands.spawn(Svg2dBundle {
-        svg,
-        origin: Origin::Center,
-        transform: Transform {
+    commands.spawn((Camera2d::default(), Msaa::Sample4));
+    commands.spawn((
+        Svg2d(svg),
+        Origin::Center,
+        Transform {
             scale: Vec3::new(2.0, 2.0, 1.0),
             ..Default::default()
         },
-        ..Default::default()
-    });
+    ));
 }

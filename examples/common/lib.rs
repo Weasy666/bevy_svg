@@ -34,7 +34,7 @@ fn setup_legend(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraMono-Medium.ttf");
 
-    commands.spawn((TextBundle::from_sections([
+    commands.spawn((Text::from_sections([
         TextSection::new(
             "Key Info",
             TextStyle {
@@ -107,13 +107,17 @@ pub struct DontChange;
 /// origin when 'O' is pressed.
 fn keyboard_input_system(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut svg_query: Query<(&mut Origin, &mut Visibility), (With<Handle<Svg>>, Without<DontChange>)>,
+    mut svg_query: Query<
+        (&mut Origin, &mut Visibility),
+        (Or<(With<Svg2d>, With<Svg3d>)>, Without<DontChange>),
+    >,
     mut ui_query: Query<
         &mut Visibility,
         (
             With<Text>,
             Or<(With<FpsText>, With<OriginText>)>,
-            Without<Handle<Svg>>,
+            Without<Svg2d>,
+            Without<Svg3d>,
         ),
     >,
 ) {
@@ -132,7 +136,7 @@ fn keyboard_input_system(
                 Origin::Center => Origin::BottomLeft,
                 Origin::TopLeft => Origin::Center,
                 Origin::TopRight => Origin::TopLeft,
-                Origin::Custom(coord) => Origin::Custom(*coord)
+                Origin::Custom(coord) => Origin::Custom(*coord),
             }
         }
     } else if keyboard_input.just_pressed(KeyCode::KeyF) {
