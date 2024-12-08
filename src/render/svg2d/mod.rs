@@ -12,6 +12,7 @@ pub const SVG_2D_SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(8_514_82
 pub use bundle::Svg2dBundle;
 pub use plugin::RenderPlugin;
 
+/// A component for 2D SVGs.
 #[derive(Component, Default)]
 #[require(Mesh2d, Origin)]
 pub struct Svg2d(pub Handle<Svg>);

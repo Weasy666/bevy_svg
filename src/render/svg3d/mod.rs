@@ -15,6 +15,7 @@ pub use plugin::RenderPlugin;
 
 use crate::{origin::Origin, svg::Svg};
 
+/// A component for 3D SVGs.
 #[derive(Component, Default)]
 #[require(Mesh3d, Origin)]
 pub struct Svg3d(pub Handle<Svg>);
