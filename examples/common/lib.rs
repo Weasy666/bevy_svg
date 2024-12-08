@@ -76,7 +76,7 @@ fn keyboard_input_system(
         &mut Visibility,
         (
             With<Text>,
-            Or<(With<FpsText>, With<OriginText>)>,
+            Or<(With<FpsTextRoot>, With<OriginTextRoot>)>,
             Without<Svg2d>,
             Without<Svg3d>,
         ),
@@ -122,6 +122,9 @@ struct FpsMaxText;
 #[derive(Component)]
 struct FrameTimeText;
 
+#[derive(Component)]
+struct FpsTextRoot;
+
 #[derive(Resource)]
 struct FpsValues {
     min: f64,
@@ -152,6 +155,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
                 left: Val::Px(15.0),
                 ..default()
             },
+            FpsTextRoot,
         ))
         .with_children(|commands| {
             commands.spawn((
@@ -225,6 +229,9 @@ fn fps_text_update_system(
 #[derive(Component)]
 struct OriginText;
 
+#[derive(Component)]
+struct OriginTextRoot;
+
 fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraMono-Medium.ttf");
@@ -240,6 +247,7 @@ fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
                 left: Val::Px(15.0),
                 ..default()
             },
+            OriginTextRoot,
         ))
         .with_children(|commands| {
             commands.spawn((TextSpan::new("Origin: "), TextFont::from_font(font_bold)));
