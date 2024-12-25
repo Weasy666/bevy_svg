@@ -1,7 +1,5 @@
 use bevy::{
-    asset::Handle,
-    ecs::component::Component,
-    render::{mesh::Mesh3d, render_resource::Shader},
+    asset::Handle, ecs::component::Component, pbr::MeshMaterial3d, render::{mesh::Mesh3d, render_resource::Shader}
 };
 
 mod bundle;
@@ -17,5 +15,5 @@ use crate::{origin::Origin, svg::Svg};
 
 /// A component for 3D SVGs.
 #[derive(Component, Default)]
-#[require(Mesh3d, Origin)]
+#[require(Mesh3d, Origin, MeshMaterial3d<Svg>)]
 pub struct Svg3d(pub Handle<Svg>);

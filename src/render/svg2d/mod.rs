@@ -1,6 +1,6 @@
 use crate::{origin::Origin, svg::Svg};
 use bevy::{
-    asset::Handle, ecs::component::Component, render::mesh::Mesh2d, render::render_resource::Shader,
+    asset::Handle, ecs::component::Component, render::{mesh::Mesh2d, render_resource::Shader}, sprite::MeshMaterial2d,
 };
 
 mod bundle;
@@ -14,5 +14,5 @@ pub use plugin::RenderPlugin;
 
 /// A component for 2D SVGs.
 #[derive(Component, Default)]
-#[require(Mesh2d, Origin)]
+#[require(Mesh2d, Origin, MeshMaterial2d<Svg>)]
 pub struct Svg2d(pub Handle<Svg>);
