@@ -7,7 +7,6 @@ mod common;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "preloading".to_string(),
@@ -23,7 +22,7 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 }
 
 #[derive(Default, Eq, PartialEq)]
@@ -50,11 +49,7 @@ fn run(mut commands: Commands, asset_server: Res<AssetServer>, mut fsm: Local<Tu
             if *frames > 0 {
                 *fsm = TutorialFsm::Wait(handle.clone(), *frames - 1);
             } else if let Some(svg) = asset_server.get_handle("neutron_star.svg") {
-                commands.spawn(Svg2dBundle {
-                    svg,
-                    origin: Origin::Center,
-                    ..Default::default()
-                });
+                commands.spawn((Svg2d(svg), Origin::Center));
 
                 *fsm = TutorialFsm::Loaded;
                 dbg!("We loaded");

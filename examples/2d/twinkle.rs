@@ -6,7 +6,6 @@ mod common;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "2d_twinkle".to_string(),
@@ -22,10 +21,6 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("twinkle.svg");
-    commands.spawn(Camera2dBundle::default());
-    commands.spawn(Svg2dBundle {
-        svg,
-        origin: Origin::Center,
-        ..Default::default()
-    });
+    commands.spawn(Camera2d::default());
+    commands.spawn((Svg2d(svg), Origin::Center));
 }

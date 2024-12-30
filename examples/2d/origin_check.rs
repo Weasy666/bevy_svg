@@ -6,7 +6,6 @@ mod common;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "origin_check".to_string(),
@@ -22,18 +21,7 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("box.svg");
-    commands.spawn(Camera2dBundle::default());
-    commands.spawn(Svg2dBundle {
-        svg: svg.clone(),
-        origin: Origin::Center,
-        ..Default::default()
-    });
-    commands.spawn((
-        Svg2dBundle {
-            svg,
-            origin: Origin::TopLeft,
-            ..Default::default()
-        },
-        common::DontChange,
-    ));
+    commands.spawn(Camera2d::default());
+    commands.spawn((Svg2d(svg.clone()), Origin::Center));
+    commands.spawn((Svg2d(svg), Origin::TopLeft, common::DontChange));
 }
