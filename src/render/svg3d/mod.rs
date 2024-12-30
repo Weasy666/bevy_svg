@@ -1,5 +1,12 @@
 use bevy::{
-    asset::Handle, ecs::{component::{Component, ComponentId}, world::DeferredWorld}, pbr::MeshMaterial3d, prelude::Entity, render::{mesh::Mesh3d, render_resource::Shader}
+    asset::Handle,
+    ecs::{
+        component::{Component, ComponentId},
+        world::DeferredWorld,
+    },
+    pbr::MeshMaterial3d,
+    prelude::Entity,
+    render::{mesh::Mesh3d, render_resource::Shader},
 };
 
 mod bundle;

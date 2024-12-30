@@ -386,20 +386,16 @@ impl<'iter> Iterator for PathConvIter<'iter> {
                     close: true,
                 })
             }
-            None => {
-                if self.needs_end {
-                    self.needs_end = false;
-                    let last = self.prev;
-                    let first = self.first;
-                    Some(PathEvent::End {
-                        last,
-                        first,
-                        close: false,
-                    })
-                } else {
-                    None
+            None => self.needs_end.then(|| {
+                self.needs_end = false;
+                let last = self.prev;
+                let first = self.first;
+                PathEvent::End {
+                    last,
+                    first,
+                    close: false,
                 }
-            }
+            }),
         }
     }
 }

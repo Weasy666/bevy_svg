@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
 repository = "https://github.com/Weasy666/bevy_svg/"
-version = "0.14.0"
+version = "0.15.0"
 keywords = ["gamedev", "graphics", "bevy", "svg"]
 categories = ["game-engines", "game-development", "graphics", "multimedia", "rendering"]
 exclude = ["assets", "examples"]
@@ -27,11 +27,11 @@ copyless = "0.1"
 lyon_geom = "1.0"
 lyon_tessellation = "1.0"
 lyon_path = "1.0"
-usvg = "0.42"
+usvg = "0.44"
 svgtypes = "0.15"
 
 anyhow = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 
 [dev-dependencies]
 bevy = { version = "0.15", default-features = true }
