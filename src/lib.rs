@@ -51,6 +51,8 @@ pub mod prelude {
     };
 }
 
+pub use plugin::SvgSet;
+
 #[cfg(any(feature = "2d", feature = "3d"))]
 use crate::plugin::SvgRenderPlugin;
 use crate::{loader::SvgAssetLoader, svg::Svg};
