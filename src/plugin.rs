@@ -41,9 +41,9 @@ use crate::{
 
 /// Sets for this plugin.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
-pub enum Set {
+pub enum SvgSet {
     /// Set in which [`Svg2dBundle`](crate::bundle::Svg2dBundle)s get drawn.
-    SVG,
+    Svg, // TODO: do we need this? Would it be more useful to split the different parts of this set?
 }
 
 /// A plugin that makes sure your [`Svg`]s get rendered
@@ -51,10 +51,10 @@ pub struct SvgRenderPlugin;
 
 impl Plugin for SvgRenderPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostUpdate, (origin::add_origin_state.in_set(Set::SVG),))
+        app.add_systems(PostUpdate, (origin::add_origin_state.in_set(SvgSet::Svg),))
             .add_systems(
                 Last,
-                (origin::apply_origin, svg_mesh_linker.in_set(Set::SVG)),
+                (origin::apply_origin, svg_mesh_linker.in_set(SvgSet::Svg)),
             )
             .add_plugins(render::SvgPlugin);
     }
