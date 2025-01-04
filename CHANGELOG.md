@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.1] - 2025-01-04
+### Changed
+- Expose `SvgSet` ([#48](https://github.com/Weasy666/bevy_svg/pull/48))
+
 ## [0.15.0] - 2024-12-30
 ### Changed
 - Update bevy to `0.15` ([#44](https://github.com/Weasy666/bevy_svg/pull/44), [#46](https://github.com/Weasy666/bevy_svg/pull/46))

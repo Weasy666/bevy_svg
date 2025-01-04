@@ -38,7 +38,7 @@ mod util;
 
 /// Import this module as `use bevy_svg::prelude::*` to get convenient imports.
 pub mod prelude {
-    pub use super::SvgPlugin;
+    pub use super::{SvgPlugin, SvgSet};
     #[cfg(any(feature = "2d", feature = "3d"))]
     pub use crate::origin::Origin;
     #[cfg(feature = "2d")]
