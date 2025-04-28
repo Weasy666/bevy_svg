@@ -18,10 +18,9 @@ use bevy::{
         entity::Entity,
         event::EventReader,
         query::{Added, Changed, Or},
-        schedule::{IntoSystemConfigs, SystemSet},
+        schedule::{IntoScheduleConfigs, SystemSet},
         system::{Commands, Query, Res, ResMut},
     },
-    hierarchy::DespawnRecursiveExt,
     log::debug,
     prelude::{Last, PostUpdate},
     render::mesh::Mesh,
@@ -149,7 +148,7 @@ fn svg_mesh_linker(
                         .or_else(|| svg_3d.map(|x| x.0.id() == *id))
                         .unwrap_or(false)
                 }) {
-                    commands.entity(entity).despawn_recursive();
+                    commands.entity(entity).despawn();
                 }
             }
             AssetEvent::Unused { .. } => {
