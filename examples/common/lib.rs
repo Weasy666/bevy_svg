@@ -204,22 +204,22 @@ fn fps_text_update_system(
 ) {
     if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
         if let Some(fps_smoothed) = fps.smoothed() {
-            if let Ok(mut text) = query.p0().get_single_mut() {
+            if let Ok(mut text) = query.p0().single_mut() {
                 *text.write_span() = format!("{fps_smoothed:.2}");
             }
             fps_values.min = fps_values.min.min(fps_smoothed);
-            if let Ok(mut text) = query.p1().get_single_mut() {
+            if let Ok(mut text) = query.p1().single_mut() {
                 *text.write_span() = format!("{:.2}", fps_values.min);
             }
             fps_values.max = fps_values.max.max(fps_smoothed);
-            if let Ok(mut text) = query.p2().get_single_mut() {
+            if let Ok(mut text) = query.p2().single_mut() {
                 *text.write_span() = format!("{:.2}", fps_values.max);
             }
         }
     }
     if let Some(frame_time) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_TIME) {
         if let Some(frame_time_smoothed) = frame_time.smoothed() {
-            if let Ok(mut text) = query.p3().get_single_mut() {
+            if let Ok(mut text) = query.p3().single_mut() {
                 *text.write_span() = format!("{frame_time_smoothed:.2}");
             }
         }
@@ -268,7 +268,7 @@ fn origin_text_update_system(
 
 pub fn camera_zoom_system(
     mut evr_scroll: EventReader<MouseWheel>,
-    mut camera: Query<(Option<Mut<OrthographicProjection>>, Mut<Transform>), With<Camera>>,
+    mut camera: Query<(Option<Mut<Projection>>, Mut<Transform>), With<Camera>>,
 ) {
     for ev in evr_scroll.read() {
         for (projection, mut transform) in camera.iter_mut() {
@@ -277,12 +277,14 @@ pub fn camera_zoom_system(
                 MouseScrollUnit::Pixel => ev.y,
             };
             if let Some(mut projection) = projection {
-                projection.scale -= if projection.scale <= 1.0 {
-                    amount * 0.05
-                } else {
-                    amount
-                };
-                projection.scale = projection.scale.clamp(0.01, 10.0);
+                if let Projection::Orthographic(ref mut projection) = *projection {
+                    projection.scale -= if projection.scale <= 1.0 {
+                        amount * 0.05
+                    } else {
+                        amount
+                    };
+                    projection.scale = projection.scale.clamp(0.01, 10.0);
+                }
             } else {
                 transform.translation.z -= amount;
             }

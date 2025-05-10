@@ -131,7 +131,7 @@ impl Svg {
             trace!("---");
             trace!("node: {:?}", node.id());
             match node {
-                usvg::Node::Group(ref group) => {
+                usvg::Node::Group(group) => {
                     let transform = transform.pre_concat(group.transform());
                     trace!("group: {:?}", group.id());
                     if !group.should_isolate() {
@@ -146,7 +146,7 @@ impl Svg {
                         todo!("group isolate not implemented")
                     }
                 }
-                usvg::Node::Text(ref text) => {
+                usvg::Node::Text(text) => {
                     trace!("text: {:?}", text.id());
                     let transform = text.abs_transform();
 
@@ -161,7 +161,7 @@ impl Svg {
                         });
                     }
                 }
-                usvg::Node::Path(ref path) => {
+                usvg::Node::Path(path) => {
                     if !path.is_visible() {
                         trace!("path: {:?} - invisible", path.id());
                         continue;

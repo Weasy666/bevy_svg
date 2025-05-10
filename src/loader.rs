@@ -1,7 +1,7 @@
 use bevy::{
     asset::{io::Reader, AssetLoader, LoadContext},
     log::debug,
-    utils::ConditionalSendFuture,
+    tasks::ConditionalSendFuture,
 };
 use thiserror::Error;
 
