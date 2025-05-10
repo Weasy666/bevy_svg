@@ -1,7 +1,7 @@
 [package]
 authors = ["Daniel Wiesenberg <weasy@hotmail.de>"]
 description = "Load and draw SVG files in Bevy."
-edition = "2021"
+edition = "2024"
 license = "MIT OR Apache-2.0"
 name = "bevy_svg"
 readme = "README.md"
@@ -10,7 +10,7 @@ version = "0.15.1"
 keywords = ["gamedev", "graphics", "bevy", "svg"]
 categories = ["game-engines", "game-development", "graphics", "multimedia", "rendering"]
 exclude = ["assets", "examples"]
-rust-version = "1.79"
+rust-version = "1.85"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,7 +21,7 @@ default = ["2d", "3d"]
 3d = ["bevy/bevy_pbr"]
 
 [dependencies]
-bevy = { version = "0.16", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_render"] }
+bevy = { version = "0.16", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_log", "bevy_render"] }
 copyless = "0.1"
 
 lyon_geom = "1.0"
