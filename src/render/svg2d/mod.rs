@@ -1,6 +1,6 @@
 use crate::{origin::Origin, svg::Svg};
 use bevy::{
-    asset::{Handle, weak_handle},
+    asset::{Handle, uuid_handle},
     ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld},
     mesh::Mesh2d,
     shader::Shader,
@@ -12,7 +12,7 @@ mod plugin;
 
 /// Handle to the custom shader with a unique random ID
 pub const SVG_2D_SHADER_HANDLE: Handle<Shader> =
-    weak_handle!("00000000-0000-0000-762a-bdb29826d266");
+    uuid_handle!("00000000-0000-0000-762a-bdb29826d266");
 
 pub use bundle::Svg2dBundle;
 pub use plugin::RenderPlugin;

@@ -16,14 +16,14 @@ use bevy::{
     asset::{AssetEvent, Assets},
     ecs::{
         entity::Entity,
-        event::EventReader,
+        message::MessageReader,
         query::{Added, Changed, Or},
         schedule::{IntoScheduleConfigs, SystemSet},
         system::{Commands, Query, Res, ResMut},
     },
     log::debug,
-    prelude::{Last, PostUpdate},
     mesh::Mesh,
+    prelude::{Last, PostUpdate},
 };
 
 #[cfg(feature = "2d")]
@@ -81,7 +81,7 @@ type SvgMeshComponents = (
 /// Bevy system which queries for all [`Svg`] bundles and adds the correct [`Mesh`] to them.
 fn svg_mesh_linker(
     mut commands: Commands,
-    mut svg_events: EventReader<AssetEvent<Svg>>,
+    mut svg_events: MessageReader<AssetEvent<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
     svgs: Res<Assets<Svg>>,
     mut query: Query<SvgMeshComponents>,
