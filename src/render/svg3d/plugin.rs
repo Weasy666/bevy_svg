@@ -1,11 +1,10 @@
+use crate::svg::Svg;
 use bevy::{
     app::{App, Plugin},
-    asset::{load_internal_asset, AssetApp},
+    asset::{AssetApp, load_internal_asset},
     pbr::{Material, MaterialPlugin},
-    render::render_resource::{Shader, ShaderRef},
+    shader::{Shader, ShaderRef},
 };
-
-use crate::svg::Svg;
 
 use super::SVG_3D_SHADER_HANDLE;
 

@@ -1,5 +1,5 @@
 use bevy::{
-    asset::{io::Reader, AssetLoader, LoadContext},
+    asset::{AssetLoader, LoadContext, io::Reader},
     log::debug,
     tasks::ConditionalSendFuture,
 };

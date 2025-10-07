@@ -1,11 +1,9 @@
 use bevy::{
-    asset::{weak_handle, Handle},
-    ecs::{
-        component::{Component, HookContext},
-        world::DeferredWorld,
-    },
+    asset::{Handle, weak_handle},
+    ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld},
+    mesh::Mesh3d,
     pbr::MeshMaterial3d,
-    render::{mesh::Mesh3d, render_resource::Shader},
+    shader::Shader,
 };
 
 mod bundle;

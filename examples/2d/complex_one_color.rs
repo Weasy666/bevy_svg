@@ -9,7 +9,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "2d_complex_one_color".to_string(),
-                resolution: (600., 600.).into(),
+                resolution: (600, 600).into(),
                 ..Default::default()
             }),
             ..Default::default()

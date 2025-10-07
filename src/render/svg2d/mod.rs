@@ -1,12 +1,10 @@
 use crate::{origin::Origin, svg::Svg};
 use bevy::{
-    asset::{weak_handle, Handle},
-    ecs::{
-        component::{Component, HookContext},
-        world::DeferredWorld,
-    },
-    render::{mesh::Mesh2d, render_resource::Shader},
-    sprite::MeshMaterial2d,
+    asset::{Handle, weak_handle},
+    ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld},
+    mesh::Mesh2d,
+    shader::Shader,
+    sprite_render::MeshMaterial2d,
 };
 
 mod bundle;
