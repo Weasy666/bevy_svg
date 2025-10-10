@@ -10,7 +10,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "preloading".to_string(),
-                resolution: (600., 600.).into(),
+                resolution: (600, 600).into(),
                 ..Default::default()
             }),
             ..Default::default()
@@ -22,7 +22,7 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
 }
 
 #[derive(Default, Eq, PartialEq)]

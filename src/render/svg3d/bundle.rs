@@ -1,11 +1,9 @@
 //! Bevy [`Bundle`] representing an SVG entity.
 
 use bevy::{
+    camera::visibility::{InheritedVisibility, ViewVisibility, Visibility},
     ecs::bundle::Bundle,
-    render::{
-        mesh::Mesh3d,
-        view::{InheritedVisibility, ViewVisibility, Visibility},
-    },
+    mesh::Mesh3d,
     transform::components::{GlobalTransform, Transform},
 };
 

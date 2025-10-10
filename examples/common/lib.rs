@@ -39,7 +39,7 @@ fn setup_legend(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn((
             Text::default(),
             TextColor::WHITE,
-            TextFont::from_font(font_medium).with_font_size(20.0),
+            TextFont::from_font_size(20.0).with_font(font_medium),
             Node {
                 position_type: PositionType::Absolute,
                 top: Val::Px(5.0),
@@ -50,13 +50,22 @@ fn setup_legend(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_children(|commands| {
             commands.spawn((
                 TextSpan::new("Key Info"),
-                TextFont::from_font(font_bold.clone()).with_font_size(30.0),
+                TextFont::from_font_size(30.0).with_font(font_bold.clone()),
             ));
-            commands.spawn((TextSpan::new("\nF"), TextFont::from_font(font_bold.clone())));
+            commands.spawn((
+                TextSpan::new("\nF"),
+                TextFont::from_font_size(20.0).with_font(font_bold.clone()),
+            ));
             commands.spawn(TextSpan::new(" - Toggle Frame Diagnostics"));
-            commands.spawn((TextSpan::new("\nO"), TextFont::from_font(font_bold.clone())));
+            commands.spawn((
+                TextSpan::new("\nO"),
+                TextFont::from_font_size(20.0).with_font(font_bold.clone()),
+            ));
             commands.spawn(TextSpan::new(" - Cycle through Origins"));
-            commands.spawn((TextSpan::new("\nV"), TextFont::from_font(font_bold.clone())));
+            commands.spawn((
+                TextSpan::new("\nV"),
+                TextFont::from_font_size(20.0).with_font(font_bold.clone()),
+            ));
             commands.spawn(TextSpan::new(" - Toggle visibility"));
         });
 }
@@ -148,7 +157,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn((
             Text::default(),
             TextColor::WHITE,
-            TextFont::from_font(font_medium).with_font_size(20.0),
+            TextFont::from_font_size(20.0).with_font(font_medium),
             Node {
                 position_type: PositionType::Absolute,
                 top: Val::Px(5.0),
@@ -160,7 +169,7 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_children(|commands| {
             commands.spawn((
                 TextSpan::new("FPS: "),
-                TextFont::from_font(font_bold.clone()).with_font_size(30.0),
+                TextFont::from_font_size(30.0).with_font(font_bold.clone()),
             ));
             commands.spawn((
                 TextSpan::default(),
@@ -170,18 +179,21 @@ fn setup_fps_counter(mut commands: Commands, asset_server: Res<AssetServer>) {
             ));
             commands.spawn((
                 TextSpan::new("\n(min: "),
-                TextFont::from_font(font_bold.clone()),
+                TextFont::from_font_size(20.0).with_font(font_bold.clone()),
             ));
             commands.spawn((TextSpan::default(), TextColor::from(GOLD), FpsMinText));
             commands.spawn((
                 TextSpan::new(" - max: "),
-                TextFont::from_font(font_bold.clone()),
+                TextFont::from_font_size(20.0).with_font(font_bold.clone()),
             ));
             commands.spawn((TextSpan::default(), TextColor::from(GOLD), FpsMaxText));
-            commands.spawn((TextSpan::new(")"), TextFont::from_font(font_bold.clone())));
+            commands.spawn((
+                TextSpan::new(")"),
+                TextFont::from_font_size(20.0).with_font(font_bold.clone()),
+            ));
             commands.spawn((
                 TextSpan::new("\nms/frame: "),
-                TextFont::from_font(font_bold.clone()).with_font_size(30.0),
+                TextFont::from_font_size(30.0).with_font(font_bold.clone()),
             ));
             commands.spawn((
                 TextSpan::default(),
@@ -240,7 +252,7 @@ fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn((
             Text::default(),
             TextColor::WHITE,
-            TextFont::from_font(font_medium).with_font_size(20.0),
+            TextFont::from_font_size(20.0).with_font(font_medium),
             Node {
                 position_type: PositionType::Absolute,
                 bottom: Val::Px(5.0),
@@ -250,7 +262,10 @@ fn setup_origin_text(mut commands: Commands, asset_server: Res<AssetServer>) {
             OriginTextRoot,
         ))
         .with_children(|commands| {
-            commands.spawn((TextSpan::new("Origin: "), TextFont::from_font(font_bold)));
+            commands.spawn((
+                TextSpan::new("Origin: "),
+                TextFont::from_font_size(20.0).with_font(font_bold),
+            ));
             commands.spawn((TextSpan::default(), TextColor::from(GOLD), OriginText));
         });
 }
@@ -267,10 +282,10 @@ fn origin_text_update_system(
 }
 
 pub fn camera_zoom_system(
-    mut evr_scroll: EventReader<MouseWheel>,
+    mut msgr_scroll: MessageReader<MouseWheel>,
     mut camera: Query<(Option<Mut<Projection>>, Mut<Transform>), With<Camera>>,
 ) {
-    for ev in evr_scroll.read() {
+    for ev in msgr_scroll.read() {
         for (projection, mut transform) in camera.iter_mut() {
             let amount = match ev.unit {
                 MouseScrollUnit::Line => ev.y,

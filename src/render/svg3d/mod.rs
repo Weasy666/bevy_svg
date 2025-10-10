@@ -1,11 +1,9 @@
 use bevy::{
-    asset::{weak_handle, Handle},
-    ecs::{
-        component::{Component, HookContext},
-        world::DeferredWorld,
-    },
+    asset::{Handle, uuid_handle},
+    ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld},
+    mesh::Mesh3d,
     pbr::MeshMaterial3d,
-    render::{mesh::Mesh3d, render_resource::Shader},
+    shader::Shader,
 };
 
 mod bundle;
@@ -13,7 +11,7 @@ mod plugin;
 
 /// Handle to the custom shader with a unique random ID
 pub const SVG_3D_SHADER_HANDLE: Handle<Shader> =
-    weak_handle!("00000000-0000-0000-762a-bdb74c2a5c66");
+    uuid_handle!("00000000-0000-0000-762a-bdb74c2a5c66");
 
 pub use bundle::Svg3dBundle;
 pub use plugin::RenderPlugin;

@@ -9,7 +9,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "2d_two_colors".to_string(),
-                resolution: (600., 600.).into(),
+                resolution: (600, 600).into(),
                 ..Default::default()
             }),
             ..Default::default()
@@ -21,6 +21,6 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("neutron_star.svg");
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
     commands.spawn((Svg2d(svg), Origin::Center));
 }

@@ -16,21 +16,21 @@ use bevy::{
     asset::{AssetEvent, Assets},
     ecs::{
         entity::Entity,
-        event::EventReader,
+        message::MessageReader,
         query::{Added, Changed, Or},
         schedule::{IntoScheduleConfigs, SystemSet},
         system::{Commands, Query, Res, ResMut},
     },
     log::debug,
+    mesh::Mesh,
     prelude::{Last, PostUpdate},
-    render::mesh::Mesh,
 };
 
 #[cfg(feature = "2d")]
-use bevy::render::mesh::Mesh2d;
+use bevy::mesh::Mesh2d;
 
 #[cfg(feature = "3d")]
-use bevy::render::mesh::Mesh3d;
+use bevy::mesh::Mesh3d;
 
 use crate::{
     origin,
@@ -81,7 +81,7 @@ type SvgMeshComponents = (
 /// Bevy system which queries for all [`Svg`] bundles and adds the correct [`Mesh`] to them.
 fn svg_mesh_linker(
     mut commands: Commands,
-    mut svg_events: EventReader<AssetEvent<Svg>>,
+    mut svg_messages: MessageReader<AssetEvent<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
     svgs: Res<Assets<Svg>>,
     mut query: Query<SvgMeshComponents>,
@@ -90,8 +90,8 @@ fn svg_mesh_linker(
         Or<(Changed<Svg2d>, Changed<Svg3d>, Added<Svg2d>, Added<Svg3d>)>,
     >,
 ) {
-    for event in svg_events.read() {
-        match event {
+    for message in svg_messages.read() {
+        match message {
             AssetEvent::Added { .. } => (),
             AssetEvent::LoadedWithDependencies { id } => {
                 for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg_2d, svg_3d, ..)| {

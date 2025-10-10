@@ -1,7 +1,7 @@
 #[cfg(feature = "2d")]
-use bevy::render::mesh::Mesh2d;
+use bevy::mesh::Mesh2d;
 #[cfg(feature = "3d")]
-use bevy::render::mesh::Mesh3d;
+use bevy::mesh::Mesh3d;
 use bevy::{
     asset::Assets,
     ecs::{
