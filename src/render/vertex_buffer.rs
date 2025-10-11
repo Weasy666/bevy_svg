@@ -1,10 +1,8 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::{Color, ColorToComponents},
-    render::{
-        mesh::{Indices, Mesh, VertexAttributeValues},
-        render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    mesh::{Indices, Mesh, VertexAttributeValues},
+    render::render_resource::PrimitiveTopology,
 };
 use copyless::VecHelper;
 use lyon_path::math::Point;

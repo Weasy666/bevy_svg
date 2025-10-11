@@ -1,11 +1,10 @@
+use crate::{render::svg2d::SVG_2D_SHADER_HANDLE, svg::Svg};
 use bevy::{
     app::{App, Plugin},
-    asset::{load_internal_asset, AssetApp},
-    render::render_resource::{Shader, ShaderRef},
-    sprite::{Material2d, Material2dPlugin},
+    asset::{AssetApp, load_internal_asset},
+    shader::{Shader, ShaderRef},
+    sprite_render::{Material2d, Material2dPlugin},
 };
-
-use crate::{render::svg2d::SVG_2D_SHADER_HANDLE, svg::Svg};
 
 /// Plugin that renders [`Svg`](crate::svg::Svg)s in 2D
 pub struct RenderPlugin;

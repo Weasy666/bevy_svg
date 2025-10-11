@@ -1,13 +1,13 @@
+use super::SVG_3D_SHADER_HANDLE;
+use crate::svg::Svg;
 use bevy::{
     app::{App, Plugin},
-    asset::{load_internal_asset, AssetApp},
-    pbr::{Material, MaterialPlugin},
-    render::render_resource::{Shader, ShaderRef},
+    asset::{AssetApp, load_internal_asset},
+    mesh::MeshVertexBufferLayoutRef,
+    pbr::{Material, MaterialPipeline, MaterialPipelineKey, MaterialPlugin},
+    render::render_resource::{RenderPipelineDescriptor, SpecializedMeshPipelineError},
+    shader::{Shader, ShaderRef},
 };
-
-use crate::svg::Svg;
-
-use super::SVG_3D_SHADER_HANDLE;
 
 /// Plugin that renders [`Svg`](crate::svg::Svg)s in 2D
 pub struct RenderPlugin;
@@ -24,5 +24,16 @@ impl Plugin for RenderPlugin {
 impl Material for Svg {
     fn fragment_shader() -> ShaderRef {
         SVG_3D_SHADER_HANDLE.into()
+    }
+
+    fn specialize(
+        _pipeline: &MaterialPipeline,
+        descriptor: &mut RenderPipelineDescriptor,
+        _layout: &MeshVertexBufferLayoutRef,
+        _key: MaterialPipelineKey<Self>,
+    ) -> bevy::prelude::Result<(), SpecializedMeshPipelineError> {
+        descriptor.primitive.cull_mode = None;
+
+        Ok(())
     }
 }

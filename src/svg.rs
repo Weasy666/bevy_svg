@@ -3,23 +3,24 @@ use bevy::{
     color::Color,
     log::{debug, trace, warn},
     math::Vec2,
-    reflect::{std_traits::ReflectDefault, Reflect},
-    render::{mesh::Mesh, render_resource::AsBindGroup},
+    mesh::Mesh,
+    reflect::{Reflect, std_traits::ReflectDefault},
+    render::render_resource::AsBindGroup,
 };
 use copyless::VecHelper;
 use lyon_path::PathEvent;
-use lyon_tessellation::{math::Point, FillTessellator, StrokeTessellator};
+use lyon_tessellation::{FillTessellator, StrokeTessellator, math::Point};
 use std::collections::VecDeque;
 use std::iter::Peekable;
 use std::path::PathBuf;
 use std::sync::Arc;
 use svgtypes::ViewBox;
 use usvg::{
-    tiny_skia_path::{PathSegment, PathSegmentsIter},
     PaintOrder,
+    tiny_skia_path::{PathSegment, PathSegmentsIter},
 };
 
-use crate::{loader::FileSvgError, render::tessellation, Convert};
+use crate::{Convert, loader::FileSvgError, render::tessellation};
 
 /// A loaded and deserialized SVG file.
 #[derive(AsBindGroup, Reflect, Debug, Clone, Asset)]
