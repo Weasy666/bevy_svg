@@ -7,14 +7,12 @@ use bevy::{
     sprite_render::MeshMaterial2d,
 };
 
-mod bundle;
 mod plugin;
 
 /// Handle to the custom shader with a unique random ID
 pub const SVG_2D_SHADER_HANDLE: Handle<Shader> =
     uuid_handle!("00000000-0000-0000-762a-bdb29826d266");
 
-pub use bundle::Svg2dBundle;
 pub use plugin::RenderPlugin;
 
 /// A component for 2D SVGs.
