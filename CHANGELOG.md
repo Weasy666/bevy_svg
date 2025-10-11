@@ -12,8 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-
 ## [Unreleased]
+
+## [0.17.0] - 2025-10-11
+### Changed
+- Update bevy to `0.17` ([#55](https://github.com/Weasy666/bevy_svg/pull/55)  Thanks @Kneelawk)
+
+### Removed
+- Deprecated `Svg2dBundle` and `Svg3dBundle` ([#57](https://github.com/Weasy666/bevy_svg/pull/57))
 
 ## [0.16.0-rc1] - 2025-05-10
 ### Changed

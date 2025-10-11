@@ -22,7 +22,7 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let svg = asset_server.load("asteroid_field.svg");
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
     commands.spawn((
         Svg2d(svg),
         Origin::Center,

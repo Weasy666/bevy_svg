@@ -8,8 +8,8 @@ mod svg2d;
 mod svg3d;
 
 #[cfg(feature = "2d")]
-pub use svg2d::{Svg2d, Svg2dBundle};
+pub use svg2d::Svg2d;
 #[cfg(feature = "3d")]
-pub use svg3d::{Svg3d, Svg3dBundle};
+pub use svg3d::Svg3d;
 
 pub use plugin::SvgPlugin;

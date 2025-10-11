@@ -42,9 +42,9 @@ pub mod prelude {
     #[cfg(any(feature = "2d", feature = "3d"))]
     pub use crate::origin::Origin;
     #[cfg(feature = "2d")]
-    pub use crate::render::{Svg2d, Svg2dBundle};
+    pub use crate::render::Svg2d;
     #[cfg(feature = "3d")]
-    pub use crate::render::{Svg3d, Svg3dBundle};
+    pub use crate::render::Svg3d;
     pub use crate::svg::Svg;
     pub use lyon_tessellation::{
         FillOptions, FillRule, LineCap, LineJoin, Orientation, StrokeOptions,
@@ -65,6 +65,7 @@ use bevy::{
 pub struct SvgPlugin;
 
 impl Plugin for SvgPlugin {
+    #[inline]
     fn build(&self, app: &mut App) {
         app.init_asset::<Svg>()
             .init_asset_loader::<SvgAssetLoader>();
