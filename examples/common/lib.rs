@@ -282,7 +282,7 @@ fn origin_text_update_system(
 }
 
 pub fn camera_zoom_system(
-    mut evr_scroll: EventReader<MouseWheel>,
+    mut evr_scroll: MessageReader<MouseWheel>,
     mut camera: Query<(Option<Mut<Projection>>, Mut<Transform>), With<Camera>>,
 ) {
     for ev in evr_scroll.read() {

@@ -10,17 +10,14 @@ use bevy::{
 use copyless::VecHelper;
 use lyon_path::PathEvent;
 use lyon_tessellation::{FillTessellator, StrokeTessellator, math::Point};
-use std::collections::VecDeque;
-use std::iter::Peekable;
-use std::path::PathBuf;
-use std::sync::Arc;
+use std::{collections::VecDeque, iter::Peekable, path::PathBuf, sync::Arc};
 use svgtypes::ViewBox;
 use usvg::{
     PaintOrder,
     tiny_skia_path::{PathSegment, PathSegmentsIter},
 };
 
-use crate::{Convert, loader::FileSvgError, render::tessellation};
+use crate::{Convert, loader::FileSvgError, render::tessellation, util};
 
 /// A loaded and deserialized SVG file.
 #[derive(AsBindGroup, Reflect, Debug, Clone, Asset)]
@@ -443,8 +440,8 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
                 Color::srgba_u8(c.red, c.green, c.blue, self.opacity().to_u8())
             }
             // TODO: implement, take average for now
-            usvg::Paint::LinearGradient(g) => crate::util::paint::avg_gradient(g),
-            usvg::Paint::RadialGradient(g) => crate::util::paint::avg_gradient(g),
+            usvg::Paint::LinearGradient(g) => util::paint::avg_gradient(g),
+            usvg::Paint::RadialGradient(g) => util::paint::avg_gradient(g),
             usvg::Paint::Pattern(_) => Color::NONE,
         };
 

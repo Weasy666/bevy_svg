@@ -65,6 +65,7 @@ use bevy::{
 pub struct SvgPlugin;
 
 impl Plugin for SvgPlugin {
+    #[inline]
     fn build(&self, app: &mut App) {
         app.init_asset::<Svg>()
             .init_asset_loader::<SvgAssetLoader>();
