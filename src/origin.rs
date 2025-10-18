@@ -15,10 +15,12 @@ use bevy::{
     transform::components::{GlobalTransform, Transform},
 };
 
-use crate::{
-    render::{Svg2d, Svg3d},
-    svg::Svg,
-};
+#[cfg(feature = "2d")]
+use crate::render::Svg2d;
+#[cfg(feature = "3d")]
+use crate::render::Svg3d;
+
+use crate::svg::Svg;
 
 #[derive(Clone, Component, Copy, Debug, Default, PartialEq)]
 /// Origin of the coordinate system.
