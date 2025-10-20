@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.1] - 2025-10-20
+### Fixed
+- Fix single-feature build for users ([#58](https://github.com/Weasy666/bevy_svg/pull/58)  Thanks @Joacchim)
+
 ## [0.17.0] - 2025-10-11
 ### Changed
 - Update bevy to `0.17` ([#55](https://github.com/Weasy666/bevy_svg/pull/55)  Thanks @Kneelawk)
