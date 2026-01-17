@@ -21,7 +21,7 @@ default = ["2d", "3d"]
 3d = ["bevy/bevy_pbr"]
 
 [dependencies]
-bevy = { version = "0.17", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_log", "bevy_render", "bevy_sprite_render"] }
+bevy = { version = "0.18", default-features = false, features = ["bevy_asset", "bevy_core_pipeline", "bevy_log", "bevy_render", "bevy_sprite_render"] }
 copyless = "0.1"
 
 lyon_geom = "1.0"
