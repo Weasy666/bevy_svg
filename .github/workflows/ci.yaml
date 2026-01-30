@@ -97,4 +97,4 @@ jobs:
       - name: Install Dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev
       - name: Build examples
-        run: ./scripts/build_examples.sh
+        run: chmod +x ./scripts/build_examples.sh && ./scripts/build_examples.sh
