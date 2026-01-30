@@ -2,7 +2,6 @@
 set -euo pipefail
 
 echo "Building examples…"
-
 awk '
   /^\[\[example\]\]/ {
     name=""
