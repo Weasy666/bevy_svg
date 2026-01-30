@@ -63,6 +63,7 @@ impl AssetLoader for SvgAssetLoader {
 }
 
 /// An error that occurs when loading a texture
+#[allow(clippy::enum_variant_names)]
 #[derive(Error, Debug)]
 pub enum SvgError {
     #[error("invalid file name")]

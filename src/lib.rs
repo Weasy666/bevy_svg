@@ -6,25 +6,12 @@
 //! Simply add the crate in your `Cargo.toml` and add the plugin to your app
 //!
 //! ```rust
-//! fn main() {
 //!     App::new()
 //!         .add_plugin(bevy_svg::prelude::SvgPlugin)
 //!         .run();
-//! }
 //! ```
 
-// rustc
-#![deny(future_incompatible, nonstandard_style)]
-#![warn(missing_docs, rust_2018_idioms, unused)]
-#![allow(elided_lifetimes_in_paths)]
-// clippy
-#![warn(
-    clippy::all,
-    clippy::restriction,
-    clippy::pedantic,
-    clippy::nursery,
-    clippy::cargo
-)]
+#![allow(clippy::type_complexity)]
 
 mod loader;
 #[cfg(any(feature = "2d", feature = "3d"))]
