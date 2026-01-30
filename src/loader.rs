@@ -1,13 +1,14 @@
 use bevy::{
     asset::{AssetLoader, LoadContext, io::Reader},
     log::debug,
+    reflect::TypePath,
     tasks::ConditionalSendFuture,
 };
 use thiserror::Error;
 
 use crate::svg::Svg;
 
-#[derive(Default)]
+#[derive(Default, TypePath)]
 pub struct SvgAssetLoader;
 
 impl AssetLoader for SvgAssetLoader {
@@ -22,34 +23,33 @@ impl AssetLoader for SvgAssetLoader {
         load_context: &mut LoadContext<'_>,
     ) -> impl ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
-            debug!("Parsing SVG: {} ...", load_context.path().display());
+            debug!("Parsing SVG: {} ...", load_context.path());
             let mut bytes = Vec::new();
             reader
                 .read_to_end(&mut bytes)
                 .await
                 .map_err(|e| FileSvgError {
                     error: e.into(),
-                    path: load_context.path().display().to_string(),
+                    path: load_context.path().to_string(),
                 })?;
 
-            let mut svg = Svg::from_bytes(&bytes, load_context.path(), None::<&std::path::Path>)?;
+            let mut svg =
+                Svg::from_bytes(&bytes, load_context.path().path(), None::<&std::path::Path>)?;
             let name = &load_context
+                .path()
                 .path()
                 .file_name()
                 .ok_or_else(|| FileSvgError {
-                    error: SvgError::InvalidFileName(load_context.path().display().to_string()),
-                    path: load_context.path().display().to_string(),
+                    error: SvgError::InvalidFileName(load_context.path().to_string()),
+                    path: load_context.path().to_string(),
                 })?
                 .to_string_lossy();
             svg.name = name.to_string();
-            debug!("Parsing SVG: {} ... Done", load_context.path().display());
+            debug!("Parsing SVG: {} ... Done", load_context.path());
 
-            debug!("Tessellating SVG: {} ...", load_context.path().display());
+            debug!("Tessellating SVG: {} ...", load_context.path());
             let mesh = svg.tessellate();
-            debug!(
-                "Tessellating SVG: {} ... Done",
-                load_context.path().display()
-            );
+            debug!("Tessellating SVG: {} ... Done", load_context.path());
             let mesh_handle = load_context.add_labeled_asset("mesh".to_string(), mesh);
             svg.mesh = mesh_handle;
 
