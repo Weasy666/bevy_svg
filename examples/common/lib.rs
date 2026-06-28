@@ -1,6 +1,6 @@
 use bevy::color::palettes::css::{GOLD, GREEN};
 use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
-use bevy::text::TextSpanAccess;
+use bevy::text::TextSection;
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
@@ -217,22 +217,22 @@ fn fps_text_update_system(
     if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
         if let Some(fps_smoothed) = fps.smoothed() {
             if let Ok(mut text) = query.p0().single_mut() {
-                *text.write_span() = format!("{fps_smoothed:.2}");
+                *text.get_text_mut() = format!("{fps_smoothed:.2}");
             }
             fps_values.min = fps_values.min.min(fps_smoothed);
             if let Ok(mut text) = query.p1().single_mut() {
-                *text.write_span() = format!("{:.2}", fps_values.min);
+                *text.get_text_mut() = format!("{:.2}", fps_values.min);
             }
             fps_values.max = fps_values.max.max(fps_smoothed);
             if let Ok(mut text) = query.p2().single_mut() {
-                *text.write_span() = format!("{:.2}", fps_values.max);
+                *text.get_text_mut() = format!("{:.2}", fps_values.max);
             }
         }
     }
     if let Some(frame_time) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_TIME) {
         if let Some(frame_time_smoothed) = frame_time.smoothed() {
             if let Ok(mut text) = query.p3().single_mut() {
-                *text.write_span() = format!("{frame_time_smoothed:.2}");
+                *text.get_text_mut() = format!("{frame_time_smoothed:.2}");
             }
         }
     }
@@ -276,7 +276,7 @@ fn origin_text_update_system(
 ) {
     for mut text in &mut text_query {
         if let Some(origin) = query.iter().next() {
-            *text.write_span() = format!("{origin:?}");
+            *text.get_text_mut() = format!("{origin:?}");
         }
     }
 }
