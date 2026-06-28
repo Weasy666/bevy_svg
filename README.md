@@ -15,14 +15,15 @@ into a vertex buffer, which lastly is convert into a [`Bevy`] mesh and drawn wit
 ## Compatibility
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/crates.io-v0.19-orange)](https://crates.io/crates/bevy/0.19) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.19.0-orange)](https://crates.io/crates/bevy-svg/0.19.0) | [`bevy-0.19`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.19) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.18-orange)](https://crates.io/crates/bevy/0.18) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.18.0-orange)](https://crates.io/crates/bevy-svg/0.18.0) | [`bevy-0.18`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.18) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.17-orange)](https://crates.io/crates/bevy/0.17) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.17.1-orange)](https://crates.io/crates/bevy-svg/0.17.1) | [`bevy-0.17`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.17) |
-| [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
 
 <details><summary>Old versions</summary>
 
 | `Bevy` version | `bevy_svg` version | Branch      |
 |----------------|--------------------|-------------|
+| [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/bevyengine/bevy) | [![Crates.io](https://img.shields.io/badge/branch-main-yellow)](https://github.com/Weasy666/bevy_svg/) | [`main`](https://github.com/Weasy666/bevy_svg) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.16-orange)](https://crates.io/crates/bevy/0.16) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.16.0-rc1-orange)](https://crates.io/crates/bevy-svg/0.16.0-rc1) | [`bevy-0.16`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.16) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.15.1-orange)](https://crates.io/crates/bevy/0.15.1) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.15.1-orange)](https://crates.io/crates/bevy-svg/0.15.1) | [`bevy-0.15`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.15) |
 | [![Crates.io](https://img.shields.io/badge/crates.io-v0.14.0-orange)](https://crates.io/crates/bevy/0.14.0) | [![Crates.io](https://img.shields.io/badge/crates.io-v0.14.0-orange)](https://crates.io/crates/bevy-svg/0.14.0) | [`bevy-0.14`](https://github.com/Weasy666/bevy_svg/tree/bevy-0.14) |
@@ -54,12 +55,12 @@ Copy this to your `Cargo.toml`
 
 ```toml
 # Stable
-bevy_svg = "0.18.0"
+bevy_svg = "0.19.0"
 
 # 2D and 3D are available on default, if you only want/need one, use the following
-bevy_svg = { version = "0.18.0", default-features = false, features = ["2d"] }
+bevy_svg = { version = "0.19.0", default-features = false, features = ["2d"] }
 # or
-bevy_svg = { version = "0.18.0", default-features = false, features = ["3d"] }
+bevy_svg = { version = "0.19.0", default-features = false, features = ["3d"] }
 
 # Living on the edge (at your own risk 😅)
 bevy_svg = { git = "https://github.com/Weasy666/bevy_svg", branch = "main" }
@@ -147,4 +148,4 @@ bevy_svg is licensed under either of the following, at your option:
 [`bevy_prototype_lyon`]: https://github.com/Nilirad/bevy_prototype_lyon
 [`Lyon`]: https://github.com/nical/lyon
 [`usvg`]: https://github.com/linebender/resvg
-[`AssetLoader`]: https://docs.rs/bevy/0.18/bevy/asset/trait.AssetLoader.html
+[`AssetLoader`]: https://docs.rs/bevy/0.19/bevy/asset/trait.AssetLoader.html
