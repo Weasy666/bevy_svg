@@ -1,8 +1,12 @@
 use crate::{origin::Origin, svg::Svg};
 use bevy::{
     asset::{Handle, uuid_handle},
-    ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld},
+    ecs::{
+        component::Component, lifecycle::HookContext, reflect::ReflectComponent,
+        template::FromTemplate, world::DeferredWorld,
+    },
     mesh::Mesh2d,
+    reflect::{Reflect, std_traits::ReflectDefault},
     shader::Shader,
     sprite_render::MeshMaterial2d,
 };
@@ -16,8 +20,9 @@ pub const SVG_2D_SHADER_HANDLE: Handle<Shader> =
 pub use plugin::RenderPlugin;
 
 /// A component for 2D SVGs.
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone, Debug, Reflect, FromTemplate)]
 #[require(Mesh2d, Origin)]
+#[reflect(Component, Default, Debug)]
 #[component(on_insert = svg_2d_on_insert)]
 pub struct Svg2d(pub Handle<Svg>);
 

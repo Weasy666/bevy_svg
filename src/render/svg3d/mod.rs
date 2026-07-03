@@ -1,8 +1,12 @@
 use bevy::{
     asset::{Handle, uuid_handle},
-    ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld},
+    ecs::{
+        component::Component, lifecycle::HookContext, reflect::ReflectComponent,
+        template::FromTemplate, world::DeferredWorld,
+    },
     mesh::Mesh3d,
     pbr::MeshMaterial3d,
+    reflect::{Reflect, std_traits::ReflectDefault},
     shader::Shader,
 };
 
@@ -17,8 +21,9 @@ pub use plugin::RenderPlugin;
 use crate::{origin::Origin, svg::Svg};
 
 /// A component for 3D SVGs.
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone, Debug, Reflect, FromTemplate)]
 #[require(Mesh3d, Origin, MeshMaterial3d<Svg>)]
+#[reflect(Component, Default, Debug)]
 #[component(on_insert = svg_3d_on_insert)]
 pub struct Svg3d(pub Handle<Svg>);
 

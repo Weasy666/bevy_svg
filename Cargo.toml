@@ -38,6 +38,10 @@ bevy = { version = "0.19", default-features = true }
 
 #### 2D examples ####
 [[example]]
+name = "2d_bsn"
+path = "examples/2d/bsn.rs"
+
+[[example]]
 name = "2d_complex_one_color"
 path = "examples/2d/complex_one_color.rs"
 
@@ -62,6 +66,10 @@ name = "2d_two_colors"
 path = "examples/2d/two_colors.rs"
 
 #### 3D examples ####
+[[example]]
+name = "3d_bsn"
+path = "examples/3d/bsn.rs"
+
 [[example]]
 name = "3d_complex_one_color"
 path = "examples/3d/complex_one_color.rs"
