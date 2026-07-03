@@ -1,4 +1,8 @@
-use crate::{render::svg2d::SVG_2D_SHADER_HANDLE, svg::Svg};
+use crate::{
+    origin::Origin,
+    render::svg2d::{SVG_2D_SHADER_HANDLE, Svg2d},
+    svg::Svg,
+};
 use bevy::{
     app::{App, Plugin},
     asset::{AssetApp, load_internal_asset},
@@ -14,7 +18,9 @@ impl Plugin for RenderPlugin {
         load_internal_asset!(app, SVG_2D_SHADER_HANDLE, "svg_2d.wesl", Shader::from_wesl);
 
         app.add_plugins(Material2dPlugin::<Svg>::default())
-            .register_asset_reflect::<Svg>();
+            .register_asset_reflect::<Svg>()
+            .register_type::<Svg2d>()
+            .register_type::<Origin>();
     }
 }
 
