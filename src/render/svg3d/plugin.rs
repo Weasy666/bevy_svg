@@ -14,7 +14,7 @@ pub struct RenderPlugin;
 
 impl Plugin for RenderPlugin {
     fn build(&self, app: &mut App) {
-        load_internal_asset!(app, SVG_3D_SHADER_HANDLE, "svg_3d.wgsl", Shader::from_wgsl);
+        load_internal_asset!(app, SVG_3D_SHADER_HANDLE, "svg_3d.wesl", Shader::from_wesl);
 
         app.add_plugins(MaterialPlugin::<Svg>::default())
             .register_asset_reflect::<Svg>();

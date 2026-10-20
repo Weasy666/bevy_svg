@@ -1,8 +1,8 @@
-#import bevy_pbr::{
-    forward_io::{VertexOutput, FragmentOutput}
+import bevy_pbr::render::{
+    forward_io::{VertexOutput, FragmentOutput},
     mesh_types::Mesh,
     mesh_view_bindings,
-}
+};
 
 @group(2) @binding(0)
 var<uniform> mesh: Mesh;
