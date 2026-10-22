@@ -1,5 +1,8 @@
 use crate::resources::{FillTessellator, StrokeTessellator};
-use bevy::app::{App, Plugin};
+use bevy::{
+    app::{App, Plugin},
+    shader::load_shader_library,
+};
 
 #[cfg(feature = "2d")]
 use crate::render::svg2d;
@@ -14,6 +17,8 @@ impl Plugin for SvgPlugin {
         let fill_tess = FillTessellator::default();
         let stroke_tess = StrokeTessellator::default();
         app.insert_resource(fill_tess).insert_resource(stroke_tess);
+
+        load_shader_library!(app, "gradient.wesl");
 
         #[cfg(feature = "2d")]
         app.add_plugins(svg2d::RenderPlugin);
