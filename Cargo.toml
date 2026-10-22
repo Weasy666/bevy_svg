@@ -27,7 +27,7 @@ copyless = "0.1"
 lyon_geom = "1.0"
 lyon_tessellation = "1.0"
 lyon_path = "1.0"
-usvg = "0.47"
+usvg = "0.48"
 svgtypes = "0.16"
 
 anyhow = "1.0"
