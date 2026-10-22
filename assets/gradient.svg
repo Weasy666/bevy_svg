@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="300" height="200" viewBox="0 0 300 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient id="white-to-black" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fff"/>
+            <stop offset="1" stop-color="#000"/>
+        </linearGradient>
+        <radialGradient id="focal" cx="0.5" cy="0.5" r="0.5" fx="0.3" fy="0.3">
+            <stop offset="0" stop-color="yellow"/>
+            <stop offset="0.5" stop-color="red"/>
+            <stop offset="1" stop-color="blue"/>
+        </radialGradient>
+        <linearGradient id="reflect" x1="0" y1="0" x2="0.25" y2="0" spreadMethod="reflect">
+            <stop offset="0" stop-color="#0f0"/>
+            <stop offset="1" stop-color="#00f"/>
+        </linearGradient>
+        <linearGradient id="repeat" x1="0" y1="0" x2="0.25" y2="0.25" spreadMethod="repeat" gradientTransform="rotate(20)">
+            <stop offset="0" stop-color="#f0f"/>
+            <stop offset="0.5" stop-color="#ff0" stop-opacity="0.3"/>
+            <stop offset="1" stop-color="#0ff"/>
+        </linearGradient>
+        <radialGradient id="focal-radius" cx="0.5" cy="0.5" r="0.5" fr="0.25">
+            <stop offset="0" stop-color="#fff"/>
+            <stop offset="1" stop-color="#f60"/>
+        </radialGradient>
+        <linearGradient id="stroke" x1="205" y1="0" x2="285" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#0cf"/>
+            <stop offset="1" stop-color="#f0c"/>
+        </linearGradient>
+        <!-- Inherits the stops of `stroke`, but fades out vertically. -->
+        <linearGradient id="fade" x1="0" y1="1" x2="0" y2="0" xlink:href="#stroke" gradientUnits="objectBoundingBox"/>
+    </defs>
+
+    <!-- Linear: white to black -->
+    <rect x="15" y="15" width="80" height="80" fill="url(#white-to-black)"/>
+    <!-- Radial with a focal point and multiple stops -->
+    <rect x="110" y="15" width="80" height="80" fill="url(#focal)"/>
+    <!-- Linear with `spreadMethod="reflect"` -->
+    <rect x="205" y="15" width="80" height="80" fill="url(#reflect)"/>
+
+    <!-- Linear with `spreadMethod="repeat"`, a `gradientTransform` and a translucent stop,
+         stroked with a gradient as well -->
+    <circle cx="55" cy="145" r="36" fill="url(#repeat)" stroke="url(#white-to-black)" stroke-width="6"/>
+    <!-- Radial with a focal radius (`fr`) and `fill-opacity` -->
+    <rect x="110" y="105" width="80" height="80" rx="12" fill="url(#focal-radius)" fill-opacity="0.8"/>
+    <!-- Gradient strokes, the second one inherits its stops via `href` -->
+    <polyline points="205,110 225,140 245,110 265,140 285,110" fill="none" stroke="url(#stroke)" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="205" y="150" width="80" height="35" fill="url(#fade)"/>
+</svg>
