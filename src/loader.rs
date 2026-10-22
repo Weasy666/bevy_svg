@@ -52,6 +52,9 @@ impl AssetLoader for SvgAssetLoader {
             debug!("Tessellating SVG: {} ... Done", load_context.path());
             let mesh_handle = load_context.add_labeled_asset("mesh".to_string(), mesh);
             svg.mesh = mesh_handle;
+            svg.gradient_image = svg
+                .gradient_image()
+                .map(|image| load_context.add_labeled_asset("gradients".to_string(), image));
 
             Ok(svg)
         })

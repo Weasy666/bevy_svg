@@ -1,6 +1,6 @@
 use bevy::{
     asset::{Asset, Handle},
-    color::Color,
+    image::Image,
     log::{debug, trace, warn},
     math::Vec2,
     mesh::Mesh,
@@ -17,7 +17,12 @@ use usvg::{
     tiny_skia_path::{PathSegment, PathSegmentsIter},
 };
 
-use crate::{Convert, loader::FileSvgError, render::tessellation, util};
+use crate::{
+    Convert,
+    gradient::{self, Gradient, Gradients, PathPaint},
+    loader::FileSvgError,
+    render::tessellation,
+};
 
 /// A loaded and deserialized SVG file.
 #[derive(AsBindGroup, Reflect, Debug, Clone, Asset)]
@@ -33,8 +38,14 @@ pub struct Svg {
     #[reflect(ignore)]
     /// All paths that make up the SVG.
     pub paths: Vec<PathDescriptor>,
+    #[reflect(ignore)]
+    /// All gradients referenced by [`Self::paths`].
+    pub gradients: Vec<Gradient>,
     /// The fully tessellated paths as [`Mesh`].
     pub mesh: Handle<Mesh>,
+    /// [`Self::gradients`] packed into a texture, see [`Svg::gradient_image`].
+    #[texture(0, sample_type = "float", filterable = false)]
+    pub gradient_image: Option<Handle<Image>>,
 }
 
 impl Default for Svg {
@@ -49,7 +60,9 @@ impl Default for Svg {
                 h: 0.,
             },
             paths: Default::default(),
+            gradients: Default::default(),
             mesh: Default::default(),
+            gradient_image: Default::default(),
         }
     }
 }
@@ -94,10 +107,18 @@ impl Svg {
         buffer.convert()
     }
 
+    /// Creates the texture that the shader looks up [`Self::gradients`] in.
+    ///
+    /// Returns `None` if the SVG has no gradients.
+    pub fn gradient_image(&self) -> Option<Image> {
+        gradient::gradient_image(&self.gradients)
+    }
+
     pub(crate) fn from_tree(tree: usvg::Tree) -> Svg {
         let view_box = tree.root().layer_bounding_box();
         let size = tree.size();
         let mut descriptors = Vec::new();
+        let mut gradients = Gradients::default();
 
         #[derive(Copy, Clone)]
         struct NodeContext<'a> {
@@ -181,12 +202,28 @@ impl Svg {
                     // inverted because we are reversing the list at the end
                     match path.paint_order() {
                         PaintOrder::FillAndStroke => {
-                            Self::process_stroke(&mut descriptors, path_with_transform);
-                            Self::process_fill(&mut descriptors, path_with_transform);
+                            Self::process_stroke(
+                                &mut descriptors,
+                                &mut gradients,
+                                path_with_transform,
+                            );
+                            Self::process_fill(
+                                &mut descriptors,
+                                &mut gradients,
+                                path_with_transform,
+                            );
                         }
                         PaintOrder::StrokeAndFill => {
-                            Self::process_fill(&mut descriptors, path_with_transform);
-                            Self::process_stroke(&mut descriptors, path_with_transform);
+                            Self::process_fill(
+                                &mut descriptors,
+                                &mut gradients,
+                                path_with_transform,
+                            );
+                            Self::process_stroke(
+                                &mut descriptors,
+                                &mut gradients,
+                                path_with_transform,
+                            );
                         }
                     }
                 }
@@ -208,11 +245,17 @@ impl Svg {
                 h: view_box.height() as f64,
             },
             paths: descriptors,
+            gradients: gradients.into_vec(),
             mesh: Default::default(),
+            gradient_image: Default::default(),
         }
     }
 
-    fn process_fill(descriptors: &mut Vec<PathDescriptor>, path_with_transform: PathWithTransform) {
+    fn process_fill(
+        descriptors: &mut Vec<PathDescriptor>,
+        gradients: &mut Gradients,
+        path_with_transform: PathWithTransform,
+    ) {
         let path = path_with_transform.path;
         // from resvg render logic
         if path.data().bounds().width() == 0.0 || path.data().bounds().height() == 0.0 {
@@ -222,27 +265,12 @@ impl Svg {
         let Some(fill) = &path.fill() else {
             return;
         };
-        let color = match fill.paint() {
-            usvg::Paint::Color(c) => {
-                Color::srgba_u8(c.red, c.green, c.blue, fill.opacity().to_u8())
-            }
-            usvg::Paint::LinearGradient(g) => {
-                // TODO: implement
-                // just taking the average between the first and last stop so we get something to render
-                crate::util::paint::avg_gradient(g)
-            }
-            usvg::Paint::RadialGradient(g) => {
-                // TODO: implement
-                // just taking the average between the first and last stop so we get something to render
-                crate::util::paint::avg_gradient(g)
-            }
-            usvg::Paint::Pattern(_) => Color::NONE,
-        };
+        let paint = PathPaint::from_usvg(fill.paint(), fill.opacity(), gradients);
 
         descriptors.alloc().init(PathDescriptor {
             abs_transform: path_with_transform.transform,
             segments: path_with_transform.convert().collect(),
-            color,
+            paint,
             draw_type: DrawType::Fill,
             is_stroke: false,
         });
@@ -250,19 +278,21 @@ impl Svg {
 
     fn process_stroke(
         descriptors: &mut Vec<PathDescriptor>,
+        gradients: &mut Gradients,
         path_with_transform: PathWithTransform,
     ) {
         let mut path_with_transform = path_with_transform;
         let path = path_with_transform.path;
         let Some(stroke) = &path.stroke() else { return };
-        let (color, draw_type) = stroke.convert();
+        let paint = PathPaint::from_usvg(stroke.paint(), stroke.opacity(), gradients);
+        let draw_type = stroke.convert();
 
         path_with_transform.is_stroke = true;
 
         descriptors.alloc().init(PathDescriptor {
             segments: path_with_transform.convert().collect(),
             abs_transform: path_with_transform.transform,
-            color,
+            paint,
             draw_type,
             is_stroke: true,
         });
@@ -272,7 +302,7 @@ impl Svg {
 #[derive(Debug, Clone)]
 pub struct PathDescriptor {
     pub segments: Vec<PathEvent>,
-    pub color: Color,
+    pub paint: PathPaint,
     pub draw_type: DrawType,
     pub abs_transform: usvg::Transform,
     pub is_stroke: bool,
@@ -412,14 +442,6 @@ impl Convert<Point> for usvg::tiny_skia_path::Point {
     }
 }
 
-impl Convert<Color> for &usvg::Stop {
-    #[inline]
-    fn convert(self) -> Color {
-        let color = self.color();
-        Color::srgba_u8(color.red, color.green, color.blue, self.opacity().to_u8())
-    }
-}
-
 impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
     fn convert(self) -> PathConvIter<'iter> {
         return PathConvIter {
@@ -432,19 +454,9 @@ impl<'iter> Convert<PathConvIter<'iter>> for PathWithTransform<'iter> {
     }
 }
 
-impl Convert<(Color, DrawType)> for &usvg::Stroke {
+impl Convert<DrawType> for &usvg::Stroke {
     #[inline]
-    fn convert(self) -> (Color, DrawType) {
-        let color = match self.paint() {
-            usvg::Paint::Color(c) => {
-                Color::srgba_u8(c.red, c.green, c.blue, self.opacity().to_u8())
-            }
-            // TODO: implement, take average for now
-            usvg::Paint::LinearGradient(g) => util::paint::avg_gradient(g),
-            usvg::Paint::RadialGradient(g) => util::paint::avg_gradient(g),
-            usvg::Paint::Pattern(_) => Color::NONE,
-        };
-
+    fn convert(self) -> DrawType {
         let linecap = match self.linecap() {
             usvg::LineCap::Butt => lyon_tessellation::LineCap::Butt,
             usvg::LineCap::Square => lyon_tessellation::LineCap::Square,
@@ -462,6 +474,6 @@ impl Convert<(Color, DrawType)> for &usvg::Stroke {
             .with_line_cap(linecap)
             .with_line_join(linejoin);
 
-        (color, DrawType::Stroke(opt))
+        DrawType::Stroke(opt)
     }
 }

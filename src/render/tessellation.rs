@@ -15,27 +15,20 @@ pub fn generate_buffer(
 
     let mut buffers = VertexBuffers::new();
 
-    let mut color = None;
     for path in &svg.paths {
         let mut buffer = VertexBuffers::new();
 
-        if color.is_none() {
-            color = Some(path.color);
-        }
-
         let segments = path.segments.clone();
+        let vertex_constructor = VertexConstructor {
+            paint: path.paint,
+            transform: path.abs_transform,
+        };
         match path.draw_type {
             DrawType::Fill => {
                 if let Err(e) = fill_tess.tessellate(
                     segments,
                     &FillOptions::tolerance(0.001),
-                    &mut BuffersBuilder::new(
-                        &mut buffer,
-                        VertexConstructor {
-                            color: path.color,
-                            transform: path.abs_transform,
-                        },
-                    ),
+                    &mut BuffersBuilder::new(&mut buffer, vertex_constructor),
                 ) {
                     error!("FillTessellator error: {:?}", e);
                 }
@@ -44,13 +37,7 @@ pub fn generate_buffer(
                 if let Err(e) = stroke_tess.tessellate(
                     segments,
                     &opts,
-                    &mut BuffersBuilder::new(
-                        &mut buffer,
-                        VertexConstructor {
-                            color: path.color,
-                            transform: path.abs_transform,
-                        },
-                    ),
+                    &mut BuffersBuilder::new(&mut buffer, vertex_constructor),
                 ) {
                     error!("StrokeTessellator error: {:?}", e);
                 }
