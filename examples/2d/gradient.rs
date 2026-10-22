@@ -1,0 +1,30 @@
+use bevy::prelude::*;
+use bevy_svg::prelude::*;
+
+#[path = "../common/lib.rs"]
+mod common;
+
+fn main() {
+    App::new()
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "2d_gradient".to_string(),
+                resolution: (600, 600).into(),
+                ..Default::default()
+            }),
+            ..Default::default()
+        }))
+        .add_plugins((common::CommonPlugin, bevy_svg::prelude::SvgPlugin))
+        .add_systems(Startup, setup)
+        .run();
+}
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let svg = asset_server.load("gradient.svg");
+    commands.spawn(Camera2d);
+    commands.spawn((
+        Svg2d(svg),
+        Origin::Center,
+        Transform::from_scale(Vec3::splat(2.0)),
+    ));
+}

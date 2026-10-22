@@ -46,6 +46,10 @@ name = "2d_complex_one_color"
 path = "examples/2d/complex_one_color.rs"
 
 [[example]]
+name = "2d_gradient"
+path = "examples/2d/gradient.rs"
+
+[[example]]
 name = "2d_multiple_translation"
 path = "examples/2d/multiple_translation.rs"
 
@@ -73,6 +77,10 @@ path = "examples/3d/bsn.rs"
 [[example]]
 name = "3d_complex_one_color"
 path = "examples/3d/complex_one_color.rs"
+
+[[example]]
+name = "3d_gradient"
+path = "examples/3d/gradient.rs"
 
 [[example]]
 name = "3d_multiple_perspective"
