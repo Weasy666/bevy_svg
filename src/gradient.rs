@@ -14,7 +14,8 @@ pub enum PathPaint {
         /// Row of the gradient in the gradient texture.
         index: u32,
         opacity: f32,
-        /// Maps the path's local coordinates into the gradient's coordinate system.
+        /// Maps the path's local coordinates into the gradient's normalized coordinate system,
+        /// see [`GradientGeometry`].
         local_to_gradient: usvg::Transform,
     },
 }
@@ -28,7 +29,8 @@ impl PathPaint {
         let color = |c: usvg::Color, alpha: usvg::Opacity| {
             PathPaint::Color(Color::srgba_u8(c.red, c.green, c.blue, alpha.to_u8()))
         };
-        let gradient = match paint {
+        // `normalize` maps the gradient's coordinate system to the one of `GradientGeometry`.
+        let (gradient, normalize) = match paint {
             usvg::Paint::Color(c) => return color(*c, opacity),
             usvg::Paint::LinearGradient(g) => {
                 let (start, end) = ((g.x1(), g.y1()), (g.x2(), g.y2()));
@@ -39,21 +41,33 @@ impl PathPaint {
                     };
                     return color(last.color(), last.opacity() * opacity);
                 }
-                GradientRef {
+                // Moves `start` to the origin, then rotates and scales `end` onto (1, 0).
+                let (dx, dy) = (end.0 - start.0, end.1 - start.1);
+                let length_squared = dx * dx + dy * dy;
+                let (x, y) = (dx / length_squared, dy / length_squared);
+                let normalize = usvg::Transform::from_translate(-start.0, -start.1)
+                    .post_concat(usvg::Transform::from_row(x, -y, y, x, 0.0, 0.0));
+                let gradient = GradientRef {
                     base: g,
-                    geometry: GradientGeometry::Linear { start, end },
-                }
+                    geometry: GradientGeometry::Linear,
+                };
+                (gradient, normalize)
             }
             // usvg already turns `r <= 0` into the color of the last stop
-            usvg::Paint::RadialGradient(g) => GradientRef {
-                base: g,
-                geometry: GradientGeometry::Radial {
-                    focal: (g.fx(), g.fy()),
-                    focal_radius: g.fr().get(),
-                    center: (g.cx(), g.cy()),
-                    radius: g.r().get(),
-                },
-            },
+            usvg::Paint::RadialGradient(g) => {
+                // Moves the focal point to the origin and scales the end circle to radius 1.
+                let (focal, radius) = ((g.fx(), g.fy()), g.r().get());
+                let normalize = usvg::Transform::from_translate(-focal.0, -focal.1)
+                    .post_concat(usvg::Transform::from_scale(1.0 / radius, 1.0 / radius));
+                let gradient = GradientRef {
+                    base: g,
+                    geometry: GradientGeometry::Radial {
+                        center: ((g.cx() - focal.0) / radius, (g.cy() - focal.1) / radius),
+                        focal_radius: g.fr().get() / radius,
+                    },
+                };
+                (gradient, normalize)
+            }
             usvg::Paint::Pattern(_) => return PathPaint::Color(Color::NONE),
         };
         let Some(local_to_gradient) = gradient.base.transform().invert() else {
@@ -62,7 +76,7 @@ impl PathPaint {
         PathPaint::Gradient {
             index: gradients.insert(gradient),
             opacity: opacity.get(),
-            local_to_gradient,
+            local_to_gradient: local_to_gradient.post_concat(normalize),
         }
     }
 
@@ -82,17 +96,16 @@ struct GradientRef<'a> {
     geometry: GradientGeometry,
 }
 
+/// The shape of a gradient in its normalized coordinate system, which keeps the numbers in the
+/// shader close to 1 regardless of the SVG's coordinates.
 #[derive(Debug, Clone, Copy)]
 enum GradientGeometry {
-    Linear {
-        start: (f32, f32),
-        end: (f32, f32),
-    },
+    /// Goes from (0, 0) to (1, 0), so `t` is x
+    Linear,
+    /// The focal point is the origin and the end circle has radius 1.
     Radial {
-        focal: (f32, f32),
-        focal_radius: f32,
         center: (f32, f32),
-        radius: f32,
+        focal_radius: f32,
     },
 }
 
@@ -108,18 +121,14 @@ pub struct Gradient {
 impl Gradient {
     fn is_opaque(&self) -> bool {
         let covers_plane = match self.geometry {
-            GradientGeometry::Linear { .. } => true,
+            GradientGeometry::Linear => true,
             GradientGeometry::Radial {
-                focal,
-                focal_radius,
                 center,
-                radius,
+                focal_radius,
             } => {
                 // Unless one circle lies inside the other, we leave some points unpainted.
-                let center_offset = (center.0 - focal.0, center.1 - focal.1);
-                let radius_delta = radius - focal_radius;
-                let a = center_offset.0 * center_offset.0 + center_offset.1 * center_offset.1
-                    - radius_delta * radius_delta;
+                let radius_delta = 1.0 - focal_radius;
+                let a = center.0 * center.0 + center.1 * center.1 - radius_delta * radius_delta;
                 a < -1e-6 // threshold as in the shader
             }
         };
@@ -164,7 +173,7 @@ impl Gradients {
     }
 }
 
-const HEADER_TEXELS: usize = 3;
+const HEADER_TEXELS: usize = 2;
 const TEXELS_PER_STOP: usize = 2;
 
 /// Packs `gradients` into an `Rgba32Float` texture with one row per gradient.
@@ -183,19 +192,15 @@ pub(crate) fn gradient_image(gradients: &[Gradient]) -> Option<Image> {
         };
         let stop_count = gradient.stops.len() as f32;
         match gradient.geometry {
-            GradientGeometry::Linear { start, end } => {
+            GradientGeometry::Linear => {
                 row[0] = [0.0, spread_method, stop_count, 0.0];
-                row[1] = [start.0, start.1, end.0, end.1];
             }
             GradientGeometry::Radial {
-                focal,
-                focal_radius,
                 center,
-                radius,
+                focal_radius,
             } => {
                 row[0] = [1.0, spread_method, stop_count, 0.0];
-                row[1] = [focal.0, focal.1, center.0, center.1];
-                row[2] = [focal_radius, radius, 0.0, 0.0];
+                row[1] = [center.0, center.1, focal_radius, 0.0];
             }
         }
         let (stop_texels, _) = row[HEADER_TEXELS..].as_chunks_mut::<TEXELS_PER_STOP>();

@@ -1,37 +1,35 @@
 import bevy_render::color_operations::srgb_to_linear;
 
-// Every row of the gradient texture describes one gradient:
+// Every row of the gradient texture describes one gradient, in a normalized coordinate system
+// (see `GradientGeometry` in `gradient.rs`):
 //
 // texel 0: (kind, spread method, stop count, _)
-// texel 1: linear: (x1, y1, x2, y2), radial: (fx, fy, cx, cy)
-// texel 2: radial: (fr, r, _, _)
-// texel 3 + 2 * i: (offset, _, _, _) of stop i
-// texel 4 + 2 * i: non-premultiplied sRGB color of stop i
+// texel 1: radial: (cx, cy, fr, _), with the focal point at the origin and r = 1
+// texel 2 + 2 * i: (offset, _, _, _) of stop i
+// texel 3 + 2 * i: non-premultiplied sRGB color of stop i
 
 const KIND_LINEAR: u32 = 0u;
 
 const SPREAD_PAD: u32 = 0u;
 const SPREAD_REFLECT: u32 = 1u;
 
-const HEADER_TEXELS: i32 = 3;
+const HEADER_TEXELS: i32 = 2;
 
 /// Evaluates the gradient in `row` of `gradients` at `position`, which is given in the
-/// coordinate system of the gradient.
+/// normalized coordinate system of the gradient.
 ///
 /// Returns a non-premultiplied, linear color.
 fn gradient_color(gradients: texture_2d<f32>, row: u32, position: vec2<f32>) -> vec4<f32> {
     let y = i32(row);
     let header = textureLoad(gradients, vec2(0, y), 0);
-    let geometry = textureLoad(gradients, vec2(1, y), 0);
 
     var t: f32;
     if u32(header.x) == KIND_LINEAR {
-        let start = geometry.xy;
-        let direction = geometry.zw - start;
-        t = dot(position - start, direction) / dot(direction, direction);
+        // The gradient goes from (0, 0) to (1, 0)
+        t = position.x;
     } else {
-        let radii = textureLoad(gradients, vec2(2, y), 0);
-        let radial_t = two_point_conical_t(position, geometry.xy, radii.x, geometry.zw, radii.y);
+        let geometry = textureLoad(gradients, vec2(1, y), 0);
+        let radial_t = two_point_conical_t(position, geometry.xy, geometry.z);
         if radial_t.y == 0.0 {
             return vec4(0.0);
         }
@@ -46,22 +44,16 @@ fn gradient_color(gradients: texture_2d<f32>, row: u32, position: vec2<f32>) -> 
 /// Finds the largest `t` for which `position` lies on the circle that is interpolated between
 /// the focal circle and the end circle, with a non-negative radius.
 ///
+/// The focal point is the origin and the end circle has radius 1.
+///
 /// Returns `(t, 1.0)`, or `(_, 0.0)` if there is no such circle and the point is not painted.
-fn two_point_conical_t(
-    position: vec2<f32>,
-    focal: vec2<f32>,
-    focal_radius: f32,
-    center: vec2<f32>,
-    radius: f32,
-) -> vec2<f32> {
-    // Solves |p - f - t * (c - f)| = fr + t * (r - fr) for t.
-    let center_offset = center - focal;
-    let position_offset = position - focal;
-    let radius_delta = radius - focal_radius;
+fn two_point_conical_t(position: vec2<f32>, center: vec2<f32>, focal_radius: f32) -> vec2<f32> {
+    // Solves |p - t * c| = fr + t * (1 - fr) for t.
+    let radius_delta = 1.0 - focal_radius;
 
-    let a = dot(center_offset, center_offset) - radius_delta * radius_delta;
-    let b = dot(position_offset, center_offset) + focal_radius * radius_delta;
-    let c = dot(position_offset, position_offset) - focal_radius * focal_radius;
+    let a = dot(center, center) - radius_delta * radius_delta;
+    let b = dot(position, center) + focal_radius * radius_delta;
+    let c = dot(position, position) - focal_radius * focal_radius;
 
     if abs(a) < 1e-6 {
         if abs(b) < 1e-6 {
