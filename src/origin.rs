@@ -9,9 +9,11 @@ use bevy::{
         component::Component,
         entity::Entity,
         query::{Changed, Or, With, Without},
+        reflect::ReflectComponent,
         system::{Commands, Query, Res},
     },
     math::{Vec2, Vec3, Vec3Swizzles},
+    reflect::{Reflect, std_traits::ReflectDefault},
     transform::components::{GlobalTransform, Transform},
 };
 
@@ -22,7 +24,8 @@ use crate::render::Svg3d;
 
 use crate::svg::Svg;
 
-#[derive(Clone, Component, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Component, Copy, Debug, Default, PartialEq, Reflect)]
+#[reflect(Component, Default, Debug, PartialEq)]
 /// Origin of the coordinate system.
 pub enum Origin {
     /// Bottom left of the image or viewbox.

@@ -1,5 +1,5 @@
-use super::SVG_3D_SHADER_HANDLE;
-use crate::svg::Svg;
+use super::{SVG_3D_SHADER_HANDLE, Svg3d};
+use crate::{origin::Origin, svg::Svg};
 use bevy::{
     app::{App, Plugin},
     asset::{AssetApp, load_internal_asset},
@@ -17,7 +17,9 @@ impl Plugin for RenderPlugin {
         load_internal_asset!(app, SVG_3D_SHADER_HANDLE, "svg_3d.wesl", Shader::from_wesl);
 
         app.add_plugins(MaterialPlugin::<Svg>::default())
-            .register_asset_reflect::<Svg>();
+            .register_asset_reflect::<Svg>()
+            .register_type::<Svg3d>()
+            .register_type::<Origin>();
     }
 }
 
