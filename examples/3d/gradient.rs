@@ -26,7 +26,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         Svg3d(svg),
         Origin::Center,
         Transform {
-            translation: Vec3::new(0.0, 0.0, -400.0),
+            translation: Vec3::new(0.0, 0.0, -450.0),
             ..Default::default()
         },
     ));
