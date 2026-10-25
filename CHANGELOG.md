@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Security` in case of vulnerabilities.
 
 ## [Unreleased]
+### Changed
+- Update bevy to `0.20` ([#63](https://github.com/Weasy666/bevy_svg/pull/63)  Thanks @codewing)
 
 ## [0.18.0] - 2026-01-30
 ### Changed
