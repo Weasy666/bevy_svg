@@ -1,6 +1,6 @@
 use bevy::{
     asset::RenderAssetUsages,
-    color::{Alpha, Color},
+    color::{Alpha, Color, ColorToComponents, Srgba},
     image::Image,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
@@ -77,7 +77,7 @@ impl PathPaint {
     /// Whether every pixel of the path is painted with full opacity.
     pub(crate) fn is_opaque(&self, gradients: &[Gradient]) -> bool {
         match *self {
-            PathPaint::Color(color) => color.alpha() >= 1.0,
+            PathPaint::Color(color) => color.is_fully_opaque(),
             PathPaint::Gradient { index, opacity, .. } => {
                 opacity >= 1.0 && gradients[index as usize].is_opaque()
             }
@@ -109,8 +109,8 @@ enum GradientGeometry {
 pub struct Gradient {
     geometry: GradientGeometry,
     spread_method: usvg::SpreadMethod,
-    /// Offset and non-premultiplied sRGB color of every stop.
-    stops: Vec<(f32, [f32; 4])>,
+    /// Offset and color of every stop.
+    stops: Vec<(f32, Srgba)>,
 }
 
 impl Gradient {
@@ -131,7 +131,7 @@ impl Gradient {
                 a < -1e-6 // threshold as in the shader
             }
         };
-        covers_plane && self.stops.iter().all(|(_, color)| color[3] >= 1.0)
+        covers_plane && self.stops.iter().all(|(_, color)| color.is_fully_opaque())
     }
 }
 
@@ -157,8 +157,8 @@ impl Gradients {
                         .iter()
                         .map(|stop| {
                             let c = stop.color();
-                            let srgb = [c.red, c.green, c.blue].map(|v| f32::from(v) / 255.0);
-                            let color = [srgb[0], srgb[1], srgb[2], stop.opacity().get()];
+                            let color = Srgba::rgb_u8(c.red, c.green, c.blue)
+                                .with_alpha(stop.opacity().get());
                             (stop.offset().get(), color)
                         })
                         .collect(),
@@ -211,7 +211,7 @@ pub(crate) fn gradient_image(gradients: &[Gradient]) -> Option<Image> {
             stop_texels.iter_mut().zip(&gradient.stops)
         {
             *offset_texel = [*offset, 0.0, 0.0, 0.0];
-            *color_texel = *color;
+            *color_texel = color.to_f32_array();
         }
     }
 
