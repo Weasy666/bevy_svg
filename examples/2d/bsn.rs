@@ -26,5 +26,9 @@ fn scene() -> impl SceneList {
         Origin::Center
     };
 
-    bsn_list![Camera2d, svg]
+    bsn_list! {
+        Camera2d
+        --
+        @svg
+    }
 }

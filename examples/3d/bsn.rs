@@ -29,5 +29,9 @@ fn scene() -> impl SceneList {
         }
     };
 
-    bsn_list![Camera3d, svg]
+    bsn_list! {
+        Camera3d
+        --
+        @svg
+    }
 }
