@@ -1,6 +1,6 @@
 use bevy::{
     asset::RenderAssetUsages,
-    color::Color,
+    color::{Alpha, Color},
     image::Image,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
@@ -73,6 +73,16 @@ impl PathPaint {
             local_to_gradient,
         }
     }
+
+    /// Whether every pixel of the path is painted with full opacity.
+    pub(crate) fn is_opaque(&self, gradients: &[Gradient]) -> bool {
+        match *self {
+            PathPaint::Color(color) => color.alpha() >= 1.0,
+            PathPaint::Gradient { index, opacity, .. } => {
+                opacity >= 1.0 && gradients[index as usize].is_opaque()
+            }
+        }
+    }
 }
 
 struct GradientRef<'a> {
@@ -101,6 +111,28 @@ pub struct Gradient {
     spread_method: usvg::SpreadMethod,
     /// Offset and non-premultiplied sRGB color of every stop.
     stops: Vec<(f32, [f32; 4])>,
+}
+
+impl Gradient {
+    fn is_opaque(&self) -> bool {
+        let covers_plane = match self.geometry {
+            GradientGeometry::Linear { .. } => true,
+            GradientGeometry::Radial {
+                focal,
+                focal_radius,
+                center,
+                radius,
+            } => {
+                // Unless one circle lies inside the other, we leave some points unpainted.
+                let center_offset = (center.0 - focal.0, center.1 - focal.1);
+                let radius_delta = radius - focal_radius;
+                let a = center_offset.0 * center_offset.0 + center_offset.1 * center_offset.1
+                    - radius_delta * radius_delta;
+                a < -1e-6 // threshold as in the shader
+            }
+        };
+        covers_plane && self.stops.iter().all(|(_, color)| color[3] >= 1.0)
+    }
 }
 
 /// Collects the gradients used by an SVG, deduplicating the ones shared between paths.

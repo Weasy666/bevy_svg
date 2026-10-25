@@ -40,7 +40,11 @@ impl Material2d for Svg {
     }
 
     fn alpha_mode(&self) -> AlphaMode2d {
-        AlphaMode2d::Blend
+        if self.has_transparency() {
+            AlphaMode2d::Blend
+        } else {
+            AlphaMode2d::Opaque
+        }
     }
 
     fn specialize(

@@ -41,7 +41,11 @@ impl Material for Svg {
     }
 
     fn alpha_mode(&self) -> AlphaMode {
-        AlphaMode::Blend
+        if self.has_transparency() {
+            AlphaMode::Blend
+        } else {
+            AlphaMode::Opaque
+        }
     }
 
     fn specialize(

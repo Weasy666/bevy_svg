@@ -114,6 +114,13 @@ impl Svg {
         gradient::gradient_image(&self.gradients)
     }
 
+    /// Whether any path is drawn with alpha < 1, which requires alpha blending.
+    pub(crate) fn has_transparency(&self) -> bool {
+        self.paths
+            .iter()
+            .any(|path| !path.paint.is_opaque(&self.gradients))
+    }
+
     pub(crate) fn from_tree(tree: usvg::Tree) -> Svg {
         let view_box = tree.root().layer_bounding_box();
         let size = tree.size();
@@ -475,5 +482,20 @@ impl Convert<DrawType> for &usvg::Stroke {
             .with_line_join(linejoin);
 
         DrawType::Stroke(opt)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Svg;
+
+    #[test]
+    fn gradient_example_has_transparency() {
+        let tree = usvg::Tree::from_str(
+            include_str!("../assets/gradient.svg"),
+            &usvg::Options::default(),
+        )
+        .unwrap();
+        assert!(Svg::from_tree(tree).has_transparency());
     }
 }

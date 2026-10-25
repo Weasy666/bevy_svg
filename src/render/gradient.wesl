@@ -55,20 +55,20 @@ fn two_point_conical_t(
     radius: f32,
 ) -> vec2<f32> {
     // Solves |p - f - t * (c - f)| = fr + t * (r - fr) for t.
-    let cd = center - focal;
-    let pd = position - focal;
-    let dr = radius - focal_radius;
+    let center_offset = center - focal;
+    let position_offset = position - focal;
+    let radius_delta = radius - focal_radius;
 
-    let a = dot(cd, cd) - dr * dr;
-    let b = dot(pd, cd) + focal_radius * dr;
-    let c = dot(pd, pd) - focal_radius * focal_radius;
+    let a = dot(center_offset, center_offset) - radius_delta * radius_delta;
+    let b = dot(position_offset, center_offset) + focal_radius * radius_delta;
+    let c = dot(position_offset, position_offset) - focal_radius * focal_radius;
 
     if abs(a) < 1e-6 {
         if abs(b) < 1e-6 {
             return vec2(0.0, 0.0);
         }
         let t = c / (2.0 * b);
-        return vec2(t, select(0.0, 1.0, focal_radius + t * dr >= 0.0));
+        return vec2(t, select(0.0, 1.0, focal_radius + t * radius_delta >= 0.0));
     }
 
     let discriminant = b * b - a * c;
@@ -79,11 +79,11 @@ fn two_point_conical_t(
     let t0 = (b + root) / a;
     let t1 = (b - root) / a;
     let t_max = max(t0, t1);
-    if focal_radius + t_max * dr >= 0.0 {
+    if focal_radius + t_max * radius_delta >= 0.0 {
         return vec2(t_max, 1.0);
     }
     let t_min = min(t0, t1);
-    return vec2(t_min, select(0.0, 1.0, focal_radius + t_min * dr >= 0.0));
+    return vec2(t_min, select(0.0, 1.0, focal_radius + t_min * radius_delta >= 0.0));
 }
 
 fn apply_spread_method(t: f32, spread_method: u32) -> f32 {
