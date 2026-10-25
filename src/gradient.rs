@@ -44,24 +44,16 @@ impl PathPaint {
                     geometry: GradientGeometry::Linear { start, end },
                 }
             }
-            usvg::Paint::RadialGradient(g) => {
-                if g.r().get() == 0.0 {
-                    // https://www.w3.org/TR/SVG11/pservers.html#RadialGradientElementRAttribute
-                    let Some(last) = g.stops().last() else {
-                        return PathPaint::Color(Color::NONE);
-                    };
-                    return color(last.color(), last.opacity() * opacity);
-                }
-                GradientRef {
-                    base: g,
-                    geometry: GradientGeometry::Radial {
-                        focal: (g.fx(), g.fy()),
-                        focal_radius: g.fr().get(),
-                        center: (g.cx(), g.cy()),
-                        radius: g.r().get(),
-                    },
-                }
-            }
+            // usvg already turns `r <= 0` into the color of the last stop
+            usvg::Paint::RadialGradient(g) => GradientRef {
+                base: g,
+                geometry: GradientGeometry::Radial {
+                    focal: (g.fx(), g.fy()),
+                    focal_radius: g.fr().get(),
+                    center: (g.cx(), g.cy()),
+                    radius: g.r().get(),
+                },
+            },
             usvg::Paint::Pattern(_) => return PathPaint::Color(Color::NONE),
         };
         let Some(local_to_gradient) = gradient.base.transform().invert() else {
