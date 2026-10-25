@@ -56,6 +56,10 @@ impl Material for Svg {
     ) -> bevy::prelude::Result<(), SpecializedMeshPipelineError> {
         descriptor.primitive.cull_mode = None;
 
+        if descriptor.vertex.shader != SVG_3D_SHADER_HANDLE {
+            return Ok(());
+        }
+
         let vertex_layout = layout.0.get_layout(&[
             Mesh::ATTRIBUTE_POSITION.at_shader_location(0),
             Mesh::ATTRIBUTE_COLOR.at_shader_location(1),
