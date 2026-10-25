@@ -1,5 +1,7 @@
 use crate::{
+    origin::Origin,
     render::{
+        Svg2d,
         svg2d::SVG_2D_SHADER_HANDLE,
         vertex_buffer::{ATTRIBUTE_GRADIENT_INDEX, ATTRIBUTE_GRADIENT_POSITION},
     },

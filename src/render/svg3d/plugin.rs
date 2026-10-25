@@ -1,6 +1,10 @@
 use super::SVG_3D_SHADER_HANDLE;
 use crate::{
-    render::vertex_buffer::{ATTRIBUTE_GRADIENT_INDEX, ATTRIBUTE_GRADIENT_POSITION},
+    origin::Origin,
+    render::{
+        Svg3d,
+        vertex_buffer::{ATTRIBUTE_GRADIENT_INDEX, ATTRIBUTE_GRADIENT_POSITION},
+    },
     svg::Svg,
 };
 use bevy::{
