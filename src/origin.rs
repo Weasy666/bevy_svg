@@ -146,9 +146,8 @@ pub fn apply_origin(
                 let origin_translation = origin.compute_translation(scaled_size);
 
                 let mut gtransf = global_transform.compute_transform();
-                gtransf.translation.x += origin_translation.x - reverse_origin_translation.x;
-                gtransf.translation.y += origin_translation.y - reverse_origin_translation.y;
-                gtransf.translation.z += origin_translation.z - reverse_origin_translation.z;
+                gtransf.translation +=
+                    gtransf.rotation * (origin_translation - reverse_origin_translation);
                 *global_transform = GlobalTransform::from(gtransf);
 
                 origin_state.previous = *origin;
@@ -157,9 +156,7 @@ pub fn apply_origin(
                 let origin_translation = origin.compute_translation(scaled_size);
 
                 let mut gtransf = global_transform.compute_transform();
-                gtransf.translation.x += origin_translation.x;
-                gtransf.translation.y += origin_translation.y;
-                gtransf.translation.z += origin_translation.z;
+                gtransf.translation += gtransf.rotation * origin_translation;
                 *global_transform = GlobalTransform::from(gtransf);
             }
         }
