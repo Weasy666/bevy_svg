@@ -53,7 +53,7 @@ impl AssetLoader for SvgAssetLoader {
             let mesh_handle = load_context.add_labeled_asset("mesh".to_string(), mesh);
             svg.mesh = mesh_handle;
             svg.gradient_image = svg
-                .gradient_image()
+                .build_gradient_image()
                 .map(|image| load_context.add_labeled_asset("gradients".to_string(), image));
 
             Ok(svg)

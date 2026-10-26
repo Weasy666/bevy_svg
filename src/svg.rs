@@ -107,10 +107,10 @@ impl Svg {
         buffer.convert()
     }
 
-    /// Creates the texture that the shader looks up [`Self::gradients`] in.
+    /// Builds the texture that the shader looks up [`Self::gradients`] in.
     ///
     /// Returns `None` if the SVG has no gradients.
-    pub fn gradient_image(&self) -> Option<Image> {
+    pub fn build_gradient_image(&self) -> Option<Image> {
         gradient::gradient_image(&self.gradients)
     }
 
