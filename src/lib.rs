@@ -13,6 +13,7 @@
 
 #![allow(clippy::type_complexity)]
 
+mod gradient;
 mod loader;
 #[cfg(any(feature = "2d", feature = "3d"))]
 mod origin;
@@ -21,7 +22,6 @@ mod plugin;
 mod render;
 mod resources;
 mod svg;
-mod util;
 
 /// Import this module as `use bevy_svg::prelude::*` to get convenient imports.
 pub mod prelude {

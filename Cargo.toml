@@ -27,7 +27,7 @@ copyless = "0.1"
 lyon_geom = "1.0"
 lyon_tessellation = "1.0"
 lyon_path = "1.0"
-usvg = "0.47"
+usvg = "0.49"
 svgtypes = "0.16"
 
 anyhow = "1.0"
@@ -44,6 +44,10 @@ path = "examples/2d/bsn.rs"
 [[example]]
 name = "2d_complex_one_color"
 path = "examples/2d/complex_one_color.rs"
+
+[[example]]
+name = "2d_gradient"
+path = "examples/2d/gradient.rs"
 
 [[example]]
 name = "2d_multiple_translation"
@@ -73,6 +77,10 @@ path = "examples/3d/bsn.rs"
 [[example]]
 name = "3d_complex_one_color"
 path = "examples/3d/complex_one_color.rs"
+
+[[example]]
+name = "3d_gradient"
+path = "examples/3d/gradient.rs"
 
 [[example]]
 name = "3d_multiple_perspective"
