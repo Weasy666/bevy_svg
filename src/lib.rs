@@ -32,7 +32,7 @@ pub mod prelude {
     pub use crate::render::Svg2d;
     #[cfg(feature = "3d")]
     pub use crate::render::Svg3d;
-    pub use crate::svg::Svg;
+    pub use crate::svg::{PathDescriptor, Svg};
     pub use lyon_tessellation::{
         FillOptions, FillRule, LineCap, LineJoin, Orientation, StrokeOptions,
     };
