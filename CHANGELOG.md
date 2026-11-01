@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Add `bsn` support ([#63](https://github.com/Weasy666/bevy_svg/pull/63)  Thanks @dardT)
+- Add `bsn` support ([#62](https://github.com/Weasy666/bevy_svg/pull/62)  Thanks @dardT)
+- Add `PathDescriptor` to prelude ([#66](https://github.com/Weasy666/bevy_svg/pull/66))
 
 ### Changed
 - Update bevy to `0.20` ([#63](https://github.com/Weasy666/bevy_svg/pull/63)  Thanks @codewing)
