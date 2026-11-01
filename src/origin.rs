@@ -3,7 +3,7 @@ use bevy::mesh::Mesh2d;
 #[cfg(feature = "3d")]
 use bevy::mesh::Mesh3d;
 use bevy::{
-    asset::{AssetId, Assets, Handle},
+    asset::{AssetId, Assets, Handle, StrongHandle},
     ecs::{
         component::Component,
         query::Changed,
@@ -23,6 +23,7 @@ use crate::render::Svg2d;
 use crate::render::Svg3d;
 
 use crate::svg::Svg;
+use std::sync::{Arc, Weak};
 
 #[derive(Clone, Component, Copy, Debug, Default, PartialEq, Reflect)]
 #[reflect(Component, Default, Debug, PartialEq)]
@@ -62,7 +63,7 @@ impl Origin {
 struct OriginOffset([FloatOrd; 2]);
 
 #[derive(Default, Resource)]
-pub(crate) struct OriginMeshes(HashMap<(AssetId<Svg>, OriginOffset), Handle<Mesh>>);
+pub(crate) struct OriginMeshes(HashMap<(AssetId<Svg>, OriginOffset), Weak<StrongHandle>>);
 
 impl OriginMeshes {
     pub(crate) fn remove_svg(&mut self, svg_id: AssetId<Svg>) {
@@ -84,14 +85,18 @@ impl OriginMeshes {
             svg_id,
             OriginOffset(translation.truncate().to_array().map(FloatOrd)),
         );
-        if let Some(handle) = self.0.get(&key) {
-            return handle.clone();
+        if let Some(handle) = self.0.get(&key).and_then(Weak::upgrade) {
+            return Handle::Strong(handle);
         }
+        self.0.retain(|_, handle| handle.strong_count() > 0);
         let Some(mesh) = meshes.get(&svg.mesh) else {
             return svg.mesh.clone();
         };
         let handle = meshes.add(mesh.clone().translated_by(translation));
-        self.0.insert(key, handle.clone());
+        let Handle::Strong(strong) = &handle else {
+            unreachable!("`Assets::add` returns a strong handle");
+        };
+        self.0.insert(key, Arc::downgrade(strong));
         handle
     }
 }
