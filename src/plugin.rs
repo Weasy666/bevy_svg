@@ -23,7 +23,7 @@ use bevy::{
     },
     log::debug,
     mesh::Mesh,
-    prelude::{Last, PostUpdate},
+    prelude::Last,
 };
 
 #[cfg(feature = "2d")]
@@ -33,7 +33,7 @@ use bevy::mesh::Mesh2d;
 use bevy::mesh::Mesh3d;
 
 use crate::{
-    origin,
+    origin::{self, Origin, OriginMeshes},
     render::{self, Svg2d, Svg3d},
     svg::Svg,
 };
@@ -47,7 +47,7 @@ pub struct SvgRenderPlugin;
 
 impl Plugin for SvgRenderPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostUpdate, origin::add_origin_state.in_set(SvgSet))
+        app.init_resource::<OriginMeshes>()
             .add_systems(Last, (origin::apply_origin, svg_mesh_linker.in_set(SvgSet)))
             .add_plugins(render::SvgPlugin);
     }
@@ -74,6 +74,7 @@ type SvgMeshComponents = (
     Entity,
     Option<&'static Svg2d>,
     Option<&'static Svg3d>,
+    &'static Origin,
     Option<&'static mut Mesh2d>,
     Option<&'static mut Mesh3d>,
 );
@@ -83,6 +84,7 @@ fn svg_mesh_linker(
     mut commands: Commands,
     mut svg_events: MessageReader<AssetEvent<Svg>>,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut origin_meshes: ResMut<OriginMeshes>,
     svgs: Res<Assets<Svg>>,
     mut query: Query<SvgMeshComponents>,
     changed_handles: Query<
@@ -94,54 +96,62 @@ fn svg_mesh_linker(
         match event {
             AssetEvent::Added { .. } => (),
             AssetEvent::LoadedWithDependencies { id } => {
-                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg_2d, svg_3d, ..)| {
-                    svg_2d
-                        .map(|x| x.0.id() == *id)
-                        .or_else(|| svg_3d.map(|x| x.0.id() == *id))
-                        .unwrap_or(false)
-                }) {
+                for (.., origin, mesh_2d, mesh_3d) in
+                    query.iter_mut().filter(|(_, svg_2d, svg_3d, ..)| {
+                        svg_2d
+                            .map(|x| x.0.id() == *id)
+                            .or_else(|| svg_3d.map(|x| x.0.id() == *id))
+                            .unwrap_or(false)
+                    })
+                {
                     let svg = svgs.get(*id).unwrap();
                     debug!(
                         "Svg `{}` created. Adding mesh component to entity.",
                         svg.name
                     );
+                    let target = origin_meshes.get_or_insert(*id, svg, origin, &mut meshes);
                     #[cfg(feature = "2d")]
                     if let Some(mut mesh) = mesh_2d {
-                        mesh.0 = svg.mesh.clone();
+                        mesh.0 = target.clone();
                     }
                     #[cfg(feature = "3d")]
                     if let Some(mut mesh) = mesh_3d {
-                        mesh.0 = svg.mesh.clone();
+                        mesh.0 = target;
                     }
                 }
             }
             AssetEvent::Modified { id } => {
-                for (.., mesh_2d, mesh_3d) in query.iter_mut().filter(|(_, svg_2d, svg_3d, ..)| {
-                    svg_2d
-                        .map(|x| x.0.id() == *id)
-                        .or_else(|| svg_3d.map(|x| x.0.id() == *id))
-                        .unwrap_or(false)
-                }) {
+                origin_meshes.remove_svg(*id);
+                for (.., origin, mesh_2d, mesh_3d) in
+                    query.iter_mut().filter(|(_, svg_2d, svg_3d, ..)| {
+                        svg_2d
+                            .map(|x| x.0.id() == *id)
+                            .or_else(|| svg_3d.map(|x| x.0.id() == *id))
+                            .unwrap_or(false)
+                    })
+                {
                     let svg = svgs.get(*id).unwrap();
                     debug!(
                         "Svg `{}` modified. Changing mesh component of entity.",
                         svg.name
                     );
+                    let target = origin_meshes.get_or_insert(*id, svg, origin, &mut meshes);
                     #[cfg(feature = "2d")]
-                    if let Some(mut mesh) = mesh_2d.filter(|mesh| mesh.0 != svg.mesh) {
+                    if let Some(mut mesh) = mesh_2d.filter(|mesh| mesh.0 != target) {
                         let old_mesh = mesh.0.clone();
-                        mesh.0 = svg.mesh.clone();
+                        mesh.0 = target.clone();
                         meshes.remove(&old_mesh);
                     }
                     #[cfg(feature = "3d")]
-                    if let Some(mut mesh) = mesh_3d.filter(|mesh| mesh.0 != svg.mesh) {
+                    if let Some(mut mesh) = mesh_3d.filter(|mesh| mesh.0 != target) {
                         let old_mesh = mesh.clone();
-                        mesh.0 = svg.mesh.clone();
+                        mesh.0 = target;
                         meshes.remove(&old_mesh);
                     }
                 }
             }
             AssetEvent::Removed { id } => {
+                origin_meshes.remove_svg(*id);
                 for (entity, ..) in query.iter_mut().filter(|(_, svg_2d, svg_3d, ..)| {
                     svg_2d
                         .map(|x| x.0.id() == *id)
@@ -159,7 +169,7 @@ fn svg_mesh_linker(
 
     // Ensure all correct meshes are set for entities which have had modified handles
     for entity in changed_handles.iter() {
-        let Ok((.., svg_2d, svg_3d, mesh_2d, mesh_3d)) = query.get_mut(entity) else {
+        let Ok((.., svg_2d, svg_3d, origin, mesh_2d, mesh_3d)) = query.get_mut(entity) else {
             continue;
         };
         let Some(handle) = svg_2d.map_or_else(|| svg_3d.map(|x| &x.0), |x| Some(&x.0)) else {
@@ -172,13 +182,14 @@ fn svg_mesh_linker(
             "Svg handle for entity `{:?}` modified. Changing mesh component of entity.",
             entity
         );
+        let target = origin_meshes.get_or_insert(handle.id(), svg, origin, &mut meshes);
         #[cfg(feature = "2d")]
         if let Some(mut mesh) = mesh_2d {
-            mesh.0 = svg.mesh.clone();
+            mesh.0 = target.clone();
         }
         #[cfg(feature = "3d")]
         if let Some(mut mesh) = mesh_3d {
-            mesh.0 = svg.mesh.clone();
+            mesh.0 = target;
         }
     }
 }
