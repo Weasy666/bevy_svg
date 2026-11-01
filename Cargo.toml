@@ -91,6 +91,10 @@ name = "3d_origin_check"
 path = "examples/3d/origin_check.rs"
 
 [[example]]
+name = "3d_origin_rotation"
+path = "examples/3d/origin_rotation.rs"
+
+[[example]]
 name = "3d_multiple_translation"
 path = "examples/3d/multiple_translation.rs"
 
